@@ -30,6 +30,15 @@ export default function Home() {
     setUser(null);
   };
 
+  const handleCallback = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUser(user);
+    } else {
+      console.error('No user found after sign-in');
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
