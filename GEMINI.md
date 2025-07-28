@@ -120,7 +120,7 @@ This project will be developed in structured stages to ensure organized progress
 
 ## 4. Commit Rules (Semantic Commits)
 
-To keep the Git history clean and readable, this project adopts **Semantic Commit Messages** standards. Each commit message must follow the format:
+All commits in this project **must** adhere to the Semantic Commit Messages standards to maintain a clean and readable Git history. Each commit message must follow the format:
 
 ```
 <type>(<scope>): <subject>
