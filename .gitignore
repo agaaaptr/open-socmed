@@ -1,0 +1,44 @@
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Production
+/dist
+/build
+
+# Next.js
+.next/
+
+# Go
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Turborepo
+.turbo/
