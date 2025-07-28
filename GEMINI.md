@@ -90,7 +90,11 @@ This project will be developed in structured stages to ensure organized progress
   * [x] Create `deploy.yml` for deploying `apps/web` to Vercel on merge to `main`.
   * [ ] (Future) Implement CI/CD for `apps/api` (e.g., to Render/Fly.io).
 
-* [ ] **Checkpoint 9: Core Feature Implementation (Planned)**
+
+* [ ] **Checkpoint 9: Linting Issue Investigation (Ongoing)**
+  * [x] Removed `.markdownlint.json` and `.vscode/settings.json` as they did not resolve the `markdownlint-cli2` error.
+  * [ ] Further investigation needed for `markdownlint-cli2` error with `package.json`.
+* [ ] **Checkpoint 10: Core Feature Implementation (Planned)**
   * [x] Refactored folder structure: `apps/web` to `apps/frontend` and `apps/api` to `apps/backend`.
   * [ ] Implement user authentication (signup, login, logout) in `apps/web`.
   * [ ] Implement user profile management (create, read, update) via `apps/api`.
@@ -99,7 +103,7 @@ This project will be developed in structured stages to ensure organized progress
   * [ ] Implement like/unlike functionality.
   * [ ] Implement follow/unfollow functionality.
 
-* [ ] **Checkpoint 10: Testing (Planned)**
+* [ ] **Checkpoint 11: Testing (Planned)**
   * [ ] Write unit tests for `apps/web` components and logic.
   * [ ] Write integration tests for `apps/api` endpoints.
   * [ ] Configure test runners (e.g., Vitest for Next.js, Go testing for API).

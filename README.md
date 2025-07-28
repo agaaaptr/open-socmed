@@ -73,6 +73,10 @@ npm run build
 
 ### 7. Linting and Formatting
 
+This project uses ESLint for JavaScript/TypeScript linting (`npm run lint`) and Prettier for code formatting (`npm run format`).
+
+Additionally, `markdownlint-cli2` is used for linting Markdown files. If you encounter errors related to `markdownlint-cli2` trying to parse non-Markdown files (e.g., `package.json`), a `.markdownlint.json` file has been added to the project root to ignore these files.
+
 ```bash
 npm run lint
 npm run format
