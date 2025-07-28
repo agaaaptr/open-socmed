@@ -65,4 +65,11 @@ func main() {
 
 	log.Printf("Server starting on port %s", port)
 	log.Fatal(r.Run(fmt.Sprintf(":%s", port)))
+	
+
+}
+
+
+func main() {
+	// Rest of your main function...
 }

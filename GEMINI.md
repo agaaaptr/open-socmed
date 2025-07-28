@@ -94,26 +94,80 @@ This project will be developed in structured stages to ensure organized progress
 * [ ] **Checkpoint 9: Linting Issue Investigation (Ongoing)**
   * [x] Removed `.markdownlint.json` and `.vscode/settings.json` as they did not resolve the `markdownlint-cli2` error.
   * [ ] Further investigation needed for `markdownlint-cli2` error with `package.json`.
-* [ ] **Checkpoint 10: Core Feature Implementation (Planned)**
-  * [x] Refactored folder structure: `apps/web` to `apps/frontend` and `apps/api` to `apps/backend`.
-  * [ ] Implement user authentication (signup, login, logout) in `apps/web`.
-  * [ ] Implement user profile management (create, read, update) via `apps/api`.
-  * [ ] Implement post creation, retrieval, update, deletion.
-  * [ ] Implement comment functionality.
-  * [ ] Implement like/unlike functionality.
-  * [ ] Implement follow/unfollow functionality.
+* [ ] **Checkpoint 10: Backend Core Feature Implementation (Planned)**
+  * [ ] Implement user profile management (create, read, update).
+  * [ ] Implement post creation, retrieval, update, and deletion (CRUD).
+  * [ ] Implement comment creation and retrieval for posts.
+  * [ ] Implement like/unlike functionality for posts.
+  * [ ] Implement follow/unfollow functionality between users.
 
-* [ ] **Checkpoint 11: Testing (Planned)**
-  * [ ] Write unit tests for `apps/web` components and logic.
-  * [ ] Write integration tests for `apps/api` endpoints.
-  * [ ] Configure test runners (e.g., Vitest for Next.js, Go testing for API).
+* [ ] **Checkpoint 11: Frontend Core Feature Implementation (Planned)**
+  * [ ] Implement user authentication (signup, login, logout) connecting to Supabase and backend.
+  * [ ] Build UI for user profile management.
+  * [ ] Build UI for creating, viewing, and interacting with posts (comments, likes).
+  * [ ] Build UI for viewing user lists and implementing follow/unfollow actions.
 
-* [ ] **Checkpoint 11: UI/UX Enhancements (Planned)**
+* [ ] **Checkpoint 12: Backend Testing (Planned)**
+  * [ ] Write integration tests for all `apps/backend` API endpoints.
+  * [ ] Configure Go testing framework.
+
+* [ ] **Checkpoint 13: Frontend Testing (Planned)**
+  * [ ] Write unit tests for `apps/frontend` components and logic.
+  * [ ] Configure test runner (e.g., Vitest for Next.js).
+
+* [ ] **Checkpoint 14: Backend - Week 1 Development Plan (Planned)**
+  * [ ] **Day 1: Setup & Database Models**
+    * [ ] Understand existing code: `apps/backend/main.go` and `supabase_schema.sql`.
+    * [ ] Create `apps/backend/models` directory.
+    * [ ] Define GORM model structs for `users`, `posts`, `comments`, `likes`, and `follows` in separate files within the `models` directory.
+  * [ ] **Day 2: User Endpoints & DB Migration**
+    * [ ] Add `db.AutoMigrate()` in `main.go` to sync models with the Supabase DB.
+    * [ ] Create `apps/backend/controllers` directory and a `users.go` file inside.
+    * [ ] Implement `CreateUser`, `GetUser`, and `UpdateUser` functions.
+    * [ ] Register user routes (`POST /users`, `GET /users/:id`, `PUT /users/:id`) in `main.go`.
+  * [ ] **Day 3: Post Endpoints (CRUD)**
+    * [ ] Create `posts.go` in the `controllers` directory.
+    * [ ] Implement full CRUD functions: `CreatePost`, `GetPosts`, `GetPost`, `UpdatePost`, `DeletePost`.
+    * [ ] Register post routes (`POST /posts`, `GET /posts`, etc.) in `main.go`.
+  * [ ] **Day 4: Comment & Like Endpoints**
+    * [ ] Create `comments.go` and `likes.go` in the `controllers` directory.
+    * [ ] Implement functions to create/read comments and like/unlike posts.
+    * [ ] Register routes: `POST /posts/:id/comments`, `GET /posts/:id/comments`, `POST /posts/:id/like`.
+  * [ ] **Day 5: Follow Endpoints & Initial Testing**
+    * [ ] Create `follows.go` in the `controllers` directory.
+    * [ ] Implement `FollowUser` and `UnfollowUser` functions.
+    * [ ] Register follow routes (`POST /users/:id/follow`).
+    * [ ] Perform initial manual testing on all created endpoints using `curl` or Postman.
+
+* [ ] **Checkpoint 15: Frontend - Week 1 Development Plan (Planned)**
+  * [ ] **Day 1: Setup & Authentication UI**
+    * [ ] Understand the existing frontend structure in `apps/frontend`.
+    * [ ] Review `supabase_schema.sql` to understand the data structure.
+    * [ ] Implement the UI for Login and Signup pages using shared UI components.
+    * [ ] Use the Supabase Auth client (`@supabase/auth-helpers-nextjs`) to handle user registration and login.
+  * [ ] **Day 2: User Profile & State Management**
+    * [ ] Create a dynamic user profile page to display user information.
+    * [ ] Integrate React Query to manage server state for fetching data from the backend.
+    * [ ] Create a custom hook (e.g., `useUser.ts`) to fetch user data from the backend API (`GET /api/users/:id`).
+  * [ ] **Day 3: Post Feed & Creation UI**
+    * [ ] Build the main feed component to display a list of posts fetched from the backend.
+    * [ ] Create a custom hook (`usePosts.ts`) to fetch posts (`GET /api/posts`).
+    * [ ] Create a form/modal component to allow users to create a new post (calling `POST /api/posts`).
+  * [ ] **Day 4: Post Interaction (Comments & Likes)**
+    * [ ] On the post component, add a button to like/unlike a post (calling `POST /api/posts/:id/like`).
+    * [ ] Add a section to display comments for a post (calling `GET /api/posts/:id/comments`).
+    * [ ] Add a form to allow users to submit a new comment (calling `POST /api/posts/:id/comments`).
+  * [ ] **Day 5: Follow Functionality & UI Polish**
+    * [ ] On the user profile page, add a "Follow"/"Unfollow" button.
+    * [ ] Hook the button to the corresponding backend API endpoint (`POST /api/users/:id/follow`).
+    * [ ] Begin polishing the UI, ensuring components are responsive and user-friendly.
+
+* [ ] **Checkpoint 16: UI/UX Enhancements (Planned)**
   * [ ] Design and implement responsive layouts.
   * [ ] Enhance shared UI components.
   * [ ] Implement notifications and real-time updates using Supabase Realtime.
 
-* [ ] **Checkpoint 12: Deployment Optimization (Planned)**
+* [ ] **Checkpoint 17: Deployment Optimization (Planned)**
   * [ ] Optimize Next.js build for production.
   * [ ] Containerize Go API (Docker) for easier deployment.
   * [ ] Configure `apps/api` deployment to Render/Fly.io.
