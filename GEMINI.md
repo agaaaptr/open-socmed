@@ -81,6 +81,9 @@ This project will be developed in structured stages to ensure organized progress
   - [x] Added `supabase_schema_deploy` job to automatically push schema on `master` branch pushes.
   - [x] Temporarily disabled `supabase_schema_deploy` and `backend_deploy` jobs in `ci-cd.yml`.
   - [x] Fixed YAML syntax error in `ci-cd.yml` (`needs: []` removed).
+  - [x] Corrected Vercel deployment command in `ci-cd.yml` to use `vercel deploy` directly.
+  - [x] Added `--yes` argument to `vercel deploy` command in `ci-cd.yml` for automatic confirmation.
+  - [x] Updated Node.js version to `22.17.0` in `ci-cd.yml`.
 
 - [x] **Checkpoint 9: Frontend Landing Page & Auth Integration (Completed)**
   - [x] Redesigned `apps/frontend/app/page.tsx` for a modern, social media-like landing page.
