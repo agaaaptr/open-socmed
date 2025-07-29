@@ -42,15 +42,17 @@
 
 This project will be developed in structured stages to ensure organized progress.
 
-* [x] **Checkpoint 1: Monorepo Initialization & Basic Structure (Completed)**
+### 3.1. General Monorepo Setup & Core Infrastructure
 
-* [x] **Checkpoint 2: Frontend (`apps/frontend`) Setup (Completed)**
+* [x] **Checkpoint 1.1: Monorepo Initialization & Basic Structure (Completed)**
 
-* [x] **Checkpoint 3: Backend (`apps/backend`) Setup (Completed)**
+* [x] **Checkpoint 1.2: Frontend (`apps/frontend`) Setup (Completed)**
 
-* [x] **Checkpoint 4: Shared UI (`packages/ui`) Setup (Completed)**
+* [x] **Checkpoint 1.3: Backend (`apps/backend`) Setup (Completed)**
 
-* [x] **Checkpoint 5: Project Restructuring & Repair (Completed)**
+* [x] **Checkpoint 1.4: Shared UI (`packages/ui`) Setup (Completed)**
+
+* [x] **Checkpoint 1.5: Project Restructuring & Repair (Completed)**
   * [x] **Backend: Fix Compilation & Structure**
     * [x] Removed duplicate `main()` function in `apps/backend/main.go`.
     * [x] Restructured backend into `models` and `controllers` directories.
@@ -64,11 +66,11 @@ This project will be developed in structured stages to ensure organized progress
   * [x] **Configuration: Shared Tooling**
     * [x] Added `dotenv-cli` for loading `.env` files in development.
 
-* [x] **Checkpoint 6: Supabase Schema & RLS (Completed)**
+* [x] **Checkpoint 1.6: Supabase Schema & RLS (Completed)**
 
-* [x] **Checkpoint 7: Turborepo Pipeline Configuration (Completed)**
+* [x] **Checkpoint 1.7: Turborepo Pipeline Configuration (Completed)**
 
-* [x] **Checkpoint 8: GitHub Actions CI/CD (Completed)**
+* [x] **Checkpoint 1.8: GitHub Actions CI/CD (Completed)**
   * [x] Consolidated `ci.yml` and `deploy.yml` into a single `ci-cd.yml`.
   * [x] Configured separate build and deploy jobs for frontend and backend.
   * [x] Set up triggers for `push` and `pull_request` on `master` branch.
@@ -81,46 +83,76 @@ This project will be developed in structured stages to ensure organized progress
   * [x] Removed `--prebuilt` option from `vercel deploy` command in `ci-cd.yml`.
   * [x] Removed `working-directory` from Vercel deploy step in `ci-cd.yml`.
 
-* [x] **Checkpoint 9: Frontend Landing Page & Auth Integration (Completed)**
+* [x] **Checkpoint 1.9: Vercel Project Duplication Troubleshooting (Completed)**
+  * [x] Identified common causes for duplicate Vercel projects (manual import, missing project IDs in CI/CD).
+  * [x] Provided steps to identify the correct Vercel project, update GitHub Actions secrets (`VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`), and delete unintended duplicate projects.
+
+* [x] **Checkpoint 1.10: Git Branching Strategy (Completed)**
+  * [x] Implemented `develop` branch for development, keeping `master` for production.
+  * [x] Configured CI/CD for `develop` branch (`ci-cd-develop.yml`) to perform linting, building, and testing only.
+
+### 3.2. Frontend Development Plan
+
+* [x] **Checkpoint 2.1: Frontend Landing Page & Auth Integration (Completed)**
   * [x] Redesigned `apps/frontend/app/page.tsx` for a modern, social media-like landing page.
   * [x] Integrated email/password sign-in/sign-up.
   * [x] Integrated Google OAuth sign-in.
 
-* [x] **Checkpoint 10: Frontend UI/UX Redesign (Completed)**
+* [x] **Checkpoint 2.2: Frontend UI/UX Redesign (Completed)**
   * [x] Configured Tailwind CSS for default dark mode.
   * [x] Applied dark mode to `app/layout.tsx`.
   * [x] Separated sign-in and sign-up into `app/auth/login/page.tsx` and `app/auth/signup/page.tsx`.
   * [x] Redesigned `app/page.tsx` as a modern landing page with header navigation for sign-in/sign-up.
   * [x] Changed brand name from "Open Socmed" to "Cirqle" in frontend.
 
-* [x] **Checkpoint 11: Vercel Project Duplication Troubleshooting (Completed)**
-  * [x] Identified common causes for duplicate Vercel projects (manual import, missing project IDs in CI/CD).
-  * [x] Provided steps to identify the correct Vercel project, update GitHub Actions secrets (`VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`), and delete unintended duplicate projects.
+* [x] **Checkpoint 2.3: Frontend Title and Icon (Completed)**
+  * [x] Updated `metadata.title` in `app/layout.tsx` to "Cirqle".
+  * [ ] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
 
-* [x] **Checkpoint 12: Git Branching Strategy (New)**
-  * [x] Implemented `develop` branch for development, keeping `master` for production.
-  * [x] Configured CI/CD for `develop` branch (`ci-cd-develop.yml`) to perform linting, building, and testing only.
-  * [ ] **Next Steps:** Set up separate Supabase project and backend instances for staging.
+* [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (Planned)**
+  * [ ] Implement user authentication (signup, login, logout) connecting to Supabase and backend.
+  * [ ] Build UI for user profile management.
+  * [ ] Build UI for creating, viewing, and interacting with posts (comments, likes).
+  * [ ] Build UI for viewing user lists and implementing follow/unfollow actions.
 
-* [ ] **Checkpoint 13: Supabase Schema Deployment (Pending)**
+* [ ] **Checkpoint 2.5: Frontend Testing (Planned)**
+  * [ ] Write unit tests for `apps/frontend` components and logic.
+  * [ ] Configure test runner (e.g., Vitest for Next.js).
+
+### 3.3. Backend Development Plan
+
+* [ ] **Checkpoint 3.1: Backend Core Feature Implementation (Planned)**
+  * [ ] Implement user profile management (create, read, update).
+  * [ ] Implement post creation, retrieval, update, and deletion (CRUD).
+  * [ ] Implement comment creation and retrieval for posts.
+  * [ ] Implement like/unlike functionality for posts.
+  * [ ] Implement follow/unfollow functionality between users.
+
+* [ ] **Checkpoint 3.2: Backend Testing (Planned)**
+  * [ ] Write integration tests for all `apps/backend` API endpoints.
+  * [ ] Configure Go testing framework.
+
+### 3.4. Cross-Cutting Concerns & Future Enhancements
+
+* [ ] **Checkpoint 4.1: Supabase Schema Deployment (Pending)**
   * [ ] Enable `supabase_schema_deploy` job in `ci-cd.yml`.
   * [ ] Ensure `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` GitHub secrets are configured.
+  * [ ] **To Do:** Set up separate Supabase project for staging environment.
 
-* [ ] **Checkpoint 14: Backend Integration (Pending)**
-  * [ ] Implement core backend features (users, posts, comments, likes, follows).
-  * [ ] Integrate frontend with backend API endpoints.
-
-* [ ] **Checkpoint 15: Backend Deployment (Pending)**
+* [ ] **Checkpoint 4.2: Backend Deployment (Pending)**
   * [ ] Enable `backend_deploy` job in `ci-cd.yml`.
   * [ ] Implement actual deployment steps for the backend (e.g., to Render).
+  * [ ] **To Do:** Set up separate backend instances for staging environment.
 
-* [ ] **Checkpoint 16: Backend Testing (Planned)**
+* [ ] **Checkpoint 4.3: UI/UX Enhancements (Planned)**
+  * [ ] Design and implement responsive layouts.
+  * [ ] Enhance shared UI components.
+  * [ ] Implement notifications and real-time updates using Supabase Realtime.
 
-* [ ] **Checkpoint 17: Frontend Testing (Planned)**
-
-* [ ] **Checkpoint 18: UI/UX Enhancements (Planned)**
-
-* [ ] **Checkpoint 19: Deployment Optimization (Planned)**
+* [ ] **Checkpoint 4.4: Deployment Optimization (Planned)**
+  * [ ] Optimize Next.js build for production.
+  * [ ] Containerize Go API (Docker) for easier deployment.
+  * [ ] Configure `apps/api` deployment to Render/Fly.io.
 
 ## 4. Commit Rules (Semantic Commits)
 
