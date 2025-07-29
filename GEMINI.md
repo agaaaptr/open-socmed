@@ -84,31 +84,39 @@ This project will be developed in structured stages to ensure organized progress
   - [x] Corrected Vercel deployment command in `ci-cd.yml` to use `vercel deploy` directly.
   - [x] Added `--yes` argument to `vercel deploy` command in `ci-cd.yml` for automatic confirmation.
   - [x] Updated Node.js version to `22.17.0` in `ci-cd.yml`.
+  - [x] Removed `--prebuilt` option from `vercel deploy` command in `ci-cd.yml`.
 
 - [x] **Checkpoint 9: Frontend Landing Page & Auth Integration (Completed)**
   - [x] Redesigned `apps/frontend/app/page.tsx` for a modern, social media-like landing page.
   - [x] Integrated email/password sign-in/sign-up.
   - [x] Integrated Google OAuth sign-in.
 
-- [ ] **Checkpoint 10: Supabase Schema Deployment (Pending)**
+- [x] **Checkpoint 10: Frontend UI/UX Redesign (Completed)**
+  - [x] Configured Tailwind CSS for default dark mode.
+  - [x] Applied dark mode to `app/layout.tsx`.
+  - [x] Separated sign-in and sign-up into `app/auth/login/page.tsx` and `app/auth/signup/page.tsx`.
+  - [x] Redesigned `app/page.tsx` as a modern landing page with header navigation for sign-in/sign-up.
+  - [x] Changed brand name from "Open Socmed" to "Cirqle" in frontend.
+
+- [ ] **Checkpoint 11: Supabase Schema Deployment (Pending)**
   - [ ] Enable `supabase_schema_deploy` job in `ci-cd.yml`.
   - [ ] Ensure `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` GitHub secrets are configured.
 
-- [ ] **Checkpoint 11: Backend Integration (Pending)**
+- [ ] **Checkpoint 12: Backend Integration (Pending)**
   - [ ] Implement core backend features (users, posts, comments, likes, follows).
   - [ ] Integrate frontend with backend API endpoints.
 
-- [ ] **Checkpoint 12: Backend Deployment (Pending)**
+- [ ] **Checkpoint 13: Backend Deployment (Pending)**
   - [ ] Enable `backend_deploy` job in `ci-cd.yml`.
   - [ ] Implement actual deployment steps for the backend (e.g., to Render).
 
-- [ ] **Checkpoint 13: Backend Testing (Planned)**
+- [ ] **Checkpoint 14: Backend Testing (Planned)**
 
-- [ ] **Checkpoint 14: Frontend Testing (Planned)**
+- [ ] **Checkpoint 15: Frontend Testing (Planned)**
 
-- [ ] **Checkpoint 15: UI/UX Enhancements (Planned)**
+- [ ] **Checkpoint 16: UI/UX Enhancements (Planned)**
 
-- [ ] **Checkpoint 16: Deployment Optimization (Planned)**
+- [ ] **Checkpoint 17: Deployment Optimization (Planned)**
 
 ## 4. Commit Rules (Semantic Commits)
 
