@@ -98,25 +98,29 @@ This project will be developed in structured stages to ensure organized progress
   - [x] Redesigned `app/page.tsx` as a modern landing page with header navigation for sign-in/sign-up.
   - [x] Changed brand name from "Open Socmed" to "Cirqle" in frontend.
 
-- [ ] **Checkpoint 11: Supabase Schema Deployment (Pending)**
+- [x] **Checkpoint 11: Vercel Project Duplication Troubleshooting (Completed)**
+  - [x] Identified common causes for duplicate Vercel projects (manual import, missing project IDs in CI/CD).
+  - [x] Provided steps to identify the correct Vercel project, update GitHub Actions secrets (`VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`), and delete unintended duplicate projects.
+
+- [ ] **Checkpoint 12: Supabase Schema Deployment (Pending)**
   - [ ] Enable `supabase_schema_deploy` job in `ci-cd.yml`.
   - [ ] Ensure `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` GitHub secrets are configured.
 
-- [ ] **Checkpoint 12: Backend Integration (Pending)**
+- [ ] **Checkpoint 13: Backend Integration (Pending)**
   - [ ] Implement core backend features (users, posts, comments, likes, follows).
   - [ ] Integrate frontend with backend API endpoints.
 
-- [ ] **Checkpoint 13: Backend Deployment (Pending)**
+- [ ] **Checkpoint 14: Backend Deployment (Pending)**
   - [ ] Enable `backend_deploy` job in `ci-cd.yml`.
   - [ ] Implement actual deployment steps for the backend (e.g., to Render).
 
-- [ ] **Checkpoint 14: Backend Testing (Planned)**
+- [ ] **Checkpoint 15: Backend Testing (Planned)**
 
-- [ ] **Checkpoint 15: Frontend Testing (Planned)**
+- [ ] **Checkpoint 16: Frontend Testing (Planned)**
 
-- [ ] **Checkpoint 16: UI/UX Enhancements (Planned)**
+- [ ] **Checkpoint 17: UI/UX Enhancements (Planned)**
 
-- [ ] **Checkpoint 17: Deployment Optimization (Planned)**
+- [ ] **Checkpoint 18: Deployment Optimization (Planned)**
 
 ## 4. Commit Rules (Semantic Commits)
 
