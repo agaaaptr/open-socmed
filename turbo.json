@@ -2,12 +2,22 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*"],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
+    "api#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
     "lint": {},
+    "api#dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["DATABASE_URL", "PORT"],
+      "passThroughEnv": ["DATABASE_URL", "PORT"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

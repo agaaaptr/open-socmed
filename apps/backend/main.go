@@ -1,24 +1,27 @@
-
 package main
 
 import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
+
+	"github.com/yourusername/open-socmed/apps/backend/controllers"
+	"github.com/yourusername/open-socmed/apps/backend/models"
 )
 
-type User struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Username string `gorm:"unique" json:"username"`
-	Email    string `gorm:"unique" json:"email"`
-}
-
 func main() {
+	// Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, using environment variables")
+	}
+
 	// Database connection
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -31,7 +34,7 @@ func main() {
 	}
 
 	// Auto-migrate the schema
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&models.User{})
 
 	// Gin router setup
 	r := gin.Default()
@@ -42,21 +45,8 @@ func main() {
 	})
 
 	// User routes
-	r.GET("/users", func(c *gin.Context) {
-		var users []User
-		db.Find(&users)
-		c.JSON(http.StatusOK, users)
-	})
-
-	r.POST("/users", func(c *gin.Context) {
-		var newUser User
-		if err := c.ShouldBindJSON(&newUser); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		db.Create(&newUser)
-		c.JSON(http.StatusCreated, newUser)
-	})
+	r.GET("/users", controllers.GetUsers(db))
+	r.POST("/users", controllers.CreateUser(db))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -65,11 +55,4 @@ func main() {
 
 	log.Printf("Server starting on port %s", port)
 	log.Fatal(r.Run(fmt.Sprintf(":%s", port)))
-	
-
-}
-
-
-func main() {
-	// Rest of your main function...
 }

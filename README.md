@@ -1,93 +1,90 @@
 # open-socmed
 
-This is a full-stack social media platform built as a monorepo using Turborepo.
+A full-stack social media platform built with a Turborepo monorepo, Next.js, Go, and Supabase.
 
-## Project Structure
+## Overview
 
-- `apps/web`: The frontend application built with Next.js (TypeScript), Tailwind CSS, Headless UI, React Query, and Supabase Auth.
-- `apps/api`: The backend API built with Go (Gin, GORM) and connected to Supabase PostgreSQL.
-- `packages/ui`: A shared library for React/Tailwind components.
+This project is a monorepo containing:
+
+- `apps/frontend`: A Next.js web application for the user-facing social media experience.
+- `apps/backend`: A Go API that serves data to the frontend.
+- `packages/ui`: A shared React component library.
+
+## Tech Stack
+
+- **Monorepo:** Turborepo & npm Workspaces
+- **Frontend:** Next.js, TypeScript, Tailwind CSS, React Query, Supabase (for Auth)
+- **Backend:** Go, Gin, GORM
+- **Database:** Supabase (PostgreSQL)
+
+---
 
 ## Getting Started
 
-### 1. Clone the repository
+Follow these steps to get the project running locally.
+
+### 1. Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [Go](https://go.dev/) (v1.22 or later)
+- [npm](https://www.npmjs.com/)
+
+### 2. Clone & Install
+
+Clone the repository and install all dependencies from the root directory.
 
 ```bash
-git clone [your-repo-url]
+git clone https://github.com/yourusername/open-socmed.git
 cd open-socmed
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
 ```
 
 ### 3. Supabase Setup
 
-1.  Create a new project on [Supabase](https://supabase.com/).
-2.  In your Supabase dashboard, navigate to "SQL Editor" and run the `supabase_schema.sql` script located in the root of this project. This will set up your database tables and Row Level Security (RLS) policies.
-3.  Get your Supabase URL and Anon Key from "Project Settings" -> "API".
-4.  Get your Database Connection String from "Project Settings" -> "Database".
+You need a Supabase project to handle the database and authentication.
+
+1.  **Create a Project:** Go to [supabase.com](https://supabase.com) and create a new project.
+2.  **Run the Schema:** In your Supabase project's SQL Editor, run the entire script from `supabase_schema.sql` (located in the project root). This will create the necessary tables and policies.
+3.  **Get Credentials:**
+    -   **API URL & Anon Key:** Find these in `Project Settings > API`.
+    -   **Database Connection String:** Find this in `Project Settings > Database`.
 
 ### 4. Environment Variables
 
-Create `.env.local` files in the respective application directories and populate them with your Supabase credentials:
+Copy the `.env.example` files to `.env.local` in both the `apps/frontend` and `apps/backend` directories.
 
-#### `apps/web/.env.local`
-
+**File: `apps/frontend/.env.local`**
 ```
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-#### `apps/api/.env.local`
-
+**File: `apps/backend/.env.local`**
 ```
-DATABASE_URL=YOUR_DATABASE_URL
+# Make sure to use the connection string for a session pool
+DATABASE_URL=YOUR_DATABASE_CONNECTION_STRING
 PORT=8080
 ```
 
-### 5. Running the Applications
+### 5. Run the Development Servers
 
-#### Frontend (Next.js)
-
-```bash
-npm run dev --workspace=apps/web
-```
-
-#### Backend (Go)
+Run the frontend and backend applications concurrently using Turborepo from the root directory.
 
 ```bash
-cd apps/api
-go run main.go
+npm run dev
 ```
 
-### 6. Building the Project
+This will start:
+- The Next.js frontend on `http://localhost:3000`
+- The Go backend on `http://localhost:8080`
 
-To build all applications in the monorepo:
+---
 
-```bash
-npm run build
-```
+## Monorepo Commands
 
-### 7. Linting and Formatting
+From the root directory:
 
-This project uses ESLint for JavaScript/TypeScript linting (`npm run lint`) and Prettier for code formatting (`npm run format`).
-
-Additionally, `markdownlint-cli2` is used for linting Markdown files. If you encounter errors related to `markdownlint-cli2` trying to parse non-Markdown files (e.g., `package.json`), a `.markdownlint.json` file has been added to the project root to ignore these files.
-
-```bash
-npm run lint
-npm run format
-```
-
-## Deployment
-
-### Frontend (Next.js) - Vercel
-
-This project is configured for deployment to Vercel. Ensure you have the `VERCEL_TOKEN` set as a GitHub Secret in your repository. The `deploy.yml` GitHub Actions workflow will automatically deploy `apps/frontend` to Vercel on merges to the `main` branch.
-
-### Backend (Go) - Render/Fly.io (Recommended)
-
-For the Go API, it is recommended to deploy to platforms like [Render](https://render.com/) or [Fly.io](https://fly.io/) as they are better suited for long-running Go applications. A separate CI/CD pipeline would typically be set up for the Go application on your chosen platform.
+- `npm run dev`: Starts all apps in development mode.
+- `npm run build`: Builds all apps for production.
+- `npm run lint`: Lints all code in the monorepo.
+- `npm run format`: Formats all code with Prettier.
