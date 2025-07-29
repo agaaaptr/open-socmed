@@ -1,0 +1,64 @@
+name: CI/CD for Develop Branch
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Turborepo Lint
+        run: npx turbo lint
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Turborepo Build
+        run: npx turbo build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests (Placeholder)
+        run: echo "No tests configured yet. Add your test commands here (e.g., npx turbo test)"
+        # Example: npx turbo test
