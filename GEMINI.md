@@ -99,7 +99,7 @@ This project will be developed in structured stages to ensure organized progress
 
 * [x] **Checkpoint 12: Git Branching Strategy (New)**
   * [x] Implemented `develop` branch for development, keeping `master` for production.
-  * [ ] **Next Steps:** Configure CI/CD for `develop` branch to deploy to staging environments.
+  * [x] Configured CI/CD for `develop` branch (`ci-cd-develop.yml`) to perform linting, building, and testing only.
   * [ ] **Next Steps:** Set up separate Supabase project and backend instances for staging.
 
 * [ ] **Checkpoint 13: Supabase Schema Deployment (Pending)**

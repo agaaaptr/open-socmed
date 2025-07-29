@@ -97,7 +97,12 @@ From the root directory:
 
 ## CI/CD & Deployment
 
-This project uses GitHub Actions for CI/CD, deploying the frontend to Vercel.
+This project uses GitHub Actions for CI/CD.
+
+### Branching Strategy
+
+- **`master` branch:** Used for production deployments. CI/CD pipeline (`.github/workflows/ci-cd.yml`) will lint, build, and deploy the frontend to Vercel.
+- **`develop` branch:** Used for active development. CI/CD pipeline (`.github/workflows/ci-cd-develop.yml`) will only perform linting, building, and testing.
 
 ### GitHub Actions Secrets
 
@@ -111,7 +116,39 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 
 ### Deployment Flow
 
-- Pushing to the `master` branch triggers the CI/CD pipeline.
-- The pipeline runs linting and build steps for both frontend and backend.
-- The frontend is then automatically deployed to Vercel.
+- Pushing to the `master` branch triggers the CI/CD pipeline for production deployment.
+- Pushing to the `develop` branch triggers the CI/CD pipeline for linting, building, and testing only.
 - Supabase schema deployment and backend deployment are currently disabled in the CI/CD pipeline.
+
+## Local Development on `develop` Branch
+
+When working on the `develop` branch, you will primarily run the applications locally to test your changes.
+
+1.  **Switch to `develop` branch:**
+    ```bash
+    git checkout develop
+    ```
+2.  **Install dependencies (if you haven't recently):**
+    ```bash
+    npm install
+    ```
+3.  **Run Linting:**
+    ```bash
+    npx turbo lint
+    ```
+4.  **Run Build:**
+    ```bash
+    npx turbo build
+    ```
+5.  **Run Tests (if configured):**
+    ```bash
+    # If you have test scripts defined in your package.json files
+    # npx turbo test
+    ```
+6.  **Run the applications locally:**
+    ```bash
+    npm run dev
+    ```
+    This will start the frontend on `http://localhost:3000` and the backend on `http://localhost:8080`.
+
+Once your changes are stable on `develop` and have been thoroughly tested locally, you can create a Pull Request from `develop` to `master` to initiate the production deployment.
