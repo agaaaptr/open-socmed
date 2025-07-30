@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.local -- go run main.go",
-    "build": "cross-env GOCACHE=./.go-cache go build -o dist/main main.go"
+    "build": "go build -o dist/main main.go"
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
