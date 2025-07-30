@@ -80,7 +80,7 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* Footer */}
+      {/* Footer Content */}
       <footer className="w-full p-4 bg-gray-800 text-center text-gray-500 text-sm">
         &copy; {new Date().getFullYear()} Cirqle. All rights reserved.
       </footer>
