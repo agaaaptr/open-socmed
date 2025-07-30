@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"github.com/yourusername/open-socmed/apps/backend/models"
+	"github.com/agaaaptr/open-socmed/apps/backend/models"
 )
 
 func GetUsers(db *gorm.DB) gin.HandlerFunc {

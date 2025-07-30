@@ -1,37 +1,35 @@
 'use client';
 
-// import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useState } from 'react';
 import Link from 'next/link';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  // const supabase = createClientComponentClient();
-  // const router = useRouter();
+  const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    // const { error } = await supabase.auth.signInWithPassword({ email, password });
-    // if (error) {
-    //   setError(error.message);
-    // } else {
-    //   router.push('/'); // Redirect to home after successful login
-    // }
-    setError('Sign-in is temporarily disabled. Backend integration pending.');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
+    } else {
+      router.push('/'); // Redirect to home after successful login
+    }
   };
 
   const handleGoogleSignIn = async () => {
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'google',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // });
-    setError('Google Sign-in is temporarily disabled. Backend integration pending.');
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   };
 
   return (

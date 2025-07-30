@@ -1,4 +1,4 @@
-module github.com/yourusername/open-socmed/apps/backend
+module github.com/agaaaptr/open-socmed/apps/backend
 
 go 1.23
 

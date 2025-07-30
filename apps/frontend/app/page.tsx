@@ -1,36 +1,29 @@
 'use client';
 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
 
 export default function HomePage() {
-  // Supabase integration temporarily disabled for frontend-only deployment
-  // const [user, setUser] = useState<any>(null);
-  // const supabase = createClientComponentClient();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClientComponentClient();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined') {
-  //     const supabaseClient = createClientComponentClient();
-  //     setSupabase(supabaseClient);
+  useEffect(() => {
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    getUser();
+  }, [supabase]);
 
-  //     async function getUser() {
-  //       const { data: { user } } = await supabaseClient.auth.getUser();
-  //       setUser(user);
-  //     }
-  //     getUser();
-  //   }
-  // }, []);
-
-  // const handleSignOut = async () => {
-  //   if (!supabase) return;
-  //   await supabase.auth.signOut();
-  //   setUser(null);
-  //   router.push('/');
-  // };
-
-  const user = null; // Simulate no user logged in for now
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">

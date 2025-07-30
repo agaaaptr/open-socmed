@@ -1,38 +1,42 @@
 'use client';
 
-// import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useState } from 'react';
 import Link from 'next/link';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  // const supabase = createClientComponentClient();
-  // const router = useRouter();
+  const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    // const { error } = await supabase.auth.signUp({ email, password });
-    // if (error) {
-    //   setError(error.message);
-    // } else {
-    //   alert('Check your email for a verification link!');
-    //   router.push('/auth/login'); // Redirect to login after successful signup
-    // }
-    setError('Sign-up is temporarily disabled. Backend integration pending.');
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError(error.message);
+    } else {
+      alert('Check your email for a verification link!');
+      router.push('/auth/login'); // Redirect to login after successful signup
+    }
   };
 
   const handleGoogleSignIn = async () => {
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'google',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // });
-    setError('Google Sign-up is temporarily disabled. Backend integration pending.');
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   };
 
   return (
