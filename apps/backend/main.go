@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Auto-migrate the schema
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Profile{})
 
 	// Gin router setup
 	r := gin.Default()
@@ -44,9 +44,9 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	// User routes
-	r.GET("/users", controllers.GetUsers(db))
-	r.POST("/users", controllers.CreateUser(db))
+	// Profile routes
+	r.GET("/profiles", controllers.GetProfiles(db))
+	r.POST("/profiles", controllers.CreateProfile(db))
 
 	port := os.Getenv("PORT")
 	if port == "" {
