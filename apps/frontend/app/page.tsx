@@ -14,10 +14,13 @@ export default function HomePage() {
   useEffect(() => {
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push('/dashboard'); // Redirect to dashboard if user is logged in
+      }
       setUser(user);
     }
     getUser();
-  }, [supabase]);
+  }, [supabase, router]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -35,9 +38,11 @@ export default function HomePage() {
         <nav>
           {user ? (
             <div className="flex items-center space-x-4">
-              <span className="text-gray-300">Hello, User!</span>
+              <Link href="/dashboard" className="py-2 px-4 border border-blue-400 text-blue-400 rounded-md hover:bg-blue-400 hover:text-white transition duration-200">
+                Dashboard
+              </Link>
               <button
-                // onClick={handleSignOut}
+                onClick={handleSignOut}
                 className="py-2 px-4 bg-red-600 hover:bg-red-700 rounded-md font-semibold transition duration-200"
               >
                 Sign Out

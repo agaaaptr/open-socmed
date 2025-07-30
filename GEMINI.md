@@ -68,25 +68,107 @@ This project is developed in structured stages to ensure organized progress.
   * [x] Changed brand name to "Cirqle" and updated metadata.
 * [x] **Checkpoint 2.2: Authentication Logic (Completed)**
   * [x] Re-enabled Supabase authentication logic in login, signup, and home pages.
-  * [x] Verified that email/password and Google OAuth flows are correctly implemented.
+  * [x] Implemented form-based signup with `username` and `full_name`.
+  * [x] Removed Google OAuth integration.
+  * [x] Created protected `/dashboard` route.
+  * [x] Configured redirects after login/signup.
 * [ ] **Checkpoint 2.3: Frontend Title and Icon (Planned)**
   * [ ] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
-* [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (Planned)**
-  * [ ] Build UI for user profile management.
-  * [ ] Build UI for creating, viewing, and interacting with posts (comments, likes).
-  * [ ] Build UI for viewing user lists and implementing follow/unfollow actions.
+* [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (Next Steps)**
+  * [ ] **User Profile Display:** Display user's `full_name` and `username` on the dashboard.
+  * [ ] **Post Creation UI:** Create a form for users to create new posts.
+  * [ ] **Post List Display:** Display a list of posts from other users.
+  * [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
+  * [ ] **Responsive Design:** Ensure all pages are responsive across devices.
+  * [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 
 ### 3.3. Backend Development Plan
 
-* [ ] **Checkpoint 3.1: Backend Core Feature Implementation (Planned)**
-  * [ ] Implement user profile management (create, read, update).
-  * [ ] Implement post creation, retrieval, update, and deletion (CRUD).
-  * [ ] Implement comment creation and retrieval for posts.
-  * [ ] Implement like/unlike functionality for posts.
-  * [ ] Implement follow/unfollow functionality between users.
+* [ ] **Checkpoint 3.1: Backend Core Feature Implementation (Next Steps)**
+  * [ ] **User Profile API:** Implement API endpoints for fetching user profiles (e.g., `/api/users/:id` or `/api/profile`).
+  * [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
+  * [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
+  * [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
+* [ ] **Checkpoint 3.2: Backend Deployment Optimization (Planned)**
+  * [ ] Containerize Go API (Docker) for easier deployment.
+  * [ ] Configure `apps/backend` deployment to a cloud provider (e.g., Render, Fly.io).
 
 ## 4. Commit Rules (Semantic Commits)
 
-All commits must follow the format: `<type>(<scope>): <subject>`.
+All commits in this project **must** adhere to the Semantic Commit Messages standards to maintain a clean and readable Git history. Each commit message must follow the format:
 
-- **Examples:** `fix(frontend): resolve build error by loading env vars`, `chore(docs): update README with new setup instructions`.
+```
+<type>(<scope>): <subject>
+```
+
+**Type (Type of Change):**
+
+- **feat**: A new feature.
+- **fix**: A bug fix.
+- **docs**: Documentation changes.
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semicolons, etc.).
+- **refactor**: A code change that neither fixes a bug nor adds a feature.
+- **perf**: A code change that improves performance.
+- **test**: Adding missing tests or correcting existing tests.
+- **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation.
+
+**Scope (Scope of Change):**
+
+The scope can be the name of the component or part of the project affected. Examples: `frontend`, `backend`, `ui`, `config`, `build`, `docs`, `monorepo`, `supabase`, `auth`, `post`, `profile`.
+
+**Subject (Commit Title):**
+
+A brief description of the change in imperative mood (e.g., "add" not "adding").
+
+**Example Commit Messages:**
+
+- `feat(auth): implement form-based signup and login`
+- `fix(frontend): resolve build error by loading env vars`
+- `docs(readme): update setup instructions`
+- `chore(monorepo): configure turborepo pipeline`
+- `test(web): add unit tests for Button component`
+- `feat(post): add API endpoint for creating posts`
+
+## 5. Session Rules
+
+At the end of each session, the agent must:
+
+- Update knowledge, detailed information, and checkpoint updates informatively in the `GEMINI.md` file.
+- Update `README.md` with the latest project conditions.
+- Always offer to commit and push to the repository.
+
+## 6. Collaboration Guidelines
+
+### 6.1. Supabase Database Synchronization
+
+When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
+
+1.  **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
+    ```bash
+    git pull origin develop # or master, depending on your branch
+    ```
+2.  **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
+    ```bash
+    supabase migration new <migration_name>
+    ```
+    Then, copy the relevant SQL from `supabase_schema.sql` or write your changes directly into the newly created migration file (`supabase/migrations/<timestamp>_<migration_name>.sql`).
+3.  **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
+    ```bash
+    supabase db push --yes
+    ```
+    *Note: Ensure you have your `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` set as environment variables or provided directly in the command.* If you encounter issues, try `supabase db reset` (CAUTION: this deletes all data) or `supabase db pull` to resync your local migration history.
+
+### 6.2. Environment Variables
+
+- **Local Development:** Each developer should have their own `.env` files in `apps/frontend/` and `apps/backend/` with their respective Supabase credentials.
+- **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Do NOT commit `.env` files to the repository.
+
+### 6.3. Code Style & Linting
+
+- Always run `npm run lint` and `npm run format` before committing to ensure code consistency.
+
+### 6.4. Branching Strategy
+
+- Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
+- Create feature branches from `develop` for new features or bug fixes.
+- Submit Pull Requests to `develop` for review.
