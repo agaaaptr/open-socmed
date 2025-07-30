@@ -13,9 +13,10 @@ This project is a monorepo containing:
 ## Tech Stack
 
 - **Monorepo:** Turborepo & npm Workspaces
-- **Frontend:** Next.js, TypeScript, Tailwind CSS, React Query, Supabase (for Auth - *currently disabled*)
+- **Frontend:** Next.js, TypeScript, Tailwind CSS, React Query, Supabase Auth
 - **Backend:** Go, Gin, GORM
 - **Database:** Supabase (PostgreSQL)
+- **Deployment:** Vercel (Frontend), GitHub Actions (CI/CD)
 
 ---
 
@@ -26,49 +27,57 @@ Follow these steps to get the project running locally.
 ### 1. Prerequisites
 
 - [Node.js](https://nodejs.org/) (v22.17.0 or later)
-- [Go](https://go.dev/) (v1.22 or later)
+- [Go](https://go.dev/) (v1.23 or later)
 - [npm](https://www.npmjs.com/)
+- [Supabase CLI](https://supabase.com/docs/guides/cli)
 
 ### 2. Clone & Install
 
 Clone the repository and install all dependencies from the root directory.
 
 ```bash
-git clone https://github.com/yourusername/open-socmed.git
+git clone https://github.com/agaaaptr/open-socmed.git
 cd open-socmed
 npm install
 ```
 
-### 3. Supabase Setup (For Full Integration)
+### 3. Supabase Project Setup
 
-To enable full Supabase integration (database and authentication), you will need a Supabase project.
-
-1.  **Create a Project:** Go to [supabase.com](https://supabase.com) and create a new project.
-2.  **Run the Schema:** In your Supabase project's SQL Editor, run the entire script from `supabase_schema.sql` (located in the project root). This will create the necessary tables and configure Row Level Security (RLS) policies.
-3.  **Get Credentials:**
-    -   **API URL & Anon Key:** Find these in `Project Settings > API`.
-    -   **Database Connection String:** Find this in `Project Settings > Database`.
-4.  **Configure OAuth (Google):**
-    -   Navigate to `Authentication` > `Providers` in your Supabase dashboard.
-    -   Enable the `Google` provider and provide your Google Cloud Console Client ID and Client Secret.
-    -   Add your Vercel deployment URL (e.g., `https://your-app.vercel.app/auth/callback`) as a Redirect URI.
+1.  **Create a Project:** Go to [supabase.com](https://supabase.com), create a new project, and save your database password.
+2.  **Login to Supabase CLI:**
+    ```bash
+    supabase login
+    ```
+    Follow the browser prompts to authorize.
+3.  **Link Project:** In the root of your local repository, link it to your remote Supabase project. Replace `<project-ref>` with your project's reference ID (found in your Supabase project's URL).
+    ```bash
+    supabase link --project-ref <project-ref>
+    ```
+    Enter your database password when prompted.
+4.  **Push Database Schema:** Apply the local schema to your remote database.
+    ```bash
+    supabase db push
+    ```
 
 ### 4. Environment Variables
 
-Copy the `.env.example` files to `.env.local` in both the `apps/frontend` and `apps/backend` directories.
+Create `.env` files in both the `apps/frontend` and `apps/backend` directories.
 
-**File: `apps/frontend/.env.local`**
-```
-# These are currently not used by the frontend as Supabase integration is temporarily disabled.
-# Uncomment and fill with your actual Supabase credentials when backend integration is ready.
-# NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+**File: `apps/frontend/.env`**
+
+Copy your project's API credentials from your Supabase Dashboard (`Project Settings > API`).
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 ```
 
-**File: `apps/backend/.env.local`**
-```
-# Make sure to use the connection string for a session pool
-DATABASE_URL=YOUR_SUPABASE_DATABASE_CONNECTION_STRING
+**File: `apps/backend/.env`**
+
+Use the database connection string from your Supabase Dashboard (`Project Settings > Database`). **Use the connection string with connection pooling.** Replace `[YOUR-PASSWORD]` with your actual database password.
+
+```env
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.<your-project-ref>.supabase.co:6543/postgres
 PORT=8080
 ```
 
@@ -93,7 +102,6 @@ From the root directory:
 - `npm run dev`: Starts all apps in development mode.
 - `npm run build`: Builds all apps for production.
 - `npm run lint`: Lints all code in the monorepo.
-- `npm run format`: Formats all code with Prettier.
 
 ## CI/CD & Deployment
 
@@ -101,8 +109,8 @@ This project uses GitHub Actions for CI/CD.
 
 ### Branching Strategy
 
-- **`master` branch:** Used for production deployments. CI/CD pipeline (`.github/workflows/ci-cd.yml`) will lint, build, and deploy the frontend to Vercel.
-- **`develop` branch:** Used for active development. CI/CD pipeline (`.github/workflows/ci-cd-develop.yml`) will only perform linting, building, and testing.
+- **`master` branch:** Used for production deployments. The CI/CD pipeline will lint, build, and deploy the frontend to Vercel.
+- **`develop` branch:** Used for active development. The CI/CD pipeline will only perform linting and building.
 
 ### GitHub Actions Secrets
 
@@ -111,44 +119,5 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 - `VERCEL_TOKEN`: Your Vercel API Token.
 - `VERCEL_ORG_ID`: Your Vercel Organization ID.
 - `VERCEL_PROJECT_ID`: Your Vercel Project ID.
-- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL (for Vercel environment variables).
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon Key (for Vercel environment variables).
-
-### Deployment Flow
-
-- Pushing to the `master` branch triggers the CI/CD pipeline for production deployment.
-- Pushing to the `develop` branch triggers the CI/CD pipeline for linting, building, and testing only.
-- Supabase schema deployment and backend deployment are currently disabled in the CI/CD pipeline.
-
-## Local Development on `develop` Branch
-
-When working on the `develop` branch, you will primarily run the applications locally to test your changes.
-
-1.  **Switch to `develop` branch:**
-    ```bash
-    git checkout develop
-    ```
-2.  **Install dependencies (if you haven't recently):**
-    ```bash
-    npm install
-    ```
-3.  **Run Linting:**
-    ```bash
-    npx turbo lint
-    ```
-4.  **Run Build:**
-    ```bash
-    npx turbo build
-    ```
-5.  **Run Tests (if configured):**
-    ```bash
-    # If you have test scripts defined in your package.json files
-    # npx turbo test
-    ```
-6.  **Run the applications locally:**
-    ```bash
-    npm run dev
-    ```
-    This will start the frontend on `http://localhost:3000` and the backend on `http://localhost:8080`.
-
-Once your changes are stable on `develop` and have been thoroughly tested locally, you can create a Pull Request from `develop` to `master` to initiate the production deployment.
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon Key.

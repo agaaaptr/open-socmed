@@ -11,8 +11,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/yourusername/open-socmed/apps/backend/controllers"
-	"github.com/yourusername/open-socmed/apps/backend/models"
+	"github.com/agaaaptr/open-socmed/apps/backend/controllers"
+	"github.com/agaaaptr/open-socmed/apps/backend/models"
 )
 
 func main() {
