@@ -84,8 +84,9 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 3.3. Backend Development Plan
 
-* [ ] **Checkpoint 3.1: Backend Core Feature Implementation (Next Steps)**
-  * [ ] **User Profile API:** Implement API endpoints for fetching user profiles (e.g., `/api/users/:id` or `/api/profile`).
+* [x] **Checkpoint 3.1: Backend Core Feature Implementation (Next Steps)**
+  * [x] Renamed `users` model/controller to `profiles` to match database schema.
+  * [ ] **User Profile API:** Implement API endpoints for fetching user profiles (e.g., `/api/profiles/:id` or `/api/profile`).
   * [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   * [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   * [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
@@ -93,7 +94,36 @@ This project is developed in structured stages to ensure organized progress.
   * [ ] Containerize Go API (Docker) for easier deployment.
   * [ ] Configure `apps/backend` deployment to a cloud provider (e.g., Render, Fly.io).
 
-## 4. Commit Rules (Semantic Commits)
+## 4. Current Known Issues
+
+### Frontend (`apps/frontend`)
+- **`npm run dev` fails with `npm error code ENOWORKSPACES`**: This error occurs when running the development server for the frontend. It indicates a conflict with how `npm` handles workspaces when executing `next dev` within the Turborepo setup. The backend (`api:dev`) usually starts successfully.
+
+### Backend (`apps/backend`)
+- **`ERROR: relation "profiles" already exists`**: This error appears during `npm run dev` for the backend. It's a benign error indicating that the `db.AutoMigrate` function in `main.go` attempts to create the `profiles` table, which already exists in the Supabase database (because it was manually created via SQL script). The backend still starts and functions correctly despite this warning.
+
+## 5. Next Steps: Troubleshooting & Development
+
+### For Frontend Developers
+- **Fix `ENOWORKSPACES` Error:**
+  - **Attempt 1 (Current State):** The `dev` script in `apps/frontend/package.json` is set to `"dev": "next dev"`. This was an attempt to let Next.js handle environment loading automatically.
+  - **Attempt 2 (Previous Attempt):** The `dev` script was `"dev": "npx next dev"`. This also resulted in `ENOWORKSPACES`.
+  - **Next Action:** Investigate alternative ways to run `next dev` within a Turborepo `npm` workspace. Consider: 
+    - Explicitly setting `NODE_OPTIONS=--openssl-legacy-provider` if it's a Node.js version compatibility issue (less likely for this specific error).
+    - Exploring `npm`'s `--workspace` flag usage with `next dev` if applicable.
+    - As a last resort for local development, consider installing `next` globally (`npm install -g next`) and then running `next dev` directly from `apps/frontend` (though this is generally discouraged in monorepos).
+- **Implement User Profile Display:** Once the `dev` server is stable, fetch and display the logged-in user's `full_name` and `username` on the `/dashboard` page.
+- **Develop Post Creation UI:** Create the user interface for creating new posts.
+
+### For Backend Developers
+- **Address `relation "profiles" already exists` Warning:**
+  - **Current State:** The error is benign and the backend still runs. 
+  - **Next Action:** For a cleaner development experience, consider removing `db.AutoMigrate(&models.Profile{})` from `main.go` and rely solely on Supabase migrations (`supabase db push`) for schema management. This is a more robust approach for production environments.
+- **Implement User Profile API:** Create API endpoints in the Go backend to fetch user profile data from the `profiles` table.
+- **Implement Post CRUD API:** Develop API endpoints for creating, reading, updating, and deleting posts.
+- **Integrate Authentication:** Implement middleware or logic in the backend to verify JWT tokens from Supabase for protected API routes.
+
+## 6. Commit Rules (Semantic Commits)
 
 All commits in this project **must** adhere to the Semantic Commit Messages standards to maintain a clean and readable Git history. Each commit message must follow the format:
 
@@ -129,7 +159,7 @@ A brief description of the change in imperative mood (e.g., "add" not "adding").
 - `test(web): add unit tests for Button component`
 - `feat(post): add API endpoint for creating posts`
 
-## 5. Session Rules
+## 7. Session Rules
 
 At the end of each session, the agent must:
 
@@ -137,9 +167,9 @@ At the end of each session, the agent must:
 - Update `README.md` with the latest project conditions.
 - Always offer to commit and push to the repository.
 
-## 6. Collaboration Guidelines
+## 8. Collaboration Guidelines
 
-### 6.1. Supabase Database Synchronization
+### 8.1. Supabase Database Synchronization
 
 When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
 
@@ -158,16 +188,16 @@ When collaborating on database schema changes, it's crucial to keep your local S
     ```
     *Note: Ensure you have your `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` set as environment variables or provided directly in the command.* If you encounter issues, try `supabase db reset` (CAUTION: this deletes all data) or `supabase db pull` to resync your local migration history.
 
-### 6.2. Environment Variables
+### 8.2. Environment Variables
 
 - **Local Development:** Each developer should have their own `.env` files in `apps/frontend/` and `apps/backend/` with their respective Supabase credentials.
 - **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Do NOT commit `.env` files to the repository.
 
-### 6.3. Code Style & Linting
+### 8.3. Code Style & Linting
 
 - Always run `npm run lint` and `npm run format` before committing to ensure code consistency.
 
-### 6.4. Branching Strategy
+### 8.4. Branching Strategy
 
 - Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
 - Create feature branches from `develop` for new features or bug fixes.
