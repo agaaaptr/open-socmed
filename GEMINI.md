@@ -95,9 +95,9 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
-- [ ] **Checkpoint 3.2: Backend Deployment Optimization (Planned)**
-  - [ ] Containerize Go API (Docker) for easier deployment.
-  - [ ] Configure `apps/backend` deployment to a cloud provider (e.g., Render, Fly.io).
+- [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
+  - [x] Containerized Go API (Docker) with `Dockerfile`.
+  - [x] Configured `apps/backend` deployment to Render via GitHub Actions (`ci-cd.yml`).
 
 ## 4. Current Known Issues
 
@@ -111,16 +111,42 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### For Frontend Developers
+### Feature: User Profile (View & Edit)
 
-- **Implement User Profile Display:** Display user's `full_name` and `username` on the dashboard.
-- **Develop Post Creation UI:** Create the user interface for creating new posts.
+**Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information.
 
-### For Backend Developers
+#### Frontend (`apps/frontend`) - Next.js:
 
-- **Implement User Profile API:** Create API endpoints in the Go backend to fetch user profile data from the `profiles` table.
-- **Implement Post CRUD API:** Develop API endpoints for creating, reading, updating, and deleting posts.
-- **Integrate Authentication:** Implement middleware or logic in the backend to verify JWT tokens from Supabase for protected API routes.
+*   **Profile Display (Dashboard):**
+    *   Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
+    *   Fetch user profile data from the backend API when the dashboard page loads.
+    *   Handle loading and error states when fetching profile data.
+*   **Edit Profile Form:**
+    *   Create a UI form on the `/dashboard` page (or a separate page like `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
+    *   Validate form input on the client-side.
+    *   Submit updated profile data to the backend API.
+    *   Handle loading and error states when submitting data.
+    *   Provide feedback to the user after successful or failed updates.
+*   **Authentication Integration:**
+    *   Ensure only authenticated users can view and edit their profiles.
+    *   Use Supabase authentication tokens to secure requests to the backend API.
+
+#### Backend (`apps/backend`) - Go:
+
+*   **`Profile` Model:**
+    *   Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
+*   **API Endpoint for Fetching Profile:**
+    *   Create an API endpoint (`GET /api/profile` or `GET /api/profiles/:id`) to retrieve user profile data based on user ID or authentication token.
+    *   Implement logic to fetch data from the database using GORM.
+    *   Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
+*   **API Endpoint for Updating Profile:**
+    *   Create an API endpoint (`PUT /api/profile` or `PUT /api/profiles/:id`) to update user profile data.
+    *   Implement logic to update data in the database using GORM.
+    *   Validate input received from the frontend.
+    *   Secure this endpoint so only authenticated users can update their own profile.
+*   **Authentication Integration:**
+    *   Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
+    *   Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
 ## 6. Commit Rules (Semantic Commits)
 
