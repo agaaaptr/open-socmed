@@ -152,11 +152,6 @@ From the root directory:
 
 This project uses GitHub Actions for CI/CD.
 
-### Branching Strategy
-
-- **`master` branch:** Used for production deployments. The CI/CD pipeline will lint, build, and deploy the frontend to Vercel.
-- **`develop` branch:** Used for active development. The CI/CD pipeline will only perform linting and building.
-
 ### GitHub Actions Secrets
 
 Ensure the following secrets are configured in your GitHub repository (`Settings > Secrets and variables > Actions`):
@@ -170,8 +165,6 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 ### Backend Deployment to Vercel (Serverless Functions)
 
 The Go backend has been refactored into Vercel serverless functions located in `apps/backend/api/`. These functions are deployed alongside the Next.js frontend as part of the main Vercel project. The `vercel.json` file in the project root configures the routing and building of these Go functions.
-
-## Collaboration
 
 ### Supabase Database Synchronization
 

@@ -60,7 +60,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 1.4: Build & CI/CD Configuration (Completed)**
   - [x] Fixed backend Go module paths (`go.mod`, `main.go`, etc.).
   - [x] Fixed frontend build failure by using `dotenv-cli` to load environment variables during `next build`.
-  - [x] Configured `develop` and `master` branch pipelines in GitHub Actions.
+  - [x] Configured GitHub Actions for CI/CD.
 - [x] **Checkpoint 1.5: Documentation Update (Completed)**
   - [x] Updated `README.md` with accurate, step-by-step setup instructions.
   - [x] Updated `GEMINI.md` to reflect the current project state.
