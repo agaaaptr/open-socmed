@@ -96,8 +96,8 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
-  - [x] Containerized Go API (Docker) with `Dockerfile`.
-  - [x] Configured `apps/backend` deployment to Render via GitHub Actions (`ci-cd.yml`).
+  - [x] Refactored Go backend into Vercel serverless functions.
+  - [x] Configured `vercel.json` for Vercel deployment.
 
 ## 4. Current Known Issues
 

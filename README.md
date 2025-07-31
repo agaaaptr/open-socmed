@@ -167,9 +167,9 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
 
-### Backend Deployment to Render
+### Backend Deployment to Vercel (Serverless Functions)
 
-The Go backend is containerized using a `Dockerfile` located at `apps/backend/Dockerfile`. Render automatically detects this `Dockerfile` when connected to your GitHub repository and handles the build and deployment process. No explicit deployment commands are needed in the GitHub Actions workflow for Render's native Git integration.
+The Go backend has been refactored into Vercel serverless functions located in `apps/backend/api/`. These functions are deployed alongside the Next.js frontend as part of the main Vercel project. The `vercel.json` file in the project root configures the routing and building of these Go functions.
 
 ## Collaboration
 

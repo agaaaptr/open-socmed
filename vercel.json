@@ -1,0 +1,22 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/health.go"
+    },
+    {
+      "source": "/api/profiles",
+      "destination": "/api/profiles.go"
+    },
+    {
+      "source": "/api/profiles/:path*",
+      "destination": "/api/profiles.go"
+    }
+  ],
+  "builds": [
+    {
+      "src": "apps/backend/api/*.go",
+      "use": "@vercel/go"
+    }
+  ]
+}
