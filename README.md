@@ -166,6 +166,8 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 
 The Go backend has been refactored into Vercel serverless functions located in `apps/backend/api/`. These functions are deployed alongside the Next.js frontend as part of the main Vercel project. The `vercel.json` file in the project root configures the routing and building of these Go functions.
 
+## Collaboration
+
 ### Supabase Database Synchronization
 
 When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
@@ -205,3 +207,25 @@ When collaborating on database schema changes, it's crucial to keep your local S
 - Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
 - Create feature branches from `develop` for new features or bug fixes.
 - Submit Pull Requests to `develop` for review.
+
+## Lessons Learned
+
+This project has provided valuable insights into monorepo management, Vercel deployment, and Go serverless functions:
+
+- **Monorepo `npm run dev` Issues (`ENOWORKSPACES`):**
+  - The `npm error code ENOWORKSPACES` often arises when `npm`'s workspace logic conflicts with how a tool (like `next dev`) expects to be run. Solutions involve ensuring the tool is run in the correct context (e.g., directly from the sub-package's directory, or using `npx` if the tool is a local dependency).
+  - For `vercel dev`, the issue was resolved by ensuring the Vercel project's root directory was correctly configured in the Vercel dashboard, and `vercel.json` explicitly defined the frontend build with `src` pointing to `apps/frontend/package.json`.
+
+- **Vercel `vercel.json` Configuration for Monorepos:**
+  - When `vercel.json` is present at the monorepo root, it becomes the single source of truth for Vercel's build and routing. All applications (frontend and backend functions) must be explicitly defined within its `builds` and `rewrites` sections.
+  - The `root` property in `builds` is not allowed for Vercel's `@vercel/next` builder when the project's root directory is already set to the monorepo root in the Vercel dashboard.
+  - `rewrites` are crucial for directing traffic to the correct application within the monorepo (e.g., `/api/*` to backend functions, `/(.*)` to the frontend).
+
+- **Go Backend Refactoring to Vercel Serverless Functions:**
+  - Migrating a traditional Go web framework (like Gin) to Vercel serverless functions requires significant architectural changes. Each API endpoint needs to be refactored into a separate Go function that adheres to Vercel's serverless function signature (`http.HandlerFunc`).
+  - `go.mod` and `go.sum` need to be cleaned up to remove unused dependencies (e.g., Gin).
+  - Local development of these functions is best done using `vercel dev` from the monorepo root, which simulates the Vercel environment.
+
+- **CI/CD Streamlining:**
+  - For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
+  - Keeping CI/CD configurations clean and focused improves maintainability and clarity.

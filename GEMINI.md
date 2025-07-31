@@ -103,11 +103,11 @@ This project is developed in structured stages to ensure organized progress.
 
 ### Frontend (`apps/frontend`)
 
-- **No known issues.** The `npm run dev` command now runs successfully.
+- **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is stable.
 
 ### Backend (`apps/backend`)
 
-- **No known issues.** The `ERROR: relation "profiles" already exists` warning has been addressed by removing `db.AutoMigrate` from `main.go`.
+- **No known issues.** The `ERROR: relation "profiles" already exists` warning has been addressed by removing `db.AutoMigrate` from `main.go`, and Vercel serverless functions are deploying correctly.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -147,6 +147,37 @@ This project is developed in structured stages to ensure organized progress.
 *   **Authentication Integration:**
     *   Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
     *   Extract user ID from the JWT token to ensure users can only access or modify their own profile.
+
+### Feature: Post Feed (View & Create)
+
+**Goal:** Users can view a feed of posts from other users and create new posts.
+
+#### Frontend (`apps/frontend`) - Next.js:
+
+*   **Post Feed Display:**
+    *   Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
+    *   Fetch post data from the backend API.
+    *   Implement pagination or infinite scrolling for the feed.
+*   **Post Creation UI:**
+    *   Create a form for users to compose and submit new posts.
+    *   Handle form input and validation.
+    *   Send new post data to the backend API.
+*   **Basic Post Interaction (UI Only):**
+    *   Implement UI for like/comment buttons (functionality will be added later).
+
+#### Backend (`apps/backend`) - Go:
+
+*   **`Post` Model:**
+    *   Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+*   **API Endpoint for Fetching Posts:**
+    *   Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+    *   Implement logic to fetch posts from the database, potentially with filtering and pagination.
+*   **API Endpoint for Creating Posts:**
+    *   Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+    *   Implement logic to save new posts to the database.
+    *   Validate post content.
+*   **Authentication Integration:**
+    *   Ensure API endpoints are protected and integrate with Supabase authentication.
 
 ## 6. Commit Rules (Semantic Commits)
 
@@ -233,3 +264,25 @@ When collaborating on database schema changes, it's crucial to keep your local S
 - Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
 - Create feature branches from `develop` for new features or bug fixes.
 - Submit Pull Requests to `develop` for review.
+
+## 9. Lessons Learned
+
+This project has provided valuable insights into monorepo management, Vercel deployment, and Go serverless functions:
+
+- **Monorepo `npm run dev` Issues (`ENOWORKSPACES`):**
+  - The `npm error code ENOWORKSPACES` often arises when `npm`'s workspace logic conflicts with how a tool (like `next dev`) expects to be run. Solutions involve ensuring the tool is run in the correct context (e.g., directly from the sub-package's directory, or using `npx` if the tool is a local dependency).
+  - For `vercel dev`, the issue was resolved by ensuring the Vercel project's root directory was correctly configured in the Vercel dashboard, and `vercel.json` explicitly defined the frontend build with `src` pointing to `apps/frontend/package.json`.
+
+- **Vercel `vercel.json` Configuration for Monorepos:**
+  - When `vercel.json` is present at the monorepo root, it becomes the single source of truth for Vercel's build and routing. All applications (frontend and backend functions) must be explicitly defined within its `builds` and `rewrites` sections.
+  - The `root` property in `builds` is not allowed for Vercel's `@vercel/next` builder when the project's root directory is already set to the monorepo root in the Vercel dashboard.
+  - `rewrites` are crucial for directing traffic to the correct application within the monorepo (e.g., `/api/*` to backend functions, `/(.*)` to the frontend).
+
+- **Go Backend Refactoring to Vercel Serverless Functions:**
+  - Migrating a traditional Go web framework (like Gin) to Vercel serverless functions requires significant architectural changes. Each API endpoint needs to be refactored into a separate Go function that adheres to Vercel's serverless function signature (`http.HandlerFunc`).
+  - `go.mod` and `go.sum` need to be cleaned up to remove unused dependencies (e.g., Gin).
+  - Local development of these functions is best done using `vercel dev` from the monorepo root, which simulates the Vercel environment.
+
+- **CI/CD Streamlining:**
+  - For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
+  - Keeping CI/CD configurations clean and focused improves maintainability and clarity.
