@@ -11,12 +11,21 @@
     {
       "source": "/api/profiles/:path*",
       "destination": "/api/profiles.go"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/apps/frontend/$1"
     }
   ],
   "builds": [
     {
       "src": "apps/backend/api/*.go",
       "use": "@vercel/go"
+    },
+    {
+      "src": "apps/frontend/package.json",
+      "use": "@vercel/next",
+      "config": { "includeFiles": "apps/frontend/**" }
     }
   ]
 }
