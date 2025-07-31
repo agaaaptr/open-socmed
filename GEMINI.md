@@ -97,28 +97,18 @@ This project is developed in structured stages to ensure organized progress.
 ## 4. Current Known Issues
 
 ### Frontend (`apps/frontend`)
-- **`npm run dev` fails with `npm error code ENOWORKSPACES`**: This error occurs when running the development server for the frontend. It indicates a conflict with how `npm` handles workspaces when executing `next dev` within the Turborepo setup. The backend (`api:dev`) usually starts successfully.
+- **No known issues.** The `npm run dev` command now runs successfully.
 
 ### Backend (`apps/backend`)
-- **`ERROR: relation "profiles" already exists`**: This error appears during `npm run dev` for the backend. It's a benign error indicating that the `db.AutoMigrate` function in `main.go` attempts to create the `profiles` table, which already exists in the Supabase database (because it was manually created via SQL script). The backend still starts and functions correctly despite this warning.
+- **No known issues.** The `ERROR: relation "profiles" already exists` warning has been addressed by removing `db.AutoMigrate` from `main.go`.
 
 ## 5. Next Steps: Troubleshooting & Development
 
 ### For Frontend Developers
-- **Fix `ENOWORKSPACES` Error:**
-  - **Attempt 1 (Current State):** The `dev` script in `apps/frontend/package.json` is set to `"dev": "next dev"`. This was an attempt to let Next.js handle environment loading automatically.
-  - **Attempt 2 (Previous Attempt):** The `dev` script was `"dev": "npx next dev"`. This also resulted in `ENOWORKSPACES`.
-  - **Next Action:** Investigate alternative ways to run `next dev` within a Turborepo `npm` workspace. Consider: 
-    - Explicitly setting `NODE_OPTIONS=--openssl-legacy-provider` if it's a Node.js version compatibility issue (less likely for this specific error).
-    - Exploring `npm`'s `--workspace` flag usage with `next dev` if applicable.
-    - As a last resort for local development, consider installing `next` globally (`npm install -g next`) and then running `next dev` directly from `apps/frontend` (though this is generally discouraged in monorepos).
-- **Implement User Profile Display:** Once the `dev` server is stable, fetch and display the logged-in user's `full_name` and `username` on the `/dashboard` page.
+- **Implement User Profile Display:** Display user's `full_name` and `username` on the dashboard.
 - **Develop Post Creation UI:** Create the user interface for creating new posts.
 
 ### For Backend Developers
-- **Address `relation "profiles" already exists` Warning:**
-  - **Current State:** The error is benign and the backend still runs. 
-  - **Next Action:** For a cleaner development experience, consider removing `db.AutoMigrate(&models.Profile{})` from `main.go` and rely solely on Supabase migrations (`supabase db push`) for schema management. This is a more robust approach for production environments.
 - **Implement User Profile API:** Create API endpoints in the Go backend to fetch user profile data from the `profiles` table.
 - **Implement Post CRUD API:** Develop API endpoints for creating, reading, updating, and deleting posts.
 - **Integrate Authentication:** Implement middleware or logic in the backend to verify JWT tokens from Supabase for protected API routes.

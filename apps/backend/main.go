@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/agaaaptr/open-socmed/apps/backend/controllers"
-	"github.com/agaaaptr/open-socmed/apps/backend/models"
+	
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Auto-migrate the schema
-	db.AutoMigrate(&models.Profile{})
+	
 
 	// Gin router setup
 	r := gin.Default()
