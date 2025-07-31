@@ -111,6 +111,43 @@ From the root directory:
 - `npm run build`: Builds all apps for production.
 - `npm run lint`: Lints all code in the monorepo.
 
+## Feature: User Profile (View & Edit)
+
+**Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information.
+
+### Frontend (`apps/frontend`) - Next.js:
+
+*   **Profile Display (Dashboard):**
+    *   Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
+    *   Fetch user profile data from the backend API when the dashboard page loads.
+    *   Handle loading and error states when fetching profile data.
+*   **Edit Profile Form:**
+    *   Create a UI form on the `/dashboard` page (or a separate page like `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
+    *   Validate form input on the client-side.
+    *   Submit updated profile data to the backend API.
+    *   Handle loading and error states when submitting data.
+    *   Provide feedback to the user after successful or failed updates.
+*   **Authentication Integration:**
+    *   Ensure only authenticated users can view and edit their profiles.
+    *   Use Supabase authentication tokens to secure requests to the backend API.
+
+### Backend (`apps/backend`) - Go:
+
+*   **`Profile` Model:**
+    *   Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
+*   **API Endpoint for Fetching Profile:**
+    *   Create an API endpoint (`GET /api/profile` or `GET /api/profiles/:id`) to retrieve user profile data based on user ID or authentication token.
+    *   Implement logic to fetch data from the database using GORM.
+    *   Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
+*   **API Endpoint for Updating Profile:**
+    *   Create an API endpoint (`PUT /api/profile` or `PUT /api/profiles/:id`) to update user profile data.
+    *   Implement logic to update data in the database using GORM.
+    *   Validate input received from the frontend.
+    *   Secure this endpoint so only authenticated users can update their own profile.
+*   **Authentication Integration:**
+    *   Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
+    *   Extract user ID from the JWT token to ensure users can only access or modify their own profile.
+
 ## CI/CD & Deployment
 
 This project uses GitHub Actions for CI/CD.
@@ -129,6 +166,10 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 - `VERCEL_PROJECT_ID`: Your Vercel Project ID.
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+
+### Backend Deployment to Render
+
+The Go backend is containerized using a `Dockerfile` located at `apps/backend/Dockerfile`. Render automatically detects this `Dockerfile` when connected to your GitHub repository and handles the build and deployment process. No explicit deployment commands are needed in the GitHub Actions workflow for Render's native Git integration.
 
 ## Collaboration
 
