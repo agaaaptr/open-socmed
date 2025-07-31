@@ -14,9 +14,9 @@ This project is a monorepo containing:
 
 - **Monorepo:** Turborepo & npm Workspaces
 - **Frontend:** Next.js, TypeScript, Tailwind CSS, React Query, Supabase Auth
-- **Backend:** Go, Gin, GORM
+- **Backend:** Go (Vercel Serverless Functions), GORM
 - **Database:** Supabase (PostgreSQL)
-- **Deployment:** Vercel (Frontend), GitHub Actions (CI/CD)
+- **Deployment:** Vercel (Frontend & Backend Serverless Functions), GitHub Actions (CI/CD)
 
 ---
 
@@ -90,16 +90,16 @@ PORT=8080
 
 ### 5. Run the Development Servers
 
-Run the frontend and backend applications concurrently using Turborepo from the root directory.
+To run the frontend and backend serverless functions locally, use the Vercel CLI from the root directory:
 
 ```bash
-npm run dev
+vercel dev
 ```
 
 This will start:
 
 - The Next.js frontend on `http://localhost:3000`
-- The Go backend on `http://localhost:8080`
+- The Go backend serverless functions, accessible via `http://localhost:3000/api/...`
 
 ---
 
@@ -107,7 +107,7 @@ This will start:
 
 From the root directory:
 
-- `npm run dev`: Starts all apps in development mode.
+- `npm run dev`: (No longer directly used for local development, use `vercel dev` instead)
 - `npm run build`: Builds all apps for production.
 - `npm run lint`: Lints all code in the monorepo.
 
