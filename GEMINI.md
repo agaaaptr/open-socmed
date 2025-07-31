@@ -32,8 +32,8 @@
 
 ### Backend (`apps/backend`)
 
-- **Language**: Go
-- **Web Framework**: Gin
+- **Language**: Go (refactored to Vercel Serverless Functions)
+- **Web Framework**: (N/A - replaced by Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
 - **Database**: Supabase PostgreSQL (via `DATABASE_URL`)
 
@@ -42,7 +42,7 @@
 - **Supabase**: Provides PostgreSQL database, Authentication, and Realtime capabilities.
 - **Supabase CLI**: Used for local development and schema migrations.
 - **GitHub Actions**: For Continuous Integration and Deployment.
-- **Vercel**: For frontend hosting.
+- **Vercel**: For frontend hosting and backend serverless functions.
 
 ## 3. Development Plan & Checkpoints
 
