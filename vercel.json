@@ -25,6 +25,7 @@
     {
       "src": "apps/frontend/package.json",
       "use": "@vercel/next",
+      "root": "apps/frontend",
       "config": { "includeFiles": "apps/frontend/**" }
     }
   ]
