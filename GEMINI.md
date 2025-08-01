@@ -77,8 +77,8 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Removed Google OAuth integration.
   - [x] Created protected `/dashboard` route.
   - [x] Configured redirects after login/signup.
-- [ ] **Checkpoint 2.3: Frontend Title and Icon (Planned)**
-  - [ ] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
+- [x] **Checkpoint 2.3: Frontend Title and Icon (Completed)**
+  - [x] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
 - [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (Next Steps)**
   - [ ] **User Profile Display:** Display user's `full_name` and `username` on the dashboard.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
@@ -229,20 +229,20 @@ At the end of each session, the agent must:
 
 When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
 
-1. **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
+1.  **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
 
     ```bash
     git pull origin develop # or master, depending on your branch
     ```
 
-2. **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
+2.  **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
 
     ```bash
     supabase migration new <migration_name>
     ```
 
     Then, copy the relevant SQL from `supabase_schema.sql` or write your changes directly into the newly created migration file (`supabase/migrations/<timestamp>_<migration_name>.sql`).
-3. **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
+3.  **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
 
     ```bash
     supabase db push --yes
@@ -263,7 +263,7 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 - Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
 - Create feature branches from `develop` for new features or bug fixes.
-- Submit Pull Requests to `develop` for review.
+- Submit Pull Requests to `develop` for `review`.
 
 ## 9. Lessons Learned
 
