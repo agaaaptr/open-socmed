@@ -109,6 +109,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for Vercel deployment.
+  - [x] Simplified `vercel.json` builds configuration to remove redundant entries.
 - [x] **Checkpoint 3.3: Backend Refactoring & Hardening (Completed)**
   - [x] Refactored database connection logic to be resilient in a serverless environment.
   - [x] Hardened the `updateProfile` endpoint by using a dedicated request struct (`UpdateProfileRequest`) to prevent mass assignment vulnerabilities.
