@@ -19,8 +19,6 @@ import (
 type UpdateProfileRequest struct {
 	FullName  *string `json:"full_name"`
 	Username  *string `json:"username"`
-	Website   *string `json:"website"`
-	AvatarURL *string `json:"avatar_url"`
 }
 
 // ProfileHandler is the entry point for the /api/profile serverless function.
@@ -97,12 +95,6 @@ func updateProfile(w http.ResponseWriter, r *http.Request, userID string, db *go
 	}
 	if req.Username != nil {
 		updates["username"] = *req.Username
-	}
-	if req.Website != nil {
-		updates["website"] = *req.Website
-	}
-	if req.AvatarURL != nil {
-		updates["avatar_url"] = *req.AvatarURL
 	}
 
 	if len(updates) == 0 {
