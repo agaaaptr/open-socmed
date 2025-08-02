@@ -94,10 +94,10 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 3.3. Backend Development Plan
 
-- [x] **Checkpoint 3.1: Backend Core Feature Implementation (Next Steps)**
+- [x] **Checkpoint 3.1: Backend Core Feature Implementation (In Progress)**
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
-  - [x] **User Profile API:** Implemented API endpoint for fetching user profiles (e.g., `/api/profiles/:id` or `/api/profile`).
+  - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Login with Username/Email Backend:** Created a serverless function (`/api/auth/signin`) to resolve username/email to email for frontend authentication.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
@@ -105,6 +105,11 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for Vercel deployment.
+- [x] **Checkpoint 3.3: Backend Refactoring & Hardening (Completed)**
+  - [x] Refactored database connection logic to be resilient in a serverless environment.
+  - [x] Hardened the `updateProfile` endpoint by using a dedicated request struct (`UpdateProfileRequest`) to prevent mass assignment vulnerabilities.
+  - [x] Corrected JWT validation to use the `sub` claim for user ID.
+  - [x] Fixed `getProfile` logic to correctly fetch a single record.
 
 ## 4. Current Known Issues
 
@@ -114,11 +119,11 @@ This project is developed in structured stages to ensure organized progress.
 
 ### Backend (`apps/backend`)
 
-- **No known issues.** The `ERROR: relation "profiles" already exists` warning has been addressed by removing `db.AutoMigrate` from `main.go`, and Vercel serverless functions are deploying correctly.
+- **No known issues.** All identified issues with the profile API have been resolved.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit)
+### Feature: User Profile (View & Edit) - COMPLETED
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information.
 
@@ -138,22 +143,22 @@ This project is developed in structured stages to ensure organized progress.
     *   Ensure only authenticated users can view and edit their profiles.
     *   Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`apps/backend`) - Go:
+#### Backend (`apps/backend`) - Go: - COMPLETED
 
 *   **`Profile` Model:**
-    *   Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
+    *   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 *   **API Endpoint for Fetching Profile:**
-    *   Create an API endpoint (`GET /api/profile` or `GET /api/profiles/:id`) to retrieve user profile data based on user ID or authentication token.
-    *   Implement logic to fetch data from the database using GORM.
-    *   Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
+    *   [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
+    *   [x] Implement logic to fetch data from the database using GORM.
+    *   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
 *   **API Endpoint for Updating Profile:**
-    *   Create an API endpoint (`PUT /api/profile` or `PUT /api/profiles/:id`) to update user profile data.
-    *   Implement logic to update data in the database using GORM.
-    *   Validate input received from the frontend.
-    *   Secure this endpoint so only authenticated users can update their own profile.
+    *   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data.
+    *   [x] Implement logic to update data in the database using GORM.
+    *   [x] Validate input received from the frontend.
+    *   [x] Secure this endpoint so only authenticated users can update their own profile.
 *   **Authentication Integration:**
-    *   Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
-    *   Extract user ID from the JWT token to ensure users can only access or modify their own profile.
+    *   [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
+    *   [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
 ### Feature: Post Feed (View & Create)
 

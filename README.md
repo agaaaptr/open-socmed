@@ -212,6 +212,12 @@ This project has provided valuable insights into monorepo management, Vercel dep
   - `go.mod` and `go.sum` need to be cleaned up to remove unused dependencies (e.g., Gin).
   - Local development of these functions is best done using `vercel dev` from the monorepo root, which simulates the Vercel environment.
 
+- **Database Connection Management in Serverless:**
+  - Initializing database connections in a global `init()` function is unreliable. Serverless functions can idle, causing the connection to time out. A better approach is to manage a connection pool within a separate package and retrieve the connection on-demand for each request, ensuring resilience.
+
+- **API Endpoint Security:**
+  - When creating update endpoints (e.g., `PUT` or `PATCH`), avoid using generic maps (`map[string]interface{}`) to accept data. This can lead to mass assignment vulnerabilities. Instead, use a specific request `struct` (DTO) that only includes the fields a user is permitted to change.
+
 - **CI/CD Streamlining:**
   - For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
   - Keeping CI/CD configurations clean and focused improves maintainability and clarity.
