@@ -14,7 +14,7 @@ This project is a monorepo containing:
 
 - **Modern & Consistent UI/UX:** A complete visual overhaul with a dark/charcoal theme and a vibrant teal (`#00FFDE`) accent, utilizing glassmorphism effects and fluid animations powered by Framer Motion.
 - **Flexible Authentication:** Users can now sign in using either their email or username, with robust client-side validation for all authentication forms.
-- **User Profile Display:** Authenticated users can view their `full_name` and `username` on the dashboard.
+- **User Profile Management:** Authenticated users can view their `full_name` and `username` on the home page, and edit their profile information on a dedicated settings page.
 - **Database Integrity:** The `profiles` table now enforces a unique constraint on the `username` column.
 
 ## Tech Stack
