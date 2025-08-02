@@ -17,23 +17,25 @@ const AccentSubmitButton = ({ children, className = '' }) => (
   );
 
 export default function SignInPage() {
-  const [identifier, setIdentifier] = useState(''); // Can be email or username
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [identifierError, setIdentifierError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
-  const validateIdentifier = (input: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
+  const validateEmail = (input: string) => {
+    const emailRegex = /^[^
+@]+@[^
+@]+\.[^
+@]+$/;
 
-    if (emailRegex.test(input) || usernameRegex.test(input)) {
-      setIdentifierError(null);
+    if (emailRegex.test(input)) {
+      setEmailError(null);
       return true;
     }
-    setIdentifierError('Please enter a valid email address or username.');
+    setEmailError('Please enter a valid email address.');
     return false;
   };
 
@@ -66,46 +68,37 @@ export default function SignInPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIdentifierError(null);
+    setEmailError(null);
     setPasswordError(null);
 
-    const isIdentifierValid = validateIdentifier(identifier);
+    const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
-    if (!isIdentifierValid || !isPasswordValid) {
+    if (!isEmailValid || !isPasswordValid) {
       return; // Stop if client-side validation fails
     }
 
-    // --- Placeholder for new backend API call ---
-    // This part will be replaced with an actual API call to your Go backend
-    // For now, it will simulate a successful login or an error.
-    console.log('Attempting sign-in with:', { identifier, password });
-
-    // Simulate API call
-    const response = await fetch('/api/auth/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
-    });
-
-    let data;
     try {
-      data = await response.json();
-    } catch (jsonError) {
-      console.error('Failed to parse JSON response:', jsonError);
-      setError('Received an invalid response from the server. Please try again.');
-      return;
-    }
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (!response.ok) {
-      setError(data.message || 'An unexpected error occurred. Please check your credentials.');
-    } else {
-      // Assuming successful login returns a session or redirects
-      // For now, we'll just redirect to home
-      router.push('/home');
-      router.refresh();
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+
+      if (data.user) {
+        router.push('/home');
+        router.refresh();
+      } else {
+        setError('Sign-in failed: No user data returned.');
+      }
+    } catch (err: any) {
+      console.error('Sign-in error:', err);
+      setError(err.message || 'An unexpected error occurred. Please try again.');
     }
-    // --- End Placeholder ---
   };
 
   return (
@@ -129,19 +122,19 @@ export default function SignInPage() {
 
         <form onSubmit={handleSignIn} className="space-y-4">
           <div>
-            <label className="text-sm font-bold text-primary-200 block mb-2">Username or Email</label>
+            <label className="text-sm font-bold text-primary-200 block mb-2">Email</label>
             <input
-              type="text"
-              placeholder="yourusername or you@example.com"
-              value={identifier}
+              type="email"
+              placeholder="you@example.com"
+              value={email}
               onChange={(e) => {
-                setIdentifier(e.target.value);
-                validateIdentifier(e.target.value); // Validate on change
+                setEmail(e.target.value);
+                validateEmail(e.target.value); // Validate on change
               }}
               required
               className="w-full p-3 rounded-lg bg-slate-800/50 border border-primary-700 text-white placeholder-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all duration-300"
             />
-            {identifierError && <p className="text-red-400 text-xs mt-1">{identifierError}</p>}
+            {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
           </div>
           <div>
             <label className="text-sm font-bold text-primary-200 block mb-2">Password</label>

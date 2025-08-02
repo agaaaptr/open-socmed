@@ -12,10 +12,7 @@
       "source": "/api/profile/:path*",
       "destination": "/api/profile.go"
     },
-    {
-      "source": "/api/auth/signin",
-      "destination": "auth/signin.go"
-    },
+    
     {
       "source": "/(.*)",
       "destination": "/apps/frontend/$1"
