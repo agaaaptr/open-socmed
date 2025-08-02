@@ -168,7 +168,7 @@ const MessagesPlaceholder = () => (
             >
                 <div>
                     <p className="font-semibold text-white text-right">You</p>
-                    <p className="text-sm text-primary-200 text-right">I'm doing great, thanks!</p>
+                    <p className="text-sm text-primary-200 text-right">I&apos;m doing great, thanks!</p>
                 </div>
                 <UserCircle className="w-6 h-6 text-accent-500 ml-3" />
             </motion.div>
