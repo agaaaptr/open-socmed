@@ -26,10 +26,7 @@ export default function SignInPage() {
   const router = useRouter();
 
   const validateEmail = (input: string) => {
-    const emailRegex = /^[^
-@]+@[^
-@]+\.[^
-@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (emailRegex.test(input)) {
       setEmailError(null);
