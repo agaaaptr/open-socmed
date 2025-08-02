@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/agaaaptr/open-socmed/apps/backend/database"
 	"github.com/agaaaptr/open-socmed/apps/backend/models"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
@@ -22,9 +23,43 @@ type UpdateProfileRequest struct {
 
 // ProfileHandler is the entry point for the /api/profile serverless function.
 func Handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Test profile endpoint"})
+	log.Printf("[DEBUG] Received request: %s %s", r.Method, r.URL.Path)
+
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	if r.Method == http.MethodOptions {
+		log.Println("[DEBUG] Responding to preflight CORS request.")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	userID, err := validateToken(r)
+	if err != nil {
+		log.Printf("[DEBUG] Token validation failed: %v", err)
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	log.Printf("[DEBUG] Token validated successfully for user ID: %s", userID)
+
+	db, err := database.GetDB()
+	if err != nil {
+		log.Printf("[ERROR] Failed to connect to database: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		getProfile(w, r, userID, db)
+	case http.MethodPut:
+		updateProfile(w, r, userID, db)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }
 
 func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.DB) {
