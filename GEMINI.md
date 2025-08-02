@@ -102,6 +102,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Login with Username/Email Backend:** Created a serverless function (`/api/auth/signin`) to resolve username/email to email for frontend authentication.
+  - [x] **Signin Error Handling:** Ensured `/api/auth/signin` always returns valid JSON responses, including for errors, to prevent frontend parsing issues.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.

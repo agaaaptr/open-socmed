@@ -22,13 +22,13 @@ type ResolveIdentifierResponse struct {
 // Handler for /api/auth/signin
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req ResolveIdentifierRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		sendJSONError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -37,14 +37,14 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	if supabaseURL == "" || supabaseKey == "" {
 		log.Printf("SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set")
-		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		sendJSONError(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}
 
 	client, err := supabase.NewClient(supabaseURL, supabaseKey, nil) // Pass nil for options
 	if err != nil {
 		log.Printf("Error creating Supabase client: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		sendJSONError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -62,24 +62,24 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		respBody, respStatus, err := client.From("profiles").Select("email", "exact=false", false).Eq("username", req.Identifier).Execute()
 		if err != nil {
 			log.Printf("Error fetching profile by username: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			sendJSONError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		if respStatus != http.StatusOK {
 			log.Printf("Supabase profiles query failed with status: %d, body: %s", respStatus, string(respBody))
-			http.Error(w, "Invalid username or email", http.StatusUnauthorized)
+			sendJSONError(w, "Invalid username or email", http.StatusUnauthorized)
 			return
 		}
 
 		if err := json.Unmarshal(respBody, &profiles); err != nil {
 			log.Printf("Error unmarshaling profiles response: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			sendJSONError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		if len(profiles) == 0 || profiles[0].Email == "" {
-			http.Error(w, "Invalid username or email", http.StatusUnauthorized)
+			sendJSONError(w, "Invalid username or email", http.StatusUnauthorized)
 			return
 		}
 		emailToReturn = profiles[0].Email
@@ -91,6 +91,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ResolveIdentifierResponse{
 		Email: emailToReturn,
 	})
+}
+
+// sendJSONError sends a JSON formatted error response
+func sendJSONError(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(ResolveIdentifierResponse{Error: message})
 }
 
 // isValidEmail is a simple helper to check for email format
