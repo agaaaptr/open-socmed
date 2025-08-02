@@ -126,7 +126,7 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit) - In Progress
+### Feature: User Profile (View & Edit) - Completed
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
@@ -135,18 +135,18 @@ This project is developed in structured stages to ensure organized progress.
 *   **Profile Display (Dashboard):**
     *   [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
     *   [x] Fetch user profile data from the backend API when the dashboard page loads.
-    *   [ ] Handle loading and error states when fetching profile data.
+    *   [x] Handle loading and error states when fetching profile data.
 *   **Edit Profile Form (Dedicated Page):**
-    *   [ ] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
-    *   [ ] Validate form input on the client-side.
-    *   [ ] Submit updated profile data to the backend API.
-    *   [ ] Handle loading and error states when submitting data.
-    *   [ ] Provide feedback to the user after successful or failed updates.
+    *   [x] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name and username.
+    *   [x] Validate form input on the client-side.
+    *   [x] Submit updated profile data to the backend API.
+    *   [x] Handle loading and error states when submitting data.
+    *   [x] Provide feedback to the user after successful or failed updates.
 *   **Authentication Integration:**
     *   [x] Ensure only authenticated users can view and edit their profiles.
     *   [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`apps/backend`) - Go: - COMPLETED
+#### Backend (`apps/backend`) - Go: - Completed
 
 *   **`Profile` Model:**
     *   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
@@ -155,7 +155,7 @@ This project is developed in structured stages to ensure organized progress.
     *   [x] Implement logic to fetch data from the database using GORM.
     *   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
 *   **API Endpoint for Updating Profile:**
-    *   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data.
+    *   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username).
     *   [x] Implement logic to update data in the database using GORM.
     *   [x] Validate input received from the frontend.
     *   [x] Secure this endpoint so only authenticated users can update their own profile.

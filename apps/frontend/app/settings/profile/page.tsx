@@ -13,8 +13,6 @@ export default function EditProfilePage() {
   const [profile, setProfile] = useState({
     full_name: '',
     username: '',
-    website: '',
-    avatar_url: '',
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -56,8 +54,6 @@ export default function EditProfilePage() {
         setProfile({
           full_name: data.full_name || '',
           username: data.username || '',
-          website: data.website || '',
-          avatar_url: data.avatar_url || '',
         });
       } catch (err: any) {
         console.error('Error fetching profile:', err);
@@ -195,34 +191,7 @@ export default function EditProfilePage() {
               placeholder="Your unique username"
             />
           </div>
-          <div>
-            <label htmlFor="website" className="block text-primary-300 text-sm font-bold mb-2">
-              Website
-            </label>
-            <input
-              type="text"
-              id="website"
-              name="website"
-              value={profile.website}
-              onChange={handleChange}
-              className="shadow appearance-none border border-primary-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-primary-800/50 placeholder-primary-400 transition-all duration-300 focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
-              placeholder="Your website URL"
-            />
-          </div>
-          <div>
-            <label htmlFor="avatar_url" className="block text-primary-300 text-sm font-bold mb-2">
-              Avatar URL
-            </label>
-            <input
-              type="text"
-              id="avatar_url"
-              name="avatar_url"
-              value={profile.avatar_url}
-              onChange={handleChange}
-              className="shadow appearance-none border border-primary-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-primary-800/50 placeholder-primary-400 transition-all duration-300 focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
-              placeholder="URL to your avatar image"
-            />
-          </div>
+          
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
