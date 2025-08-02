@@ -43,7 +43,7 @@ const LoadingSpinner = () => (
 );
 
 // Profile Card Component
-// Placeholder Components for Dashboard
+// Placeholder Components for Home
 const TimelinePlaceholder = () => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
