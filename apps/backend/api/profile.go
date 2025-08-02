@@ -22,7 +22,7 @@ type UpdateProfileRequest struct {
 }
 
 // ProfileHandler is the entry point for the /api/profile serverless function.
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[DEBUG] Received request: %s %s", r.Method, r.URL.Path)
 
 	// Set CORS headers
