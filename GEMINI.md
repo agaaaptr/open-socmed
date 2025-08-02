@@ -64,6 +64,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Fixed backend Go module paths (`go.mod`, `main.go`, etc.).
   - [x] Fixed frontend build failure by using `dotenv-cli` to load environment variables during `next build`.
   - [x] Configured GitHub Actions for CI/CD.
+  - [x] **Lint and Build Verification:** Successfully ran linting and build commands, confirming project integrity.
 - [x] **Checkpoint 1.5: Documentation Update (Completed)**
   - [x] Updated `README.md` with accurate, step-by-step setup instructions.
   - [x] Updated `GEMINI.md` to reflect the current project state.
@@ -81,9 +82,11 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Integrated `framer-motion` for fluid, physics-based animations across the application.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
   - [x] Added `lucide-react` for a consistent and high-quality icon set.
+  - [x] **UI/UX Enhancements for Home and Profile Pages:** Improved visual appeal and interactivity of home page placeholders and profile edit form, ensuring consistency with overall design, color scheme, and smooth animations.
 - [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
-  - [x] **User Profile Display:** Display user's `full_name` and `username` on the dashboard.
+  - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Username/Email:** Implemented frontend and backend logic to allow users to sign in using either their email or username.
+  - [ ] **Home as Main Page:** Redesign the home page to be the main social media feed, incorporating placeholders for timeline, stories, and messages.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
@@ -123,25 +126,25 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit) - COMPLETED
+### Feature: User Profile (View & Edit) - In Progress
 
-**Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information.
+**Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
 #### Frontend (`apps/frontend`) - Next.js:
 
 *   **Profile Display (Dashboard):**
-    *   Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
-    *   Fetch user profile data from the backend API when the dashboard page loads.
-    *   Handle loading and error states when fetching profile data.
-*   **Edit Profile Form:**
-    *   Create a UI form on the `/dashboard` page (or a separate page like `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
-    *   Validate form input on the client-side.
-    *   Submit updated profile data to the backend API.
-    *   Handle loading and error states when submitting data.
-    *   Provide feedback to the user after successful or failed updates.
+    *   [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
+    *   [x] Fetch user profile data from the backend API when the dashboard page loads.
+    *   [ ] Handle loading and error states when fetching profile data.
+*   **Edit Profile Form (Dedicated Page):**
+    *   [ ] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
+    *   [ ] Validate form input on the client-side.
+    *   [ ] Submit updated profile data to the backend API.
+    *   [ ] Handle loading and error states when submitting data.
+    *   [ ] Provide feedback to the user after successful or failed updates.
 *   **Authentication Integration:**
-    *   Ensure only authenticated users can view and edit their profiles.
-    *   Use Supabase authentication tokens to secure requests to the backend API.
+    *   [x] Ensure only authenticated users can view and edit their profiles.
+    *   [x] Use Supabase authentication tokens to secure requests to the backend API.
 
 #### Backend (`apps/backend`) - Go: - COMPLETED
 
@@ -190,6 +193,69 @@ This project is developed in structured stages to ensure organized progress.
     *   Validate post content.
 *   **Authentication Integration:**
     *   Ensure API endpoints are protected and integrate with Supabase authentication.
+
+### Feature: Timeline (Main Feed)
+
+**Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
+
+#### Frontend (`apps/frontend`) - Next.js:
+
+*   **Timeline Display:**
+    *   [ ] Integrate post feed display into the main dashboard layout.
+    *   [ ] Implement a visually appealing and interactive timeline UI.
+    *   [ ] Consider infinite scrolling or pagination for loading more posts.
+*   **Content Aggregation:**
+    *   [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
+*   **Interaction Points:**
+    *   [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
+
+#### Backend (`apps/backend`) - Go:
+
+*   **Timeline API:**
+    *   [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
+    *   [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
+
+### Feature: Stories
+
+**Goal:** Users can view and create short, ephemeral stories.
+
+#### Frontend (`apps/frontend`) - Next.js:
+
+*   **Stories Display:**
+    *   [ ] Create a UI component to display a carousel or list of active stories.
+    *   [ ] Implement a full-screen viewer for individual stories.
+*   **Story Creation UI:**
+    *   [ ] Create a form or interface for users to upload images/videos and create new stories.
+*   **Placeholder:**
+    *   [ ] Add a placeholder UI element on the dashboard for stories.
+
+#### Backend (`apps/backend`) - Go:
+
+*   **`Story` Model:**
+    *   [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
+*   **API Endpoints:**
+    *   [ ] Create API endpoints for creating, fetching, and viewing stories.
+
+### Feature: Direct Messages
+
+**Goal:** Users can send and receive direct messages with other users.
+
+#### Frontend (`apps/frontend`) - Next.js:
+
+*   **Message List:**
+    *   [ ] Create a UI to display a list of conversations/chats.
+*   **Chat Interface:**
+    *   [ ] Implement a real-time chat interface for sending and receiving messages.
+*   **Placeholder:**
+    *   [ ] Add a placeholder UI element on the dashboard for direct messages.
+
+#### Backend (`apps/backend`) - Go:
+
+*   **`Message` Model:**
+    *   [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
+*   **API Endpoints:**
+    *   [ ] Create API endpoints for sending, receiving, and retrieving messages.
+    *   [ ] Consider WebSocket integration for real-time messaging.
 
 ## 6. Commit Rules (Semantic Commits)
 
