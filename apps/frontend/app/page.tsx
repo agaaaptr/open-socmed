@@ -61,8 +61,8 @@ const Header = ({ user, onSignOut }) => (
             exit={{ opacity: 0, scale: 0.8 }}
             className="flex items-center space-x-4"
           >
-            <Link href="/dashboard" className="py-2 px-4 text-primary-200 hover:text-accent-500 transition-colors duration-300">
-              Dashboard
+            <Link href="/home" className="py-2 px-4 text-primary-200 hover:text-accent-500 transition-colors duration-300">
+              Home
             </Link>
             <button
               onClick={onSignOut}

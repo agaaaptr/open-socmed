@@ -94,8 +94,8 @@ export default function SignInPage() {
       setError(data.message || 'An unexpected error occurred.');
     } else {
       // Assuming successful login returns a session or redirects
-      // For now, we'll just redirect to dashboard
-      router.push('/dashboard');
+      // For now, we'll just redirect to home
+      router.push('/home');
       router.refresh();
     }
     // --- End Placeholder ---
