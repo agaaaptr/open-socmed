@@ -27,10 +27,6 @@
       "use": "@vercel/go"
     },
     {
-      "src": "apps/backend/api/auth/signin.go",
-      "use": "@vercel/go"
-    },
-    {
       "src": "apps/frontend/package.json",
       "use": "@vercel/next",
       "config": { "includeFiles": "apps/frontend/**" }
