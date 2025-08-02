@@ -76,6 +76,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Separated sign-in and sign-up into their own pages.
   - [x] Changed brand name to "Cirqle" and updated metadata.
 - [x] **Checkpoint 2.2: Authentication Logic (Completed)**
+  - [x] Reverted to email/password only login.
 - [x] **Checkpoint 2.3: Visual & UX Overhaul (Completed)**
   - [x] Established a new, consistent design system: dark/purple theme with a bright teal (`#00FFDE`) as the primary accent.
   - [x] Eliminated mixed gradients in favor of a clean, high-contrast aesthetic.
@@ -83,9 +84,9 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
   - [x] Added `lucide-react` for a consistent and high-quality icon set.
   - [x] **UI/UX Enhancements for Home and Profile Pages:** Improved visual appeal and interactivity of home page placeholders and profile edit form, ensuring consistency with overall design, color scheme, and smooth animations.
-- [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
+- [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
-  - [x] **Login with Username/Email:** Implemented frontend and backend logic to allow users to sign in using either their email or username.
+  - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
   - [ ] **Home as Main Page:** Redesign the home page to be the main social media feed, incorporating placeholders for timeline, stories, and messages.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
@@ -101,8 +102,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
-  - [x] **Login with Username/Email Backend:** Implemented full authentication logic in the serverless function (`/api/auth/signin`) to sign in users with resolved email/username and password via Supabase. (Fixed `gotrue-go` `SignIn` method issue by using `Token` method and resolving import error).
-  - [x] **Signin Error Handling:** Ensured `/api/auth/signin` always returns valid JSON responses, including for errors, to prevent frontend parsing issues.
+  - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
@@ -115,7 +115,6 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Hardened the `updateProfile` endpoint by using a dedicated request struct (`UpdateProfileRequest`) to prevent mass assignment vulnerabilities.
   - [x] Corrected JWT validation to use the `sub` claim for user ID.
   - [x] Fixed `getProfile` logic to correctly fetch a single record.
-  - [x] **Fixed Vercel Rewrite for Signin:** Corrected `vercel.json` rewrite rule for `/api/auth/signin` to correctly route to the Go serverless function.
 
 ## 4. Current Known Issues
 
@@ -125,11 +124,11 @@ This project is developed in structured stages to ensure organized progress.
 
 ### Backend (`apps/backend`)
 
-- **No known issues.** All identified issues with the profile API have been resolved.
+- **Ongoing Issue: `/api/profile` endpoint returns 404.** Despite correct `vercel.json` configuration and `profile.go` having a `Handler` function, the Vercel deployment is not correctly routing requests to this Go serverless function. This suggests a deeper issue with Vercel's monorepo handling of Go serverless functions.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit) - Completed
+### Feature: User Profile (View & Edit) - Ongoing Troubleshooting
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
@@ -149,16 +148,16 @@ This project is developed in structured stages to ensure organized progress.
     *   [x] Ensure only authenticated users can view and edit their profiles.
     *   [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`apps/backend`) - Go: - Completed
+#### Backend (`apps/backend`) - Go: - Ongoing Troubleshooting
 
 *   **`Profile` Model:**
     *   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 *   **API Endpoint for Fetching Profile:**
-    *   [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
+    *   [ ] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token. (Currently returning 404)
     *   [x] Implement logic to fetch data from the database using GORM.
     *   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
 *   **API Endpoint for Updating Profile:**
-    *   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username).
+    *   [ ] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username). (Currently returning 404)
     *   [x] Implement logic to update data in the database using GORM.
     *   [x] Validate input received from the frontend.
     *   [x] Secure this endpoint so only authenticated users can update their own profile.
@@ -173,29 +172,29 @@ This project is developed in structured stages to ensure organized progress.
 #### Frontend (`apps/frontend`) - Next.js:
 
 *   **Post Feed Display:**
-    *   Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-    *   Fetch post data from the backend API.
-    *   Implement pagination or infinite scrolling for the feed.
+    *   [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
+    *   [ ] Fetch post data from the backend API.
+    *   [ ] Implement pagination or infinite scrolling for the feed.
 *   **Post Creation UI:**
-    *   Create a form for users to compose and submit new posts.
-    *   Handle form input and validation.
-    *   Send new post data to the backend API.
+    *   [ ] Create a form for users to compose and submit new posts.
+    *   [ ] Handle form input and validation.
+    *   [ ] Send new post data to the backend API.
 *   **Basic Post Interaction (UI Only):**
-    *   Implement UI for like/comment buttons (functionality will be added later).
+    *   [ ] Implement UI for like/comment buttons (functionality will be added later).
 
 #### Backend (`apps/backend`) - Go:
 
 *   **`Post` Model:**
-    *   Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+    *   [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
 *   **API Endpoint for Fetching Posts:**
-    *   Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
-    *   Implement logic to fetch posts from the database, potentially with filtering and pagination.
+    *   [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+    *   [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
 *   **API Endpoint for Creating Posts:**
-    *   Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
-    *   Implement logic to save new posts to the database.
-    *   Validate post content.
+    *   [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+    *   [ ] Implement logic to save new posts to the database.
+    *   [ ] Validate post content.
 *   **Authentication Integration:**
-    *   Ensure API endpoints are protected and integrate with Supabase authentication.
+    *   [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
 ### Feature: Timeline (Main Feed)
 
