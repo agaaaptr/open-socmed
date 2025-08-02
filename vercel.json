@@ -5,11 +5,11 @@
       "destination": "/api/health.go"
     },
     {
-      "source": "/api/profiles",
+      "source": "/api/profile",
       "destination": "/api/profiles.go"
     },
     {
-      "source": "/api/profiles/:path*",
+      "source": "/api/profile/:path*",
       "destination": "/api/profiles.go"
     },
     {
