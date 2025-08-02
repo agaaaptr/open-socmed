@@ -16,6 +16,7 @@ This project is a monorepo containing:
 - **Flexible Authentication:** Users can now sign in using either their email or username, with robust client-side validation for all authentication forms.
 - **User Profile Management:** Authenticated users can view their `full_name` and `username` on the home page, and edit their profile information on a dedicated settings page.
 - **Database Integrity:** The `profiles` table now enforces a unique constraint on the `username` column.
+- **Login Fix:** Resolved an issue where login failed due to incorrect Vercel rewrite configuration for the `/api/auth/signin` endpoint.
 
 ## Tech Stack
 

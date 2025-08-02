@@ -14,7 +14,7 @@
     },
     {
       "source": "/api/auth/signin",
-      "destination": "/api/auth/signin.go"
+      "destination": "auth/signin.go"
     },
     {
       "source": "/(.*)",
@@ -23,7 +23,7 @@
   ],
   "builds": [
     {
-      "src": "apps/backend/api/*.go",
+      "src": "apps/backend/api/**/*.go",
       "use": "@vercel/go"
     },
     {
