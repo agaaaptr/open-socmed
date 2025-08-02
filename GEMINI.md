@@ -115,6 +115,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Hardened the `updateProfile` endpoint by using a dedicated request struct (`UpdateProfileRequest`) to prevent mass assignment vulnerabilities.
   - [x] Corrected JWT validation to use the `sub` claim for user ID.
   - [x] Fixed `getProfile` logic to correctly fetch a single record.
+  - [x] **Fixed Vercel Rewrite for Signin:** Corrected `vercel.json` rewrite rule for `/api/auth/signin` to correctly route to the Go serverless function.
 
 ## 4. Current Known Issues
 
