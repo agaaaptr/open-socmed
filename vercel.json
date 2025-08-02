@@ -6,11 +6,11 @@
     },
     {
       "source": "/api/profile",
-      "destination": "/api/profiles.go"
+      "destination": "/api/index.go"
     },
     {
       "source": "/api/profile/:path*",
-      "destination": "/api/profiles.go"
+      "destination": "/api/index.go"
     },
     {
       "source": "/api/auth/signin",
@@ -23,7 +23,7 @@
   ],
   "builds": [
     {
-      "src": "apps/backend/api/**/*.go",
+      "src": "apps/backend/api/index.go",
       "use": "@vercel/go"
     },
     {
