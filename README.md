@@ -6,15 +6,22 @@ A full-stack social media platform built with a Turborepo monorepo, Next.js, Go,
 
 This project is a monorepo containing:
 
-- `apps/frontend`: A Next.js web application for the user-facing social media experience.
-- `apps/backend`: A Go API that serves data to the frontend.
+- `apps/frontend`: A Next.js web application for the user-facing social media experience, featuring a modern, interactive UI.
+- `apps/backend`: A Go API that serves data to the frontend, including serverless functions for authentication.
 - `packages/ui`: A shared React component library.
+
+## Key Features & Improvements
+
+- **Modern & Consistent UI/UX:** A complete visual overhaul with a dark/charcoal theme and a vibrant teal (`#00FFDE`) accent, utilizing glassmorphism effects and fluid animations powered by Framer Motion.
+- **Flexible Authentication:** Users can now sign in using either their email or username, with robust client-side validation for all authentication forms.
+- **User Profile Display:** Authenticated users can view their `full_name` and `username` on the dashboard.
+- **Database Integrity:** The `profiles` table now enforces a unique constraint on the `username` column.
 
 ## Tech Stack
 
 - **Monorepo:** Turborepo & npm Workspaces
-- **Frontend:** Next.js, TypeScript, Tailwind CSS, React Query, Supabase Auth
-- **Backend:** Go (Vercel Serverless Functions), GORM
+- **Frontend:** Next.js, TypeScript, Tailwind CSS, Framer Motion, Lucide React, React Query, Supabase Auth
+- **Backend:** Go (Vercel Serverless Functions), GORM, supabase-go
 - **Database:** Supabase (PostgreSQL)
 - **Deployment:** Vercel (Frontend & Backend Serverless Functions), GitHub Actions (CI/CD)
 
@@ -60,11 +67,21 @@ npm install
     ```
 
     Enter your database password when prompted.
-6. **Push Database Schema:** Apply the local schema to your remote database. If you encounter issues, ensure your remote database is empty or use `supabase db reset` (CAUTION: this deletes all data) or `supabase db pull` to resync your local migration history.
+6. **Push Database Schema:** Apply the local schema to your remote database. This command is crucial for applying any schema changes (e.g., new tables, columns, constraints) defined in your `supabase/migrations` directory.
 
     ```bash
     supabase db push --yes
     ```
+
+    *Note: If you encounter issues with `supabase db push` related to database password or connection, ensure your `SUPABASE_ACCESS_TOKEN` environment variable is set (after `supabase login`) and that you provide the correct database password when prompted or via the `PGPASSWORD` environment variable (e.g., `PGPASSWORD=YourDbPassword supabase db push --yes`). If you need to reset your local database state to match remote, use `supabase db reset` (CAUTION: this deletes all data) or `supabase db pull` to resync your local migration history.*
+
+7. **Generate New Migrations (for schema changes):** If you make changes to your local `supabase_schema.sql` or directly in your Supabase dashboard and want to capture them as a migration, use:
+
+    ```bash
+    supabase migration new <migration_name>
+    ```
+
+    Then, copy the relevant SQL from `supabase_schema.sql` or write your changes directly into the newly created migration file (`supabase/migrations/<timestamp>_<migration_name>.sql`). Remember to `supabase db push` after creating new migrations.
 
 ### 4. Environment Variables
 
@@ -86,7 +103,12 @@ Use the database connection string from your Supabase Dashboard (`Project Settin
 ```env
 DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.<your-project-ref>.supabase.co:6543/postgres
 PORT=8080
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key> # Required for backend operations like resolving usernames
 ```
+
+### Important Note on Supabase Service Role Key
+
+The `SUPABASE_SERVICE_ROLE_KEY` is a powerful key that grants full access to your Supabase database, bypassing Row Level Security (RLS). It is used by the backend serverless functions (e.g., `/api/auth/signin`) for operations that require elevated privileges, such as querying user profiles by username. **This key must NEVER be exposed to the client-side (frontend).** Ensure it is only used in secure server-side environments (like Vercel's serverless functions) and managed as a secret environment variable.
 
 ### 5. Run the Development Servers
 
@@ -111,43 +133,6 @@ From the root directory:
 - `npm run build`: Builds all apps for production.
 - `npm run lint`: Lints all code in the monorepo.
 
-## Feature: User Profile (View & Edit)
-
-**Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information.
-
-### Frontend (`apps/frontend`) - Next.js:
-
-*   **Profile Display (Dashboard):**
-    *   Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
-    *   Fetch user profile data from the backend API when the dashboard page loads.
-    *   Handle loading and error states when fetching profile data.
-*   **Edit Profile Form:**
-    *   Create a UI form on the `/dashboard` page (or a separate page like `/settings/profile`) that allows users to edit their full name, username, and other profile fields.
-    *   Validate form input on the client-side.
-    *   Submit updated profile data to the backend API.
-    *   Handle loading and error states when submitting data.
-    *   Provide feedback to the user after successful or failed updates.
-*   **Authentication Integration:**
-    *   Ensure only authenticated users can view and edit their profiles.
-    *   Use Supabase authentication tokens to secure requests to the backend API.
-
-### Backend (`apps/backend`) - Go:
-
-*   **`Profile` Model:**
-    *   Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
-*   **API Endpoint for Fetching Profile:**
-    *   Create an API endpoint (`GET /api/profile` or `GET /api/profiles/:id`) to retrieve user profile data based on user ID or authentication token.
-    *   Implement logic to fetch data from the database using GORM.
-    *   Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
-*   **API Endpoint for Updating Profile:**
-    *   Create an API endpoint (`PUT /api/profile` or `PUT /api/profiles/:id`) to update user profile data.
-    *   Implement logic to update data in the database using GORM.
-    *   Validate input received from the frontend.
-    *   Secure this endpoint so only authenticated users can update their own profile.
-*   **Authentication Integration:**
-    *   Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
-    *   Extract user ID from the JWT token to ensure users can only access or modify their own profile.
-
 ## CI/CD & Deployment
 
 This project uses GitHub Actions for CI/CD.
@@ -161,6 +146,7 @@ Ensure the following secrets are configured in your GitHub repository (`Settings
 - `VERCEL_PROJECT_ID`: Your Vercel Project ID.
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+- `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase Service Role Key (for backend serverless functions).
 
 ### Backend Deployment to Vercel (Serverless Functions)
 

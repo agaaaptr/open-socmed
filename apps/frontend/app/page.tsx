@@ -5,6 +5,175 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, MessageSquare, Users, Heart } from 'lucide-react';
+
+// Reusable Accent-colored Text
+const AccentText = ({ children, className = '' }) => (
+  <span className={`text-accent-500 ${className}`}>
+    {children}
+  </span>
+);
+
+// Reusable Feature Card component
+const FeatureCard = ({ icon, title, description, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay, ease: 'easeInOut' }}
+    whileHover={{ scale: 1.03, y: -5 }}
+    className="p-6 rounded-2xl bg-primary-900/50 backdrop-blur-md border border-primary-700/50 shadow-lg transition-shadow duration-300 hover:shadow-accent-500/10"
+  >
+    <div className="flex items-center justify-center w-12 h-12 mb-4 bg-accent-500/10 rounded-full border border-accent-500/20">
+      {icon}
+    </div>
+    <h3 className="text-xl font-bold mb-2 text-white">{title}</h3>
+    <p className="text-primary-300">{description}</p>
+  </motion.div>
+);
+
+// Reusable Accent-colored Button
+const AccentButton = ({ href, children, className = '' }) => (
+  <Link
+    href={href}
+    className={`inline-block text-primary-900 font-bold py-2 px-5 rounded-full bg-accent-500 hover:bg-accent-400 transition-all duration-300 ease-in-out shadow-lg hover:shadow-accent-500/40 transform hover:scale-105 ${className}`}>
+    {children}
+  </Link>
+);
+
+// Header Component
+const Header = ({ user, onSignOut }) => (
+  <motion.header
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="fixed top-0 left-0 right-0 z-50 p-4 bg-primary-900/80 backdrop-blur-lg shadow-md flex justify-between items-center border-b border-primary-800/50"
+  >
+    <Link href="/" className="text-3xl font-bold text-white">
+      Cirqle
+    </Link>
+    <nav>
+      <AnimatePresence>
+        {user ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="flex items-center space-x-4"
+          >
+            <Link href="/dashboard" className="py-2 px-4 text-primary-200 hover:text-accent-500 transition-colors duration-300">
+              Dashboard
+            </Link>
+            <button
+              onClick={onSignOut}
+              className="py-2 px-4 bg-red-600 hover:bg-red-700 rounded-md font-semibold text-white transition-colors duration-300"
+            >
+              Sign Out
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="space-x-2 md:space-x-4 flex items-center"
+          >
+            <Link href="/auth/signin" className="py-2 px-4 text-primary-200 hover:text-accent-500 transition-colors duration-300">
+              Sign In
+            </Link>
+            <AccentButton href="/auth/signup">Get Started</AccentButton>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  </motion.header>
+);
+
+// Hero Section Component
+const HeroSection = ({ user }) => (
+  <motion.main
+    initial="hidden"
+    animate="visible"
+    variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } }}
+    className="flex-grow flex flex-col items-center justify-center text-center p-8 pt-32"
+  >
+    <motion.h1
+      variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+      transition={{ duration: 0.6 }}
+      className="text-5xl md:text-7xl font-extrabold mb-4 text-white"
+    >
+      Your New <AccentText>Social Universe</AccentText>
+    </motion.h1>
+    <motion.p
+      variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="text-lg md:text-xl text-primary-300 max-w-3xl mb-8"
+    >
+      Discover, connect, and share in a universe that revolves around you. Cirqle is where your story comes to life.
+    </motion.p>
+    {!user && (
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
+          Join the Cirqle <ArrowRight className="inline-block ml-2 h-5 w-5" />
+        </AccentButton>
+      </motion.div>
+    )}
+  </motion.main>
+);
+
+// Features Section Component
+const FeaturesSection = () => (
+  <section className="w-full max-w-6xl mx-auto p-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <FeatureCard
+        delay={0.2}
+        icon={<MessageSquare className="w-6 h-6 text-accent-400" />}
+        title="Share Your Story"
+        description="Post updates, photos, and videos with our easy-to-use editor."
+      />
+      <FeatureCard
+        delay={0.4}
+        icon={<Users className="w-6 h-6 text-accent-400" />}
+        title="Build Your Community"
+        description="Connect with friends, family, and people who share your interests."
+      />
+      <FeatureCard
+        delay={0.6}
+        icon={<Heart className="w-6 h-6 text-accent-400" />}
+        title="Discover & Interact"
+        description="Explore trending topics and react to posts that inspire you."
+      />
+    </div>
+  </section>
+);
+
+// CTA Section Component
+const CTASection = () => (
+  <section className="w-full text-center p-16">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+    >
+      <h2 className="text-4xl font-bold text-white mb-4">Ready to <AccentText>Dive In?</AccentText></h2>
+      <p className="text-primary-300 mb-8 max-w-xl mx-auto">Become a part of the fastest-growing social platform. Your new community is just one click away.</p>
+      <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
+        Sign Up Now
+      </AccentButton>
+    </motion.div>
+  </section>
+);
+
+// Footer Component
+const Footer = () => (
+  <footer className="w-full p-6 text-center text-primary-400/70 text-sm">
+    &copy; {new Date().getFullYear()} Cirqle. All rights reserved.
+  </footer>
+);
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -12,15 +181,12 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    async function getUser() {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.push('/dashboard'); // Redirect to dashboard if user is logged in
-      }
       setUser(user);
-    }
+    };
     getUser();
-  }, [supabase, router]);
+  }, [supabase]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -29,59 +195,15 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      {/* Header */}
-      <header className="w-full p-4 bg-gray-800 shadow-md flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-blue-400 hover:text-blue-300 transition duration-200">
-          Cirqle
-        </Link>
-        <nav>
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="py-2 px-4 border border-blue-400 text-blue-400 rounded-md hover:bg-blue-400 hover:text-white transition duration-200">
-                Dashboard
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="py-2 px-4 bg-red-600 hover:bg-red-700 rounded-md font-semibold transition duration-200"
-              >
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <div className="space-x-4">
-              <Link href="/auth/login" className="py-2 px-4 border border-blue-400 text-blue-400 rounded-md hover:bg-blue-400 hover:text-white transition duration-200">
-                Sign In
-              </Link>
-              <Link href="/auth/signup" className="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-md font-semibold transition duration-200">
-                Sign Up
-              </Link>
-            </div>
-          )}
-        </nav>
-      </header>
+    <div className="min-h-screen flex flex-col bg-primary-900 text-white overflow-x-hidden">
+      {/* Animated Background */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-900 via-slate-900 to-primary-800/50 animate-background-pan -z-10" />
 
-      {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center text-center p-8">
-        <h1 className="text-5xl font-extrabold mb-4 text-blue-400">
-          Connect with the World
-        </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mb-8">
-          Join Cirqle to share your moments, discover new friends, and explore communities.
-        </p>
-        {!user && (
-          <div className="space-x-4">
-            <Link href="/auth/signup" className="py-3 px-8 bg-blue-600 hover:bg-blue-700 rounded-full text-lg font-semibold transition duration-200">
-              Get Started
-            </Link>
-          </div>
-        )}
-      </main>
-
-      {/* Footer Content */}
-      <footer className="w-full p-4 bg-gray-800 text-center text-gray-500 text-sm">
-        &copy; {new Date().getFullYear()} Cirqle. All rights reserved.
-      </footer>
+      <Header user={user} onSignOut={handleSignOut} />
+      <HeroSection user={user} />
+      <FeaturesSection />
+      <CTASection />
+      <Footer />
     </div>
   );
 }

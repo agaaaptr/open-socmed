@@ -27,6 +27,8 @@
 - **Framework**: Next.js (TypeScript)
 - **Styling**: Tailwind CSS
 - **UI Components**: Headless UI
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
 - **Data Fetching**: React Query
 - **Authentication**: Supabase Auth
 
@@ -36,6 +38,7 @@
 - **Web Framework**: (N/A - replaced by Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
 - **Database**: Supabase PostgreSQL (via `DATABASE_URL`)
+- **Supabase Client**: supabase-go
 
 ### Database & CI/CD
 
@@ -72,26 +75,30 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Separated sign-in and sign-up into their own pages.
   - [x] Changed brand name to "Cirqle" and updated metadata.
 - [x] **Checkpoint 2.2: Authentication Logic (Completed)**
-  - [x] Re-enabled Supabase authentication logic in login, signup, and home pages.
-  - [x] Implemented form-based signup with `username` and `full_name`.
-  - [x] Removed Google OAuth integration.
-  - [x] Created protected `/dashboard` route.
-  - [x] Configured redirects after login/signup.
-- [x] **Checkpoint 2.3: Frontend Title and Icon (Completed)**
-  - [x] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
-- [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (Next Steps)**
-  - [ ] **User Profile Display:** Display user's `full_name` and `username` on the dashboard.
+- [x] **Checkpoint 2.3: Visual & UX Overhaul (Completed)**
+  - [x] Established a new, consistent design system: dark/purple theme with a bright teal (`#00FFDE`) as the primary accent.
+  - [x] Eliminated mixed gradients in favor of a clean, high-contrast aesthetic.
+  - [x] Integrated `framer-motion` for fluid, physics-based animations across the application.
+  - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
+  - [x] Added `lucide-react` for a consistent and high-quality icon set.
+- [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
+  - [x] **User Profile Display:** Display user's `full_name` and `username` on the dashboard.
+  - [x] **Login with Username/Email:** Implemented frontend and backend logic to allow users to sign in using either their email or username.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [ ] **Responsive Design:** Ensure all pages are responsive across devices.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
+- [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
+  - [ ] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
 
 ### 3.3. Backend Development Plan
 
 - [x] **Checkpoint 3.1: Backend Core Feature Implementation (Next Steps)**
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
-  - [ ] **User Profile API:** Implement API endpoints for fetching user profiles (e.g., `/api/profiles/:id` or `/api/profile`).
+  - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
+  - [x] **User Profile API:** Implemented API endpoint for fetching user profiles (e.g., `/api/profiles/:id` or `/api/profile`).
+  - [x] **Login with Username/Email Backend:** Created a serverless function (`/api/auth/signin`) to resolve username/email to email for frontend authentication.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.

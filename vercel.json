@@ -13,6 +13,10 @@
       "destination": "/api/profiles.go"
     },
     {
+      "source": "/api/auth/signin",
+      "destination": "/api/auth/signin.go"
+    },
+    {
       "source": "/(.*)",
       "destination": "/apps/frontend/$1"
     }
@@ -20,6 +24,10 @@
   "builds": [
     {
       "src": "apps/backend/api/*.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "apps/backend/api/auth/signin.go",
       "use": "@vercel/go"
     },
     {
