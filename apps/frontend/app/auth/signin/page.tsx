@@ -88,10 +88,17 @@ export default function SignInPage() {
       body: JSON.stringify({ identifier, password }),
     });
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('Failed to parse JSON response:', jsonError);
+      setError('Received an invalid response from the server. Please try again.');
+      return;
+    }
 
     if (!response.ok) {
-      setError(data.message || 'An unexpected error occurred.');
+      setError(data.message || 'An unexpected error occurred. Please check your credentials.');
     } else {
       // Assuming successful login returns a session or redirects
       // For now, we'll just redirect to home

@@ -142,7 +142,7 @@ func validateToken(r *http.Request) (string, error) {
 	})
 
 	if err != nil {
-		log.Printf("[DEBUG] VALIDATION ERROR: Failed to parse JWT token: %v", err)
+		log.Printf("[DEBUG] VALIDATION ERROR: Failed to parse JWT token: %v. Token string: %s", err, tokenString)
 		return "", fmt.Errorf("invalid token: %w", err)
 	}
 

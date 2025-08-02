@@ -64,7 +64,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Fixed backend Go module paths (`go.mod`, `main.go`, etc.).
   - [x] Fixed frontend build failure by using `dotenv-cli` to load environment variables during `next build`.
   - [x] Configured GitHub Actions for CI/CD.
-  - [x] **Lint and Build Verification:** Successfully ran linting and build commands, confirming project integrity.
+  - [x] **Lint Verification:** Successfully ran linting commands, confirming project integrity. (Build command is not applicable for Vercel serverless functions).
 - [x] **Checkpoint 1.5: Documentation Update (Completed)**
   - [x] Updated `README.md` with accurate, step-by-step setup instructions.
   - [x] Updated `GEMINI.md` to reflect the current project state.
@@ -101,7 +101,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
-  - [x] **Login with Username/Email Backend:** Created a serverless function (`/api/auth/signin`) to resolve username/email to email for frontend authentication.
+  - [x] **Login with Username/Email Backend:** Implemented full authentication logic in the serverless function (`/api/auth/signin`) to sign in users with resolved email/username and password via Supabase. (Fixed `gotrue-go` `SignIn` method issue by using `Token` method and resolving import error).
   - [x] **Signin Error Handling:** Ensured `/api/auth/signin` always returns valid JSON responses, including for errors, to prevent frontend parsing issues.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
