@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/agaaaptr/open-socmed/apps/backend/database"
 	"github.com/agaaaptr/open-socmed/apps/backend/models"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
