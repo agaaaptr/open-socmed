@@ -2,63 +2,167 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/agaaaptr/open-socmed/apps/backend/database"
 	"github.com/agaaaptr/open-socmed/apps/backend/models"
-	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
+	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func init() {
-	// Load .env file (for local development)
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Error loading .env file, using environment variables")
-	}
-
-	// Database connection
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		log.Fatal("DATABASE_URL environment variable not set")
-	}
-
-	var errDB error
-	db, errDB = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if errDB != nil {
-		log.Fatalf("Failed to connect to database: %v", errDB)
-	}
+// UpdateProfileRequest defines the structure for incoming profile update data.
+// This ensures that users can only update specific, allowed fields.
+type UpdateProfileRequest struct {
+	FullName  *string `json:"full_name"`
+	Username  *string `json:"username"`
+	Website   *string `json:"website"`
+	AvatarURL *string `json:"avatar_url"`
 }
 
-// ProfilesHandler handles requests for /api/profiles
-func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
+// ProfileHandler is the entry point for the /api/profile serverless function.
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("[DEBUG] Received request: %s %s", r.Method, r.URL.Path)
+
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	if r.Method == http.MethodOptions {
+		log.Println("[DEBUG] Responding to preflight CORS request.")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	userID, err := validateToken(r)
+	if err != nil {
+		log.Printf("[DEBUG] Token validation failed: %v", err)
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	log.Printf("[DEBUG] Token validated successfully for user ID: %s", userID)
+
+	db, err := database.GetDB()
+	if err != nil {
+		log.Printf("[ERROR] Failed to connect to database: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		getProfiles(w, r)
-	case http.MethodPost:
-		createProfile(w, r)
+		getProfile(w, r, userID, db)
+	case http.MethodPut:
+		updateProfile(w, r, userID, db)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func getProfiles(w http.ResponseWriter, r *http.Request) {
-	var profiles []models.Profile
-	db.Find(&profiles)
-	json.NewEncoder(w).Encode(profiles)
-}
-
-func createProfile(w http.ResponseWriter, r *http.Request) {
-	var newProfile models.Profile
-	if err := json.NewDecoder(r.Body).Decode(&newProfile); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.DB) {
+	var profile models.Profile
+	if err := db.Where("id = ?", userID).First(&profile).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Printf("[DEBUG] Profile not found for user ID: %s", userID)
+			http.Error(w, "Profile not found", http.StatusNotFound)
+			return
+		}
+		log.Printf("[DEBUG] Database error in getProfile: %v", err)
+		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	db.Create(&newProfile)
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newProfile)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(profile)
+}
+
+func updateProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.DB) {
+	var req UpdateProfileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("[DEBUG] Failed to decode request body in updateProfile: %v", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Create a map from the request struct to only update non-nil fields.
+	// This prevents accidentally overwriting existing data with empty values.
+	updates := make(map[string]interface{})
+	if req.FullName != nil {
+		updates["full_name"] = *req.FullName
+	}
+	if req.Username != nil {
+		updates["username"] = *req.Username
+	}
+	if req.Website != nil {
+		updates["website"] = *req.Website
+	}
+	if req.AvatarURL != nil {
+		updates["avatar_url"] = *req.AvatarURL
+	}
+
+	if len(updates) == 0 {
+		log.Println("[DEBUG] No fields to update.")
+		http.Error(w, "No fields to update", http.StatusBadRequest)
+		return
+	}
+
+	if err := db.Model(&models.Profile{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
+		log.Printf("[DEBUG] Database error in updateProfile: %v", err)
+		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("[DEBUG] Successfully updated profile for user ID: %s", userID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Profile updated successfully"})
+}
+
+func validateToken(r *http.Request) (string, error) {
+	jwtSecret := os.Getenv("SUPABASE_JWT_SECRET")
+	if jwtSecret == "" {
+		log.Println("[DEBUG] VALIDATION ERROR: SUPABASE_JWT_SECRET environment variable not set.")
+		return "", fmt.Errorf("server configuration error: missing JWT secret")
+	}
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		log.Println("[DEBUG] VALIDATION ERROR: Missing Authorization header.")
+		return "", fmt.Errorf("missing Authorization header")
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenString == authHeader {
+		log.Printf("[DEBUG] VALIDATION ERROR: Invalid Authorization header format. Header was: %s", authHeader)
+		return "", fmt.Errorf("invalid Authorization header format, must be 'Bearer <token>'")
+	}
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(jwtSecret), nil
+	})
+
+	if err != nil {
+		log.Printf("[DEBUG] VALIDATION ERROR: Failed to parse JWT token: %v", err)
+		return "", fmt.Errorf("invalid token: %w", err)
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID, ok := claims["sub"].(string)
+		if !ok {
+			log.Printf("[DEBUG] VALIDATION ERROR: 'sub' claim is missing or not a string. Claims: %v", claims)
+			return "", fmt.Errorf("invalid token claims: 'sub' (user ID) is missing or not a string")
+		}
+		return userID, nil
+	}
+
+	log.Println("[DEBUG] VALIDATION ERROR: Token is invalid for an unknown reason.")
+	return "", fmt.Errorf("invalid token")
 }
