@@ -1,32 +1,16 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/health",
-      "destination": "/api/health.go"
-    },
-    {
-      "source": "/api/profile",
-      "destination": "/api/profile.go"
-    },
-    {
-      "source": "/api/profile/:path*",
-      "destination": "/api/profile.go"
-    },
-    
-    {
-      "source": "/(.*)",
-      "destination": "/apps/frontend/$1"
-    }
-  ],
   "builds": [
+    {
+      "src": "apps/backend/api/health.go",
+      "use": "@vercel/go"
+    },
     {
       "src": "apps/backend/api/profile.go",
       "use": "@vercel/go"
     },
     {
       "src": "apps/frontend/package.json",
-      "use": "@vercel/next",
-      "config": { "includeFiles": "apps/frontend/**" }
+      "use": "@vercel/next"
     }
   ]
 }
