@@ -9,7 +9,7 @@
 ### Monorepo Structure
 
 - **`apps/web`**: The main frontend application built with Next.js (TypeScript).
-- **`apps/api`**: The backend API, consisting of Vercel Serverless Functions written in Go.
+- **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
 - **`packages/go-common`**: A shared Go module for common functionalities like database connection and models.
 
@@ -33,7 +33,7 @@
 - **Authentication**: Supabase Auth
 - **Environment Variables**: `dotenv-cli` for local development.
 
-### Backend (`apps/api`)
+### Backend (`api/`)
 
 - **Language**: Go (Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
@@ -125,6 +125,12 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Hardened the `updateProfile` endpoint by using a dedicated request struct (`UpdateProfileRequest`) to prevent mass assignment vulnerabilities.
   - [x] Corrected JWT validation to use the `sub` claim for user ID.
   - [x] Fixed `getProfile` logic to correctly fetch a single record.
+- [x] **Checkpoint 3.4: Backend Directory Restructuring (Completed)**
+  - [x] Moved Go serverless functions from `apps/api` to `api/` at the project root.
+  - [x] Updated `vercel.json` to reflect the new API directory structure.
+  - [x] Updated Go package names to `main` for Vercel compatibility.
+  - [x] Updated `go.mod` to use relative path for `packages/go-common`.
+  - [x] Restructured Go API functions into individual subdirectories with their own `go.mod` files.
 
 ## 4. Current Known Issues
 
@@ -132,9 +138,17 @@ This project is developed in structured stages to ensure organized progress.
 
 - **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is expected to be stable with the new configuration.
 
-### Backend (`apps/api`)
+### Backend (`api/`)
 
-- **Ongoing Issue: `/api/profile` endpoint returns 404.** Despite correct `vercel.json` configuration and `profile.go` having a `Handler` function, the Vercel deployment is not correctly routing requests to this Go serverless function. This suggests a deeper issue with Vercel's monorepo handling of Go serverless functions.
+- **`/api/profile` endpoint returns 404 in `vercel dev` (Unresolved Locally):** Despite extensive debugging and restructuring to ensure correct Go module configuration and Vercel deployment patterns, the `/api/profile` endpoint continues to return a 404 when running `vercel dev`.
+  - **Investigation Summary:**
+    - Initial attempts focused on `vercel.json` routing (`routes` vs. `rewrites`).
+    - Restructured Go API to be self-contained (removed `packages/go-common` dependency, copied code directly into each function).
+    - Ensured all Go files within each function (`api/profile`, `api/health`) use `package <directory_name>` (e.g., `package profile`).
+    - Cleaned `go.mod` and `go.sum` files in both root and function directories.
+    - Verified `vercel.json` `builds` configuration for Go functions.
+  - **Current Hypothesis:** The issue is likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
+  - **Next Step:** Proceeding with deployment to Vercel production to verify if the issue persists in the deployed environment, which will help isolate the problem to either the local development environment or the build/runtime on Vercel.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -155,7 +169,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`apps/api`) - Go: - Completed
+#### Backend (`api/`) - Go: - Completed
 
 - [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 - [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
@@ -182,7 +196,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Send new post data to the backend API.
 - [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### Backend (`apps/api`) - Go
+#### Backend (`api/`) - Go
 
 - [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
 - [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
@@ -204,7 +218,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### Backend (`apps/api`) - Go
+#### Backend (`api/`) - Go
 
 - [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
 - [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
@@ -220,7 +234,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Create a form or interface for users to upload images/videos and create new stories.
 - [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### Backend (`apps/api`) - Go
+#### Backend (`api/`) - Go
 
 - [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
 - [ ] Create API endpoints for creating, fetching, and viewing stories.
@@ -235,7 +249,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Implement a real-time chat interface for sending and receiving messages.
 - [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### Backend (`apps/api`) - Go
+#### Backend (`api/`) - Go
 
 - [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.
@@ -354,7 +368,7 @@ This project has provided valuable insights into monorepo management, Vercel dep
 
 - **Go Serverless Function Naming Convention:**
   - For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
-  - **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`).
+  - **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
 
 - **Environment Variables in Monorepos:**
   - Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
@@ -373,3 +387,126 @@ This project has provided valuable insights into monorepo management, Vercel dep
 - **CI/CD Streamlining:**
   - For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
   - Keeping CI/CD configurations clean and focused improves maintainability and clarity.
+
+## 10. Development Guidelines & Conventions
+
+This section outlines the step-by-step process and rules for creating new API endpoints and other project components, ensuring consistency and Vercel compatibility.
+
+### 10.1. Creating a New Go API (Serverless Function)
+
+To create a new Go serverless API function that is compatible with Vercel and adheres to the project's structure, follow these steps:
+
+1.  **Create Function Directory:**
+    *   Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
+    *   **Example:** For a `/api/posts` endpoint, create `api/posts/`.
+    ```bash
+    mkdir -p api/posts
+    ```
+
+2.  **Create `index.go` File:**
+    *   Inside the new function directory (`api/posts/`), create a file named `index.go`.
+    *   **`index.go` Content:**
+        *   Use `package <function_directory_name>` (e.g., `package posts`).
+        *   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
+    *   **Example `api/posts/index.go`:**
+    ```go
+    package posts
+
+    import (
+        "encoding/json"
+        "net/http"
+        // Import other necessary dependencies
+    )
+
+    func Handler(w http.ResponseWriter, r *http.Request) {
+        if r.Method != http.MethodGet {
+            http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+            return
+        }
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(map[string]string{"message": "Posts API endpoint"})
+    }
+    ```
+
+3.  **Create `go.mod` for the New Function:**
+    *   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
+    *   **`go.mod` Content:**
+        *   `module <function_directory_name>` (e.g., `module posts`).
+        *   Specify the Go version (e.g., `go 1.21`).
+        *   Add `require` directives for any dependencies used by this function.
+    *   **Example `api/posts/go.mod`:**
+    ```go
+    module posts
+
+    go 1.21
+
+    require (
+        // Add your dependencies here, e.g.,
+        // github.com/joho/godotenv v1.5.1
+    )
+    ```
+
+4.  **Copy Shared Code (if any):**
+    *   If your new API function requires shared Go code (like database connection or models), copy the necessary `.go` files directly into the function's directory (`api/posts/`).
+    *   **Crucially, ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).**
+    *   Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory, or simply call `GetDB()` if `database.go` is in the same package).
+
+5.  **Update `vercel.json`:**
+    *   Add a new entry in the `builds` section of `vercel.json` for your new API function.
+    *   **Example Addition in `vercel.json`:**
+    ```json
+    {
+      "version": 2,
+      "builds": [
+        // ... existing builds
+        {
+          "src": "api/posts/index.go", // Path to your new function's index.go
+          "use": "@vercel/go"
+        }
+      ]
+      // No need for explicit "routes" or "rewrites" for API functions
+      // if they are placed directly under the top-level "api/" directory.
+    }
+    ```
+
+6.  **Run `go mod tidy`:**
+    *   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+    ```bash
+    cd api/posts
+    go mod tidy
+    ```
+
+7.  **Test Locally:**
+    *   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+
+### 10.2. General File/Folder Creation Rules
+
+#### For Frontend (`apps/web`)
+
+*   **React Components:**
+    *   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
+    *   Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
+*   **Next.js Pages:**
+    *   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
+    *   Inside, create a `page.tsx` file as the entry point for that page.
+*   **Utilities/Hooks/Libs:**
+    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
+    *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
+
+#### For Shared Go Modules (`packages/go-common`)
+
+*   **Structure:**
+    *   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
+    *   Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
+*   **Dependencies:**
+    *   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
+    *   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
+
+#### For Shared UI Components (`packages/ui`)
+
+*   **React Components:**
+    *   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
+    *   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
+*   **Dependencies:**
+    *   Add new dependencies to `packages/ui/package.json`.
+    *   Run `npm install` at the project root after modifying `package.json`.

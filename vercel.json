@@ -1,23 +1,24 @@
 {
   "version": 2,
+  "devCommand": "turbo dev",
   "builds": [
     {
       "src": "apps/web/next.config.js",
       "use": "@vercel/next"
     },
     {
-      "src": "apps/api/**/*.go",
+      "src": "api/profile/index.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "api/health/index.go",
       "use": "@vercel/go"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/apps/web/$1"
+      "source": "/(.*)",
+      "destination": "/apps/web/$1"
     }
   ]
 }

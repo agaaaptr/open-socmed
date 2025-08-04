@@ -1,11 +1,9 @@
-module github.com/agaaaptr/open-socmed
+module profile
 
-go 1.24.5
-
-replace github.com/agaaaptr/open-socmed/packages/go-common => /vercel/path0/packages/go-common
+go 1.21
 
 require (
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	gorm.io/driver/postgres v1.6.0

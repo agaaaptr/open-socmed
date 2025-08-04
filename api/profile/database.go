@@ -1,4 +1,4 @@
-package database
+package profile
 
 import (
 	"log"

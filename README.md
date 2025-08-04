@@ -1,125 +1,237 @@
 # open-socmed
 
-`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo, Next.js, Go, and Supabase.
+`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and shared UI/Go component libraries.
 
-## Monorepo Structure
+## 1. Getting Started
 
-This project is structured as a monorepo to manage multiple applications and shared packages efficiently.
+To set up the project locally, follow these steps:
 
-- **`apps/web`**: The Next.js frontend application.
-- **`apps/api`**: The Go backend API, deployed as Vercel Serverless Functions.
-- **`packages/ui`**: A shared React component library.
-- **`packages/go-common`**: A shared Go module for common functionalities (e.g., database connection, models).
+### 1.1. Prerequisites
 
-## Technologies Used
+- Node.js (v18 or higher)
+- Go (v1.21 or higher)
+- npm (v8 or higher)
+- Supabase CLI
+- Docker (for local Supabase setup, optional)
 
-- **Monorepo Management**: Turborepo, npm Workspaces
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS, Framer Motion, Lucide React, React Query, Supabase Auth
-- **Backend**: Go, GORM, Vercel Serverless Functions
-- **Database**: Supabase PostgreSQL
-- **CI/CD**: GitHub Actions, Vercel
+### 1.2. Installation
 
-## Getting Started
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-repo/open-socmed.git
+    cd open-socmed
+    ```
 
-Follow these steps to set up and run the project locally.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-### 1. Clone the Repository
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the project root for frontend environment variables:
+    ```
+    NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+    ```
+    Create a `.env` file in the project root for backend environment variables:
+    ```
+    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
+    SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
+    ```
+    **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
 
-```bash
-git clone https://github.com/agaaaptr/open-socmed.git
-cd open-socmed
-```
+4.  **Set up Supabase (Local or Remote):**
+    *   **Remote Supabase:** Link your local project to a remote Supabase project:
+        ```bash
+        supabase login
+        supabase link --project-ref your-project-ref
+        ```
+    *   **Local Supabase (using Docker):**
+        ```bash
+        supabase start
+        ```
 
-### 2. Install Dependencies
+5.  **Push database migrations:**
+    ```bash
+    supabase db push --yes
+    ```
 
-Install all root and workspace dependencies using npm.
+### 1.3. Running the Development Server
 
-```bash
-npm install
-```
-
-### 3. Supabase Setup
-
-This project relies on Supabase for its database and authentication. If you don't have a Supabase project, create one at [Supabase.com](https://supabase.com/).
-
-#### 3.1. Environment Variables
-
-Create the following `.env` files in the **root of your project** and fill them with your Supabase credentials. These are crucial for both frontend and backend local development.
-
-- **`.env.local` (for Frontend - `apps/web`):
-
-  ```
-  NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-  ```
-
-- **`.env` (for Backend - `apps/api`):
-
-  ```
-  DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
-  SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
-  ```
-
-**Important:** Replace `YOUR_SUPABASE_PROJECT_URL`, `YOUR_SUPABASE_ANON_KEY`, `YOUR_DB_PASSWORD`, and `YOUR_SUPABASE_JWT_SECRET` with your actual Supabase project details. **Do not commit these files to Git.**
-
-#### 3.2. Database Synchronization
-
-Ensure your local Supabase CLI is set up and linked to your remote project. Then, push the schema.
-
-```bash
-supabase login
-supabase link --project-ref your-project-ref
-supabase db push --yes
-```
-
-### 4. Run the Development Server
-
-Start the monorepo development server using Turborepo. This will run both the Next.js frontend and make the Go serverless functions available locally.
+To start both the frontend and backend development servers:
 
 ```bash
 npm run dev
 ```
 
-Access the frontend at `http://localhost:3000` (or `3001` if port 3000 is in use).
+This will typically run the Next.js frontend on `http://localhost:3000` (or `3001` if `3000` is in use) and the Go API functions will be served by Vercel CLI.
 
-### 5. Linting and Building
+## 2. Project Structure & Conventions
 
-To lint and build the entire monorepo:
+This project follows a monorepo structure managed by Turborepo. Understanding its layout and conventions is crucial for effective contribution.
 
-```bash
-npm run lint
-npm run build
-```
+### 2.1. Core Directories
 
-## Deployment
+- **`apps/`**: Contains independent applications within the monorepo.
+  - **`apps/web`**: The Next.js frontend application.
+- **`api/`**: Contains Go serverless functions deployed via Vercel.
+  - Each subdirectory within `api/` (e.g., `api/profile`, `api/health`) represents a distinct serverless function.
+  - Each function directory must contain an `index.go` file with a `Handler` function and its own `go.mod`.
+- **`packages/`**: Contains shared code and components used across different applications.
+  - **`packages/ui`**: Shared React/Tailwind components.
+  
 
-This project is designed for deployment on Vercel.
+### 2.2. Naming Conventions & File Creation
 
-### Vercel Dashboard Configuration
+To maintain consistency and Vercel compatibility, please adhere to the following:
 
-After importing your Git repository to Vercel, ensure the following settings are configured in your Vercel Project Dashboard (`Settings` tab):
+- **Go Serverless Functions (`api/`):**
+  - **Directory Structure:** Each new API endpoint should reside in its own subdirectory under `api/` (e.g., `api/your_new_endpoint/`).
+  - **File Naming:** The main entry file for each function must be `index.go`.
+  - **Package Naming:** The `index.go` file should use a package name that matches its directory (e.g., `package your_new_endpoint`).
+  - **Handler Function:** The entry point for Vercel must be a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
+  - **`go.mod`:** Each function directory (`api/your_new_endpoint/`) must have its own `go.mod` file, managing its specific dependencies.
 
-- **Framework Preset**: `Next.js`
-- **Root Directory**: `.` (or empty)
-- **Build Command**: `turbo build`
-- **Development Command**: `turbo dev`
-- **Include files outside of the Root Directory in the Build Step**: `Enabled`
+- **Frontend Components (`apps/web` & `packages/ui`):**
+  - Follow standard Next.js and React conventions.
+  - Use PascalCase for React component files (e.g., `MyComponent.tsx`).
+  - Use kebab-case for utility files or non-component modules (e.g., `utils/helpers.ts`).
 
-### Environment Variables on Vercel
+- **Shared Go Modules (`packages/go-common`):**
+  - Organize code into logical subdirectories (e.g., `database/`, `models/`).
+  - Each subdirectory can have its own package name (e.g., `package database`, `package models`).
+  - The `packages/go-common` directory itself has a `go.mod` file for its shared dependencies.
 
-Add all necessary environment variables (e.g., `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `SUPABASE_JWT_SECRET`) directly in your Vercel Project Dashboard (`Settings` -> `Environment Variables`).
+### 2.3. General Tips for Contributors
 
-## Contributing
+- **`vercel dev`:** When running locally, ensure your `vercel.json` is correctly configured to route requests to both frontend and Go API functions.
+- **`go.mod` Management:** Always run `go mod tidy` within the specific Go module directory after adding or removing dependencies.
+- **Linting & Formatting:** Before committing, always run `npm run lint` and `npm run format` from the project root to ensure code consistency.
+- **Testing:** If applicable, write and run tests for your changes.
 
-Follow the [Semantic Commit Messages](https://www.conventionalcommits.org/en/v1.0.0/) standard for all commits.
+### 2.4. API Development Guidelines
 
-```
-<type>(<scope>): <subject>
-```
+To create a new Go serverless API function that is compatible with Vercel and adheres to the project's conventions, follow these steps:
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
-**Scopes:** `web`, `api`, `ui`, `go-common`, `config`, `build`, `docs`, `monorepo`, `supabase`, `auth`, `post`, `profile`
+1.  **Create Function Directory:**
+    *   Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
+    *   **Example:** For a `/api/posts` endpoint, create `api/posts/` (this will be the module name).
+    ```bash
+    mkdir -p api/posts
+    ```
 
-## License
+2.  **Create `index.go` File:**
+    *   Inside the new function directory (`api/posts/`), create a file named `index.go`.
+    *   **`index.go` Content:**
+        *   Use `package posts` (matching the directory name).
+        *   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
+    *   **Example `api/posts/index.go`:**
+    ```go
+    package posts
 
-[Specify your license here, e.g., MIT License]
+    import (
+        "encoding/json"
+        "net/http"
+        // Import other necessary dependencies
+    )
+
+    func Handler(w http.ResponseWriter, r *http.Request) {
+        if r.Method != http.MethodGet {
+            http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+            return
+        }
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(map[string]string{"message": "Posts API endpoint"})
+    }
+    ```
+
+3.  **Create `go.mod` for the New Function:**
+    *   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
+    *   **`go.mod` Content:**
+        *   `module posts` (matching the directory name).
+        *   Specify the Go version (e.g., `go 1.21`).
+        *   Add `require` directives for any dependencies used by this function.
+    *   **Example `api/posts/go.mod`:**
+    ```go
+    module posts
+
+    go 1.21
+
+    require (
+        // Add your dependencies here, e.g.,
+        // github.com/joho/godotenv v1.5.1
+    )
+    ```
+
+4.  **Copy Shared Code (if any):**
+    *   If your new API function requires shared Go code (like database connection or models), copy the necessary `.go` files directly into the function's directory (`api/posts/`).
+    *   Ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).
+    *   Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory).
+
+5.  **Update `vercel.json`:**
+    *   Add a new entry in the `builds` section of `vercel.json` for your new API function.
+    *   **Example Addition in `vercel.json`:**
+    ```json
+    {
+      "version": 2,
+      "builds": [
+        // ... existing builds
+        {
+          "src": "api/posts/index.go", // Path to your new function's index.go
+          "use": "@vercel/go"
+        }
+      ]
+      // No need for explicit "routes" or "rewrites" for API functions
+      // if they are placed directly under the top-level "api/" directory.
+    }
+    ```
+
+6.  **Run `go mod tidy`:**
+    *   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+    ```bash
+    cd api/posts
+    go mod tidy
+    ```
+
+7.  **Test Locally:**
+    *   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+
+### 2.5. General File/Folder Creation Rules
+
+#### For Frontend (`apps/web`)
+
+*   **React Components:**
+    *   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
+    *   Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
+*   **Next.js Pages:**
+    *   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
+    *   Inside, create a `page.tsx` file as the entry point for that page.
+*   **Utilities/Hooks/Libs:**
+    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
+    *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
+
+#### For Shared Go Modules (`packages/go-common`)
+
+*   **Structure:**
+    *   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
+    *   Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
+*   **Dependencies:**
+    *   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
+    *   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
+
+#### For Shared UI Components (`packages/ui`)
+
+*   **React Components:**
+    *   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
+    *   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
+*   **Dependencies:**
+    *   Add new dependencies to `packages/ui/package.json`.
+    *   Run `npm install` at the project root after modifying `package.json`.
+
+## 3. Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+
+## 4. License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

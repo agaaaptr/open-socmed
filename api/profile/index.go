@@ -8,8 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/agaaaptr/open-socmed/packages/go-common/database"
-	"github.com/agaaaptr/open-socmed/packages/go-common/models"
+	
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
@@ -45,7 +44,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[DEBUG] Token validated successfully for user ID: %s", userID)
 
-	db, err := database.GetDB()
+	    db, err := GetDB()
 	if err != nil {
 		log.Printf("[ERROR] Failed to connect to database: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -63,7 +62,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.DB) {
-	var profile models.Profile
+	var profile Profile
 	if err := db.Where("id = ?", userID).First(&profile).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Printf("[DEBUG] Profile not found for user ID: %s", userID)
@@ -103,7 +102,7 @@ func updateProfile(w http.ResponseWriter, r *http.Request, userID string, db *go
 		return
 	}
 
-	if err := db.Model(&models.Profile{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
+	if err := db.Model(&Profile{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
 		log.Printf("[DEBUG] Database error in updateProfile: %v", err)
 		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
 		return
