@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { UserCircle, Loader, LogOut, Edit } from 'lucide-react';
+import { UserCircle, Loader, LogOut, Edit, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfileViewPage() {
@@ -105,6 +105,10 @@ export default function ProfileViewPage() {
         className="w-full max-w-2xl p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
       >
         <div className="flex justify-between items-center mb-6">
+          <Link href="/home" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            Back to Home
+          </Link>
           <h1 className="text-4xl font-bold text-text-light">Your Profile</h1>
           <Link href="/settings/profile" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
             <Edit className="mr-2 h-5 w-5" />

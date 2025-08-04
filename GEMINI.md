@@ -129,6 +129,7 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [ ] **Responsive Design:** Ensure all pages are responsive across devices.
+  - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
   - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.

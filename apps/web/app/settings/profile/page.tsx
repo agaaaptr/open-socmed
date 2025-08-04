@@ -139,7 +139,7 @@ export default function EditProfilePage() {
           <h1 className="text-4xl font-bold text-text-light">Edit Profile</h1>
           <Link href="/profile" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to Home
+            Back to Profile Detail
           </Link>
         </div>
 
