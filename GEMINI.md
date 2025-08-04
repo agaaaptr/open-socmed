@@ -6,7 +6,7 @@
 
 `open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and shared UI/Go component libraries.
 
-### Monorepo Structure
+### 1.1. Monorepo Structure
 
 - **`apps/web`**: The main frontend application built with Next.js (TypeScript).
 - **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
@@ -15,14 +15,14 @@
 
 ## 2. Technologies Used
 
-### Core Monorepo
+### 2.1. Core Monorepo
 
 - **Turborepo**: For monorepo management and optimized build caching.
 - **npm Workspaces**: For managing dependencies across packages.
 - **TypeScript**: For type safety across JavaScript/React projects.
 - **ESLint & Prettier**: For code linting and formatting.
 
-### Frontend (`apps/web`)
+### 2.2. Frontend (`apps/web`)
 
 - **Framework**: Next.js (TypeScript)
 - **Styling**: Tailwind CSS
@@ -33,7 +33,7 @@
 - **Authentication**: Supabase Auth
 - **Environment Variables**: `dotenv-cli` for local development.
 
-### Backend (`api/`)
+### 2.3. Backend (`api/`)
 
 - **Language**: Go (Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
@@ -41,7 +41,7 @@
 - **Supabase Client**: `supabase-go`
 - **Environment Variables**: `godotenv` for local development.
 
-### Database & CI/CD
+### 2.4. Database & CI/CD
 
 - **Supabase**: Provides PostgreSQL database, Authentication, and Realtime capabilities.
 - **Supabase CLI**: Used for local development and schema migrations.
@@ -134,11 +134,11 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 4. Current Known Issues
 
-### Frontend (`apps/web`)
+### 4.1. Frontend (`apps/web`)
 
 - **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is expected to be stable with the new configuration.
 
-### Backend (`api/`)
+### 4.2. Backend (`api/`)
 
 - **`/api/profile` endpoint returns 404 in `vercel dev` (Unresolved Locally):** Despite extensive debugging and restructuring to ensure correct Go module configuration and Vercel deployment patterns, the `/api/profile` endpoint continues to return a 404 when running `vercel dev`.
   - **Investigation Summary:**
@@ -150,16 +150,18 @@ This project is developed in structured stages to ensure organized progress.
   - **Current Hypothesis:** The issue is likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
   - **Next Step:** Proceeding with deployment to Vercel production to verify if the issue persists in the deployed environment, which will help isolate the problem to either the local development environment or the build/runtime on Vercel.
 - **Vercel Deployment Failure (Go Build Error):** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Root Cause:** Mismatched `package` declarations across Go files within the `api/profile` and `api/health` directories. `index.go`, `database.go`, and `profile.go` (for profile) and `index.go`, `database.go` (for health) were using `package handler` instead of their respective directory names.
-  - **Resolution:** Changed `package handler` to `package profile` in `api/profile/index.go`, `api/profile/database.go`, and `api/profile/profile.go`. Similarly, changed `package handler` to `package health` in `api/health/index.go` and `api/health/database.go`. This ensures all relevant files are within the same package, allowing `GetDB()` and `Profile` to be correctly resolved.
+  - **Root Cause:** Mismatched `package` declarations across Go files within the `api/profile` and `api/health` directories. Initially, `index.go`, `database.go`, and `profile.go` (for profile) and `index.go`, `database.go` (for health) were using `package handler` instead of their respective directory names.
+  - **Resolution:**
+    1.  Changed `package handler` to `package profile` in `api/profile/index.go`, `api/profile/database.go`, and `api/profile/profile.go`. Similarly, changed `package handler` to `package health` in `api/health/index.go` and `api/health/database.go`. (Initial attempt)
+    2.  **Further Refinement (Current):** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach is more robust for Vercel deployments as it avoids potential issues with how Vercel handles multiple Go files within a single serverless function directory.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit) - Completed
+### 5.1. Feature: User Profile (View & Edit) - Completed
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
-#### Frontend (`apps/web`) - Next.js
+#### 5.1.1. Frontend (`apps/web`) - Next.js
 
 - [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
 - [x] Fetch user profile data from the backend API when the dashboard page loads.
@@ -172,7 +174,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`api/`) - Go: - Completed
+#### 5.1.2. Backend (`api/`) - Go: - Completed
 
 - [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 - [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
@@ -185,11 +187,11 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
 - [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
-### Feature: Post Feed (View & Create)
+### 5.2. Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
-#### Frontend (`apps/web`) - Next.js
+#### 5.2.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
 - [ ] Fetch post data from the backend API.
@@ -199,7 +201,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Send new post data to the backend API.
 - [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### Backend (`api/`) - Go
+#### 5.2.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
 - [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
@@ -209,11 +211,11 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Validate post content.
 - [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
-### Feature: Timeline (Main Feed)
+### 5.3. Feature: Timeline (Main Feed)
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
-#### Frontend (`apps/web`) - Next.js
+#### 5.3.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Integrate post feed display into the main dashboard layout.
 - [ ] Implement a visually appealing and interactive timeline UI.
@@ -221,42 +223,41 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### Backend (`api/`) - Go
+#### 5.3.2. Backend (`api/`) - Go
 
 - [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
 - [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
 
-### Feature: Stories
+### 5.4. Feature: Stories
 
 **Goal:** Users can view and create short, ephemeral stories.
 
-#### Frontend (`apps/web`) - Next.js
+#### 5.4.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI component to display a carousel or list of active stories.
 - [ ] Implement a full-screen viewer for individual stories.
 - [ ] Create a form or interface for users to upload images/videos and create new stories.
 - [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### Backend (`api/`) - Go
+#### 5.4.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
 - [ ] Create API endpoints for creating, fetching, and viewing stories.
 
-### Feature: Direct Messages
+### 5.5. Feature: Direct Messages
 
 **Goal:** Users can send and receive direct messages with other users.
 
-#### Frontend (`apps/web`) - Next.js
+#### 5.5.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI to display a list of conversations/chats.
 - [ ] Implement a real-time chat interface for sending and receiving messages.
 - [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### Backend (`api/`) - Go
+#### 5.5.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.
-
 - [ ] Consider WebSocket integration for real-time messaging.
 
 ## 6. Commit Rules (Semantic Commits)
@@ -364,33 +365,38 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 This project has provided valuable insights into monorepo management, Vercel deployment, and Go serverless functions:
 
--   **Monorepo Structure & Vercel Compatibility:**
-    -   The most robust monorepo structure for Vercel involves placing applications in `apps/` and shared code in `packages/`.
-    -   Vercel's `builds` and `routes` in `vercel.json` are crucial for explicitly defining how different parts of the monorepo are built and served.
-    -   The `routes` array is evaluated sequentially, allowing for explicit routing rules (e.g., `/api/*` to backend, `/*` to frontend).
-    -   **Crucial Insight:** `vercel dev` (and Vercel deployment) expects Go serverless functions to reside directly under a top-level `api/` directory relative to the project root, or within a sub-directory of `apps/` that is explicitly configured in `vercel.json`. The `apps/api` structure is now fully compatible.
+### 9.1. Monorepo Structure & Vercel Compatibility
 
--   **Go Serverless Function Naming Convention:**
-    -   For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
-    -   **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
+-   The most robust monorepo structure for Vercel involves placing applications in `apps/` and shared code in `packages/`.
+-   Vercel's `builds` and `routes` in `vercel.json` are crucial for explicitly defining how different parts of the monorepo are built and served.
+-   The `routes` array is evaluated sequentially, allowing for explicit routing rules (e.g., `/api/*` to backend, `/*` to frontend).
+-   **Crucial Insight:** `vercel dev` (and Vercel deployment) expects Go serverless functions to reside directly under a top-level `api/` directory relative to the project root, or within a sub-directory of `apps/` that is explicitly configured in `vercel.json`. The `apps/api` structure is now fully compatible.
 
--   **Environment Variables in Monorepos:**
-    -   Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
-    -   **Solution:** Use `dotenv-cli` in the `build` script of the Next.js application's `package.json` to explicitly load environment variables from the correct relative path (e.g., `dotenv -e ../../.env.local -- next build`).
-    -   Ensure `dotenv-cli` is installed as a `devDependency` in the Next.js application's `package.json`.
-    -   For Go backend, `godotenv` can load `.env` files locally, but for Vercel deployment, environment variables must be set in the Vercel Dashboard.
+### 9.2. Go Serverless Function Naming Convention
 
--   **Vercel Dashboard Settings vs. `vercel.json`:**
-    -   **`vercel.json` takes precedence.** If `vercel.json` exists, Vercel will primarily rely on its configuration for builds and routing, often ignoring settings in the dashboard.
-    -   **Recommended Dashboard Settings for this Monorepo:**
-        -   **Root Directory:** `.` (or empty)
-        -   **Build Command:** `turbo build`
-        -   **Development Command:** `turbo dev`
-        -   **Include files outside of the Root Directory in the Build Step:** Enabled.
+-   For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
+-   **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
 
--   **CI/CD Streamlining:**
-    -   For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
-    -   Keeping CI/CD configurations clean and focused improves maintainability and clarity.
+### 9.3. Environment Variables in Monorepos
+
+-   Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
+-   **Solution:** Use `dotenv-cli` in the `build` script of the Next.js application's `package.json` to explicitly load environment variables from the correct relative path (e.g., `dotenv -e ../../.env.local -- next build`).
+-   Ensure `dotenv-cli` is installed as a `devDependency` in the Next.js application's `package.json`.
+-   For Go backend, `godotenv` can load `.env` files locally, but for Vercel deployment, environment variables must be set in the Vercel Dashboard.
+
+### 9.4. Vercel Dashboard Settings vs. `vercel.json`
+
+-   **`vercel.json` takes precedence.** If `vercel.json` exists, Vercel will primarily rely on its configuration for builds and routing, often ignoring settings in the dashboard.
+-   **Recommended Dashboard Settings for this Monorepo:**
+    -   **Root Directory:** `.` (or empty)
+    -   **Build Command:** `turbo build`
+    -   **Development Command:** `turbo dev`
+    -   **Include files outside of the Root Directory in the Build Step:** Enabled.
+
+### 9.5. CI/CD Streamlining
+
+-   For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
+-   Keeping CI/CD configurations clean and focused improves maintainability and clarity.
 
 ## 10. Development Guidelines & Conventions
 
@@ -490,7 +496,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 
 ### 10.2. General File/Folder Creation Rules
 
-#### For Frontend (`apps/web`)
+#### 10.2.1. For Frontend (`apps/web`)
 
 -   **React Components:**
     -   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
@@ -502,7 +508,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     -   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
     -   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
-#### For Shared Go Modules (`packages/go-common`)
+#### 10.2.2. For Shared Go Modules (`packages/go-common`)
 
 -   **Structure:**
     -   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
@@ -511,7 +517,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     -   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
     -   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
-#### For Shared UI Components (`packages/ui`)
+#### 10.2.3. For Shared UI Components (`packages/ui`)
 
 -   **React Components:**
     -   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
