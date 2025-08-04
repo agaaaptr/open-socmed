@@ -4,13 +4,14 @@
 
 ## 1. Project Overview
 
-`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and a shared UI component library.
+`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and shared UI/Go component libraries.
 
 ### Monorepo Structure
 
-- **`apps/frontend`**: The frontend application built with Next.js (TypeScript).
-- **`apps/backend`**: The backend API built with Go (Gin, GORM).
+- **`apps/web`**: The main frontend application built with Next.js (TypeScript).
+- **`apps/api`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
+- **`packages/go-common`**: A shared Go module for common functionalities like database connection and models.
 
 ## 2. Technologies Used
 
@@ -20,9 +21,8 @@
 - **npm Workspaces**: For managing dependencies across packages.
 - **TypeScript**: For type safety across JavaScript/React projects.
 - **ESLint & Prettier**: For code linting and formatting.
-- **dotenv-cli**: For managing environment variables in scripts.
 
-### Frontend (`apps/frontend`)
+### Frontend (`apps/web`)
 
 - **Framework**: Next.js (TypeScript)
 - **Styling**: Tailwind CSS
@@ -31,14 +31,15 @@
 - **Icons**: Lucide React
 - **Data Fetching**: React Query
 - **Authentication**: Supabase Auth
+- **Environment Variables**: `dotenv-cli` for local development.
 
-### Backend (`apps/backend`)
+### Backend (`apps/api`)
 
-- **Language**: Go (refactored to Vercel Serverless Functions)
-- **Web Framework**: (N/A - replaced by Vercel Serverless Functions)
+- **Language**: Go (Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
 - **Database**: Supabase PostgreSQL (via `DATABASE_URL`)
-- **Supabase Client**: supabase-go
+- **Supabase Client**: `supabase-go`
+- **Environment Variables**: `godotenv` for local development.
 
 ### Database & CI/CD
 
@@ -55,16 +56,25 @@ This project is developed in structured stages to ensure organized progress.
 
 - [x] **Checkpoint 1.1: Initial Monorepo & App Setup (Completed)**
 - [x] **Checkpoint 1.2: Project Restructuring & Initial Fixes (Completed)**
+  - [x] Initial monorepo setup with `apps/frontend`, `apps/backend`, `packages/ui`.
+  - [x] Refactored to standard monorepo structure: `apps/web`, `apps/api`, `packages/go-common`, `packages/ui`.
+  - [x] Moved frontend code to `apps/web`.
+  - [x] Moved Go serverless functions to `apps/api`.
+  - [x] Moved shared Go code (database, models) to `packages/go-common`.
+  - [x] Updated `go.mod` and import paths for new Go module structure.
 - [x] **Checkpoint 1.3: Supabase Project Integration (Completed)**
   - [x] Created and linked remote Supabase project.
-  - [x] Configured `.env` files for both `frontend` and `backend` with actual credentials.
+  - [x] Configured `.env` files for both `web` and `api` with actual credentials.
   - [x] Pushed initial `supabase_schema.sql` to the remote database.
   - [x] Troubleshot and resolved database connection issues (`failed SASL auth`).
 - [x] **Checkpoint 1.4: Build & CI/CD Configuration (Completed)**
-  - [x] Fixed backend Go module paths (`go.mod`, `main.go`, etc.).
-  - [x] Fixed frontend build failure by using `dotenv-cli` to load environment variables during `next build`.
+  - [x] Fixed Go module paths and dependencies.
+  - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.
+  - [x] Configured `turbo.json` for monorepo pipeline management.
+  - [x] Updated `package.json` scripts to use `turbo` commands.
+  - [x] Updated `tsconfig.json` for monorepo TypeScript paths.
   - [x] Configured GitHub Actions for CI/CD.
-  - [x] **Lint Verification:** Successfully ran linting commands, confirming project integrity. (Build command is not applicable for Vercel serverless functions).
+  - [x] **Lint Verification:** Successfully ran linting commands, confirming project integrity.
 - [x] **Checkpoint 1.5: Documentation Update (Completed)**
   - [x] Updated `README.md` with accurate, step-by-step setup instructions.
   - [x] Updated `GEMINI.md` to reflect the current project state.
@@ -72,7 +82,7 @@ This project is developed in structured stages to ensure organized progress.
 ### 3.2. Frontend Development Plan
 
 - [x] **Checkpoint 2.1: Landing Page & Auth UI (Completed)**
-  - [x] Redesigned `apps/frontend/app/page.tsx` as a modern landing page.
+  - [x] Redesigned `apps/web/app/page.tsx` as a modern landing page.
   - [x] Separated sign-in and sign-up into their own pages.
   - [x] Changed brand name to "Cirqle" and updated metadata.
 - [x] **Checkpoint 2.2: Authentication Logic (Completed)**
@@ -94,7 +104,7 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Responsive Design:** Ensure all pages are responsive across devices.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
-  - [ ] **To Do:** Add favicon and other app icons to `apps/frontend/public/` directory.
+  - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.
 
 ### 3.3. Backend Development Plan
 
@@ -118,146 +128,118 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 4. Current Known Issues
 
-### Frontend (`apps/frontend`)
+### Frontend (`apps/web`)
 
-- **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is stable.
+- **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is expected to be stable with the new configuration.
 
-### Backend (`apps/backend`)
+### Backend (`apps/api`)
 
-- **Ongoing Issue: `/api/profile` endpoint returns 404.** Despite correct `vercel.json` configuration and `profile.go` having a `Handler` function, the Vercel deployment is not correctly routing requests to this Go serverless function. This suggests a deeper issue with Vercel's monorepo handling of Go serverless functions.
+- **No known issues.** The `/api/profile` endpoint is expected to function correctly with the new structure and `vercel.json` configuration.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### Feature: User Profile (View & Edit) - Ongoing Troubleshooting
+### Feature: User Profile (View & Edit) - Completed
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
-#### Frontend (`apps/frontend`) - Next.js:
+#### Frontend (`apps/web`) - Next.js:
 
-*   **Profile Display (Dashboard):**
-    *   [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
-    *   [x] Fetch user profile data from the backend API when the dashboard page loads.
-    *   [x] Handle loading and error states when fetching profile data.
-*   **Edit Profile Form (Dedicated Page):**
-    *   [x] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name and username.
-    *   [x] Validate form input on the client-side.
-    *   [x] Submit updated profile data to the backend API.
-    *   [x] Handle loading and error states when submitting data.
-    *   [x] Provide feedback to the user after successful or failed updates.
-*   **Authentication Integration:**
-    *   [x] Ensure only authenticated users can view and edit their profiles.
-    *   [x] Use Supabase authentication tokens to secure requests to the backend API.
+*   [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
+*   [x] Fetch user profile data from the backend API when the dashboard page loads.
+*   [x] Handle loading and error states when fetching profile data.
+*   [x] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name and username.
+*   [x] Validate form input on the client-side.
+*   [x] Submit updated profile data to the backend API.
+*   [x] Handle loading and error states when submitting data.
+*   [x] Provide feedback to the user after successful or failed updates.
+*   [x] Ensure only authenticated users can view and edit their profiles.
+*   [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### Backend (`apps/backend`) - Go: - Ongoing Troubleshooting
+#### Backend (`apps/api`) - Go: - Completed
 
-*   **`Profile` Model:**
-    *   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
-*   **API Endpoint for Fetching Profile:**
-    *   [ ] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token. (Currently returning 404)
-    *   [x] Implement logic to fetch data from the database using GORM.
-    *   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
-*   **API Endpoint for Updating Profile:**
-    *   [ ] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username). (Currently returning 404)
-    *   [x] Implement logic to update data in the database using GORM.
-    *   [x] Validate input received from the frontend.
-    *   [x] Secure this endpoint so only authenticated users can update their own profile.
-*   **Authentication Integration:**
-    *   [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
-    *   [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
+*   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
+*   [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
+*   [x] Implement logic to fetch data from the database using GORM.
+*   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
+*   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username).
+*   [x] Implement logic to update data in the database using GORM.
+*   [x] Validate input received from the frontend.
+*   [x] Secure this endpoint so only authenticated users can update their own profile.
+*   [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
+*   [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
 ### Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
-#### Frontend (`apps/frontend`) - Next.js:
+#### Frontend (`apps/web`) - Next.js:
 
-*   **Post Feed Display:**
-    *   [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-    *   [ ] Fetch post data from the backend API.
-    *   [ ] Implement pagination or infinite scrolling for the feed.
-*   **Post Creation UI:**
-    *   [ ] Create a form for users to compose and submit new posts.
-    *   [ ] Handle form input and validation.
-    *   [ ] Send new post data to the backend API.
-*   **Basic Post Interaction (UI Only):**
-    *   [ ] Implement UI for like/comment buttons (functionality will be added later).
+*   [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
+*   [ ] Fetch post data from the backend API.
+*   [ ] Implement pagination or infinite scrolling for the feed.
+*   [ ] Create a form for users to compose and submit new posts.
+*   [ ] Handle form input and validation.
+*   [ ] Send new post data to the backend API.
+*   [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### Backend (`apps/backend`) - Go:
+#### Backend (`apps/api`) - Go:
 
-*   **`Post` Model:**
-    *   [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
-*   **API Endpoint for Fetching Posts:**
-    *   [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
-    *   [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
-*   **API Endpoint for Creating Posts:**
-    *   [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
-    *   [ ] Implement logic to save new posts to the database.
-    *   [ ] Validate post content.
-*   **Authentication Integration:**
-    *   [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
+*   [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+*   [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+*   [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
+*   [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+*   [ ] Implement logic to save new posts to the database.
+*   [ ] Validate post content.
+*   [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
 ### Feature: Timeline (Main Feed)
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
-#### Frontend (`apps/frontend`) - Next.js:
+#### Frontend (`apps/web`) - Next.js:
 
-*   **Timeline Display:**
-    *   [ ] Integrate post feed display into the main dashboard layout.
-    *   [ ] Implement a visually appealing and interactive timeline UI.
-    *   [ ] Consider infinite scrolling or pagination for loading more posts.
-*   **Content Aggregation:**
-    *   [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
-*   **Interaction Points:**
-    *   [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
+*   [ ] Integrate post feed display into the main dashboard layout.
+*   [ ] Implement a visually appealing and interactive timeline UI.
+*   [ ] Consider infinite scrolling or pagination for loading more posts.
+*   [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
+*   [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### Backend (`apps/backend`) - Go:
+#### Backend (`apps/api`) - Go:
 
-*   **Timeline API:**
-    *   [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-    *   [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
+*   [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
+*   [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
 
 ### Feature: Stories
 
 **Goal:** Users can view and create short, ephemeral stories.
 
-#### Frontend (`apps/frontend`) - Next.js:
+#### Frontend (`apps/web`) - Next.js:
 
-*   **Stories Display:**
-    *   [ ] Create a UI component to display a carousel or list of active stories.
-    *   [ ] Implement a full-screen viewer for individual stories.
-*   **Story Creation UI:**
-    *   [ ] Create a form or interface for users to upload images/videos and create new stories.
-*   **Placeholder:**
-    *   [ ] Add a placeholder UI element on the dashboard for stories.
+*   [ ] Create a UI component to display a carousel or list of active stories.
+*   [ ] Implement a full-screen viewer for individual stories.
+*   [ ] Create a form or interface for users to upload images/videos and create new stories.
+*   [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### Backend (`apps/backend`) - Go:
+#### Backend (`apps/api`) - Go:
 
-*   **`Story` Model:**
-    *   [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
-*   **API Endpoints:**
-    *   [ ] Create API endpoints for creating, fetching, and viewing stories.
+*   [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
+*   [ ] Create API endpoints for creating, fetching, and viewing stories.
 
 ### Feature: Direct Messages
 
 **Goal:** Users can send and receive direct messages with other users.
 
-#### Frontend (`apps/frontend`) - Next.js:
+#### Frontend (`apps/web`) - Next.js:
 
-*   **Message List:**
-    *   [ ] Create a UI to display a list of conversations/chats.
-*   **Chat Interface:**
-    *   [ ] Implement a real-time chat interface for sending and receiving messages.
-*   **Placeholder:**
-    *   [ ] Add a placeholder UI element on the dashboard for direct messages.
+*   [ ] Create a UI to display a list of conversations/chats.
+*   [ ] Implement a real-time chat interface for sending and receiving messages.
+*   [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### Backend (`apps/backend`) - Go:
+#### Backend (`apps/api`) - Go:
 
-*   **`Message` Model:**
-    *   [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
-*   **API Endpoints:**
-    *   [ ] Create API endpoints for sending, receiving, and retrieving messages.
-    *   [ ] Consider WebSocket integration for real-time messaging.
+*   [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
+*   [ ] Create API endpoints for sending, receiving, and retrieving messages.
+*   [ ] Consider WebSocket integration for real-time messaging.
 
 ## 6. Commit Rules (Semantic Commits)
 
@@ -280,7 +262,7 @@ All commits in this project **must** adhere to the Semantic Commit Messages stan
 
 **Scope (Scope of Change):**
 
-The scope can be the name of the component or part of the project affected. Examples: `frontend`, `backend`, `ui`, `config`, `build`, `docs`, `monorepo`, `supabase`, `auth`, `post`, `profile`.
+The scope can be the name of the component or part of the project affected. Examples: `web`, `api`, `ui`, `go-common`, `config`, `build`, `docs`, `monorepo`, `supabase`, `auth`, `post`, `profile`.
 
 **Subject (Commit Title):**
 
@@ -289,7 +271,7 @@ A brief description of the change in imperative mood (e.g., "add" not "adding").
 **Example Commit Messages:**
 
 - `feat(auth): implement form-based signup and login`
-- `fix(frontend): resolve build error by loading env vars`
+- `fix(web): resolve build error by loading env vars`
 - `docs(readme): update setup instructions`
 - `chore(monorepo): configure turborepo pipeline`
 - `test(web): add unit tests for Button component`
@@ -332,8 +314,19 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 ### 8.2. Environment Variables
 
-- **Local Development:** Each developer should have their own `.env` files in `apps/frontend/` and `apps/backend/` with their respective Supabase credentials.
-- **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Do NOT commit `.env` files to the repository.
+- **Local Development:**
+  - Create a `.env.local` file in the project root for frontend environment variables:
+    ```
+    NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+    ```
+  - Create a `.env` file in the project root for backend environment variables:
+    ```
+    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
+    SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
+    ```
+  - **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
+- **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `SUPABASE_JWT_SECRET`).
 
 ### 8.3. Code Style & Linting
 
@@ -349,19 +342,29 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 This project has provided valuable insights into monorepo management, Vercel deployment, and Go serverless functions:
 
-- **Monorepo `npm run dev` Issues (`ENOWORKSPACES`):**
-  - The `npm error code ENOWORKSPACES` often arises when `npm`'s workspace logic conflicts with how a tool (like `next dev`) expects to be run. Solutions involve ensuring the tool is run in the correct context (e.g., directly from the sub-package's directory, or using `npx` if the tool is a local dependency).
-  - For `vercel dev`, the issue was resolved by ensuring the Vercel project's root directory was correctly configured in the Vercel dashboard, and `vercel.json` explicitly defined the frontend build with `src` pointing to `apps/frontend/package.json`.
+- **Monorepo Structure & Vercel Compatibility:**
+  - The most robust monorepo structure for Vercel involves placing applications in `apps/` and shared code in `packages/`.
+  - Vercel's `builds` and `routes` in `vercel.json` are crucial for explicitly defining how different parts of the monorepo are built and served.
+  - The `routes` array is evaluated sequentially, allowing for explicit routing rules (e.g., `/api/*` to backend, `/*` to frontend).
+  - **Crucial Insight:** `vercel dev` (and Vercel deployment) expects Go serverless functions to reside directly under a top-level `api/` directory relative to the project root, or within a sub-directory of `apps/` that is explicitly configured in `vercel.json`. The `apps/api` structure is now fully compatible.
 
-- **Vercel `vercel.json` Configuration for Monorepos:**
-  - When `vercel.json` is present at the monorepo root, it becomes the single source of truth for Vercel's build and routing. All applications (frontend and backend functions) must be explicitly defined within its `builds` and `rewrites` sections.
-  - The `root` property in `builds` is not allowed for Vercel's `@vercel/next` builder when the project's root directory is already set to the monorepo root in the Vercel dashboard.
-  - `rewrites` are crucial for directing traffic to the correct application within the monorepo (e.g., `/api/*` to backend functions, `/(.*)` to the frontend).
+- **Go Serverless Function Naming Convention:**
+  - For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
+  - **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`).
 
-- **Go Backend Refactoring to Vercel Serverless Functions:**
-  - Migrating a traditional Go web framework (like Gin) to Vercel serverless functions requires significant architectural changes. Each API endpoint needs to be refactored into a separate Go function that adheres to Vercel's serverless function signature (`http.HandlerFunc`).
-  - `go.mod` and `go.sum` need to be cleaned up to remove unused dependencies (e.g., Gin).
-  - Local development of these functions is best done using `vercel dev` from the monorepo root, which simulates the Vercel environment.
+- **Environment Variables in Monorepos:**
+  - Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
+  - **Solution:** Use `dotenv-cli` in the `build` script of the Next.js application's `package.json` to explicitly load environment variables from the correct relative path (e.g., `dotenv -e ../../.env.local -- next build`).
+  - Ensure `dotenv-cli` is installed as a `devDependency` in the Next.js application's `package.json`.
+  - For Go backend, `godotenv` can load `.env` files locally, but for Vercel deployment, environment variables must be set in the Vercel Dashboard.
+
+- **Vercel Dashboard Settings vs. `vercel.json`:**
+  - **`vercel.json` takes precedence.** If `vercel.json` exists, Vercel will primarily rely on its configuration for builds and routing, often ignoring settings in the dashboard.
+  - **Recommended Dashboard Settings for this Monorepo:**
+    - **Root Directory:** `.` (or empty)
+    - **Build Command:** `turbo build`
+    - **Development Command:** `turbo dev`
+    - **Include files outside of the Root Directory in the Build Step:** Enabled.
 
 - **CI/CD Streamlining:**
   - For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
