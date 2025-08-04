@@ -53,25 +53,25 @@
 This project utilizes a custom color palette named "Subtle Harmony" designed for a modern, clean, and fresh aesthetic with smooth animations and interactive elements. The palette focuses on depth through subtle gradients and soft shadows, a calm and inviting base, and bright yet balanced accent colors.
 
 - **`background` (Base & Primary Elements):**
-    - `bg-dark`: `#0D0D1A` (Even darker base)
-    - `bg-medium`: `#1A1A2E` (Old primary-900, now medium dark)
-    - `bg-light`: `#28283A` (Old primary-800, now light dark)
-    - `bg-gradient-start`: `#0D0D1A` (Start of the background gradient)
-    - `bg-gradient-end`: `#1A0D2E` (A very dark purple for the end of the gradient)
+  - `bg-dark`: `#0D0D1A` (Even darker base)
+  - `bg-medium`: `#1A1A2E` (Old primary-900, now medium dark)
+  - `bg-light`: `#28283A` (Old primary-800, now light dark)
+  - `bg-gradient-start`: `#0D0D1A` (Start of the background gradient)
+  - `bg-gradient-end`: `#1A0D2E` (A very dark purple for the end of the gradient)
 
 - **`text` (Typography):**
-    - `text-light`: `#E0E0EB` (Soft Off-White) - Primary text color for readability.
-    - `text-muted`: `#A0A0B0` (Desaturated Gray) - Secondary text, descriptions, placeholders.
-    - `text-accent`: `#8B5CF6` (Soft Violet/Purple) - For links, important labels, or subtle branding.
+  - `text-light`: `#E0E0EB` (Soft Off-White) - Primary text color for readability.
+  - `text-muted`: `#A0A0B0` (Desaturated Gray) - Secondary text, descriptions, placeholders.
+  - `text-accent`: `#8B5CF6` (Soft Violet/Purple) - For links, important labels, or subtle branding.
 
 - **`accent` (Interactive Elements & Highlights):**
-    - `accent-main`: `#8B5CF6` (Soft Violet/Purple) - Main accent color for buttons, active states, icons.
-    - `accent-hover`: `#9F7AEA` (Lighter Violet/Purple) - For hover states of accent elements.
-    - `accent-subtle`: `#8B5CF633` (Violet/Purple with 20% opacity) - For very subtle backgrounds, borders, or shadows related to accent elements.
+  - `accent-main`: `#8B5CF6` (Soft Violet/Purple) - Main accent color for buttons, active states, icons.
+  - `accent-hover`: `#9F7AEA` (Lighter Violet/Purple) - For hover states of accent elements.
+  - `accent-subtle`: `#8B5CF633` (Violet/Purple with 20% opacity) - For very subtle backgrounds, borders, or shadows related to accent elements.
 
 - **`border` (Subtle Separators):**
-    - `border-subtle`: `#1A1A2E` (Matches `background.medium` for subtle blend)
-    - `border-medium`: `#28283A` (Matches `background.light` for slightly more prominent borders)
+  - `border-subtle`: `#1A1A2E` (Matches `background.medium` for subtle blend)
+  - `border-medium`: `#28283A` (Matches `background.light` for slightly more prominent borders)
 
 ## 3. Development Plan & Checkpoints
 
@@ -113,7 +113,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 2.2: Authentication Logic (Completed)**
   - [x] Reverted to email/password only login.
 - [x] **Checkpoint 2.3: Visual & UX Overhaul (Completed)**
-  - [x] Established a new, consistent design system: dark/purple theme with a bright teal (`#00FFDE`) as the primary accent.
+  - [x] Established a new, consistent design system.
   - [x] Eliminated mixed gradients in favor of a clean, high-contrast aesthetic.
   - [x] Integrated `framer-motion` for fluid, physics-based animations across the application.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
@@ -337,20 +337,20 @@ At the end of each session, the agent must:
 
 When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
 
-1.  **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
+1. **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
 
     ```bash
     git pull origin develop # or master, depending on your branch
     ```
 
-2.  **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
+2. **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
 
     ```bash
     supabase migration new <migration_name>
     ```
 
     Then, copy the relevant SQL from `supabase_schema.sql` or write your changes directly into the newly created migration file (`supabase/migrations/<timestamp>_<migration_name>.sql`).
-3.  **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
+3. **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
 
     ```bash
     supabase db push --yes
@@ -360,33 +360,33 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 ### 8.2. Environment Variables
 
--   **Local Development:**
-    -   Create a `.env.local` file in the project root for frontend environment variables:
+- **Local Development:**
+  - Create a `.env.local` file in the project root for frontend environment variables:
 
         ```
         NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
         NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
         ```
 
-    -   Create a `.env` file in the project root for backend environment variables:
+  - Create a `.env` file in the project root for backend environment variables:
 
         ```
         DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
         SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
         ```
 
-    -   **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
--   **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `SUPABASE_JWT_SECRET`).
+  - **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
+- **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `SUPABASE_JWT_SECRET`).
 
 ### 8.3. Code Style & Linting
 
--   Always run `npm run lint` and `npm run format` before committing to ensure code consistency.
+- Always run `npm run lint` and `npm run format` before committing to ensure code consistency.
 
 ### 8.4. Branching Strategy
 
--   Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
--   Create feature branches from `develop` for new features or bug fixes.
--   Submit Pull Requests to `develop` for `review`.
+- Follow the `develop`/`master` branching strategy as outlined in the `README.md`.
+- Create feature branches from `develop` for new features or bug fixes.
+- Submit Pull Requests to `develop` for `review`.
 
 ## 9. Lessons Learned
 
@@ -394,41 +394,41 @@ This project has provided valuable insights into monorepo management, Vercel dep
 
 ### 9.1. Monorepo Structure & Vercel Compatibility
 
--   The most robust monorepo structure for Vercel involves placing applications in `apps/` and shared code in `packages/`.
--   Vercel's `builds` and `routes` in `vercel.json` are crucial for explicitly defining how different parts of the monorepo are built and served.
--   The `routes` array is evaluated sequentially, allowing for explicit routing rules (e.g., `/api/*` to backend, `/*` to frontend).
--   **Crucial Insight:** `vercel dev` (and Vercel deployment) expects Go serverless functions to reside directly under a top-level `api/` directory relative to the project root, or within a sub-directory of `apps/` that is explicitly configured in `vercel.json`. The `apps/api` structure is now fully compatible.
+- The most robust monorepo structure for Vercel involves placing applications in `apps/` and shared code in `packages/`.
+- Vercel's `builds` and `routes` in `vercel.json` are crucial for explicitly defining how different parts of the monorepo are built and served.
+- The `routes` array is evaluated sequentially, allowing for explicit routing rules (e.g., `/api/*` to backend, `/*` to frontend).
+- **Crucial Insight:** `vercel dev` (and Vercel deployment) expects Go serverless functions to reside directly under a top-level `api/` directory relative to the project root, or within a sub-directory of `apps/` that is explicitly configured in `vercel.json`. The `apps/api` structure is now fully compatible.
 
 ### 9.2. Go Serverless Function Naming Convention
 
--   For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
--   **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
+- For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
+- **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
 
 ### 9.3. Environment Variables in Monorepos
 
--   Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
--   **Solution:** Use `dotenv-cli` in the `build` script of the Next.js application's `package.json` to explicitly load environment variables from the correct relative path (e.g., `dotenv -e ../../.env.local -- next build`).
--   Ensure `dotenv-cli` is installed as a `devDependency` in the Next.js application's `package.json`.
--   For Go backend, `godotenv` can load `.env` files locally, but for Vercel deployment, environment variables must be set in the Vercel Dashboard.
+- Next.js applications in a monorepo do not automatically read `.env` files from the monorepo root during `next build`.
+- **Solution:** Use `dotenv-cli` in the `build` script of the Next.js application's `package.json` to explicitly load environment variables from the correct relative path (e.g., `dotenv -e ../../.env.local -- next build`).
+- Ensure `dotenv-cli` is installed as a `devDependency` in the Next.js application's `package.json`.
+- For Go backend, `godotenv` can load `.env` files locally, but for Vercel deployment, environment variables must be set in the Vercel Dashboard.
 
 ### 9.4. Vercel Dashboard Settings vs. `vercel.json`
 
--   **`vercel.json` takes precedence.** If `vercel.json` exists, Vercel will primarily rely on its configuration for builds and routing, often ignoring settings in the dashboard.
--   **Recommended Dashboard Settings for this Monorepo:**
-    -   **Root Directory:** `.` (or empty)
-    -   **Build Command:** `turbo build`
-    -   **Development Command:** `turbo dev`
-    -   **Include files outside of the Root Directory in the Build Step:** Enabled.
+- **`vercel.json` takes precedence.** If `vercel.json` exists, Vercel will primarily rely on its configuration for builds and routing, often ignoring settings in the dashboard.
+- **Recommended Dashboard Settings for this Monorepo:**
+  - **Root Directory:** `.` (or empty)
+  - **Build Command:** `turbo build`
+  - **Development Command:** `turbo dev`
+  - **Include files outside of the Root Directory in the Build Step:** Enabled.
 
 ### 9.5. CI/CD Streamlining
 
--   For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
--   Keeping CI/CD configurations clean and focused improves maintainability and clarity.
+- For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
+- Keeping CI/CD configurations clean and focused improves maintainability and clarity.
 
 ### 9.6. Vercel Go Serverless Function Build Behavior (Crucial Insight)
 
--   **Problem:** Vercel's build process for Go serverless functions (using `@vercel/go` builder) expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files are present in the function directory (even if they are in the same `package`), Vercel may fail to correctly link or compile them, leading to `undefined` symbol errors during deployment.
--   **Solution:** Always consolidate all Go code for a specific serverless function into its `index.go` file. This includes database connection logic, GORM models, and any other helper functions or structs directly used by that function. Remove any redundant `.go` files from the function directory after consolidation.
+- **Problem:** Vercel's build process for Go serverless functions (using `@vercel/go` builder) expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files are present in the function directory (even if they are in the same `package`), Vercel may fail to correctly link or compile them, leading to `undefined` symbol errors during deployment.
+- **Solution:** Always consolidate all Go code for a specific serverless function into its `index.go` file. This includes database connection logic, GORM models, and any other helper functions or structs directly used by that function. Remove any redundant `.go` files from the function directory after consolidation.
 
 ## 10. Development Guidelines & Conventions
 
@@ -438,21 +438,21 @@ This section outlines the step-by-step process and rules for creating new API en
 
 To create a new Go serverless API function that is compatible with Vercel and adheres to the project's structure, follow these steps:
 
-1.  **Create Function Directory:**
-    -   Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
-    -   **Example:** For a `/api/posts` endpoint, create `api/posts/`.
+1. **Create Function Directory:**
+    - Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
+    - **Example:** For a `/api/posts` endpoint, create `api/posts/`.
 
     ```bash
     mkdir -p api/posts
     ```
 
-2.  **Create `index.go` File (Consolidated Code):**
-    -   Inside the new function directory (`api/posts/`), create a file named `index.go`.
-    -   **`index.go` Content:**
-        -   Use `package <function_directory_name>` (e.g., `package posts`).
-        -   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-        -   **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
-    -   **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
+2. **Create `index.go` File (Consolidated Code):**
+    - Inside the new function directory (`api/posts/`), create a file named `index.go`.
+    - **`index.go` Content:**
+        - Use `package <function_directory_name>` (e.g., `package posts`).
+        - Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
+        - **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
+    - **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
 
     ```go
     package posts
@@ -537,13 +537,13 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-3.  **Create `go.mod` for the New Function:**
-    -   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
-    -   **`go.mod` Content:**
-        -   `module <function_directory_name>` (e.g., `module posts`).
-        -   Specify the Go version (e.g., `go 1.21`).
-        -   Add `require` directives for any dependencies used by this function.
-    -   **Example `api/posts/go.mod`:**
+3. **Create `go.mod` for the New Function:**
+    - Inside the new function directory (`api/posts/`), create a file named `go.mod`.
+    - **`go.mod` Content:**
+        - `module <function_directory_name>` (e.g., `module posts`).
+        - Specify the Go version (e.g., `go 1.21`).
+        - Add `require` directives for any dependencies used by this function.
+    - **Example `api/posts/go.mod`:**
 
     ```go
     module posts
@@ -559,9 +559,9 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     )
     ```
 
-4.  **Update `vercel.json`:**
-    -   Add a new entry in the `builds` section of `vercel.json` for your new API function.
-    -   **Example Addition in `vercel.json`:**
+4. **Update `vercel.json`:**
+    - Add a new entry in the `builds` section of `vercel.json` for your new API function.
+    - **Example Addition in `vercel.json`:**
 
     ```json
     {
@@ -578,45 +578,45 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-5.  **Run `go mod tidy`:**
-    -   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+5. **Run `go mod tidy`:**
+    - Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
 
     ```bash
     cd api/posts
     go mod tidy
     ```
 
-6.  **Test Locally:**
-    -   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+6. **Test Locally:**
+    - From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
 
 ### 10.2. General File/Folder Creation Rules
 
 #### 10.2.1. For Frontend (`apps/web`)
 
--   **React Components:**
-    -   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
-    -   Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
--   **Next.js Pages:**
-    -   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
-    -   Inside, create a `page.tsx` file as the entry point for that page.
--   **Utilities/Hooks/Libs:**
-    -   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
-    -   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
+  - Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
+- **Next.js Pages:**
+  - Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
+  - Inside, create a `page.tsx` file as the entry point for that page.
+- **Utilities/Hooks/Libs:**
+  - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
+  - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
 #### 10.2.2. For Shared Go Modules (`packages/go-common`)
 
--   **Structure:**
-    -   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
-    -   Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
--   **Dependencies:**
-    -   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
-    -   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
+- **Structure:**
+  - Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
+  - Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
+- **Dependencies:**
+  - If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
+  - After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 
--   **React Components:**
-    -   Use **PascalCase** for component file names (e.g., `Button.tsx`).
-    -   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
--   **Dependencies:**
-    -   Add new dependencies to `packages/ui/package.json`.
-    -   Run `npm install` at the project root after modifying `package.json`.
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `Button.tsx`).
+  - Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
+- **Dependencies:**
+  - Add new dependencies to `packages/ui/package.json`.
+  - Run `npm install` at the project root after modifying `package.json`.

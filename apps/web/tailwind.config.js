@@ -21,10 +21,10 @@ module.exports = {
           'accent': '#8B5CF6', // For links, important labels, or subtle branding
         },
         accent: {
-          'main': '#8B5CF6', // Vibrant Teal
-          'hover': '#9F7AEA', // Lighter Teal
+          'main': '#8B5CF6', // Bright Violet for primary actions
+          'hover': '#9F7AEA', // Slightly darker violet for hover states
           'bold-hover': '#7A4CD4', // Darker, bolder violet for button hover
-          'subtle': '#8B5CF633', // Teal with 20% opacity
+          'subtle': '#8B5CF633', // Subtle accent for less emphasis
         },
         border: {
           'subtle': '#1A1A2E', // Same as background.medium for subtle blend
