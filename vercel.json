@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "apps/frontend/next.config.js",
@@ -7,6 +8,16 @@
     {
       "src": "apps/backend/api/**/*.go",
       "use": "@vercel/go"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
