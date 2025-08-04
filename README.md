@@ -97,10 +97,7 @@ To maintain consistency and Vercel compatibility, please adhere to the following
   - Use PascalCase for React component files (e.g., `MyComponent.tsx`).
   - Use kebab-case for utility files or non-component modules (e.g., `utils/helpers.ts`).
 
-- **Shared Go Modules (`packages/go-common`):**
-  - Organize code into logical subdirectories (e.g., `database/`, `models/`).
-  - Each subdirectory can have its own package name (e.g., `package database`, `package models`).
-  - The `packages/go-common` directory itself has a `go.mod` file for its shared dependencies.
+
 
 ### 2.3. General Tips for Contributors
 
@@ -210,14 +207,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
     *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
-#### For Shared Go Modules (`packages/go-common`)
 
-*   **Structure:**
-    *   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
-    *   Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
-*   **Dependencies:**
-    *   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
-    *   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
 #### For Shared UI Components (`packages/ui`)
 

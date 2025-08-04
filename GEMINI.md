@@ -396,19 +396,21 @@ This section outlines the step-by-step process and rules for creating new API en
 
 To create a new Go serverless API function that is compatible with Vercel and adheres to the project's structure, follow these steps:
 
-1.  **Create Function Directory:**
-    *   Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
-    *   **Example:** For a `/api/posts` endpoint, create `api/posts/`.
+1. **Create Function Directory:**
+    - Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
+    - **Example:** For a `/api/posts` endpoint, create `api/posts/`.
+
     ```bash
     mkdir -p api/posts
     ```
 
-2.  **Create `index.go` File:**
-    *   Inside the new function directory (`api/posts/`), create a file named `index.go`.
-    *   **`index.go` Content:**
-        *   Use `package <function_directory_name>` (e.g., `package posts`).
-        *   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-    *   **Example `api/posts/index.go`:**
+2. **Create `index.go` File:**
+    - Inside the new function directory (`api/posts/`), create a file named `index.go`.
+    - **`index.go` Content:**
+        - Use `package <function_directory_name>` (e.g., `package posts`).
+        - Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
+    - **Example `api/posts/index.go`:**
+
     ```go
     package posts
 
@@ -428,13 +430,14 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-3.  **Create `go.mod` for the New Function:**
-    *   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
-    *   **`go.mod` Content:**
-        *   `module <function_directory_name>` (e.g., `module posts`).
-        *   Specify the Go version (e.g., `go 1.21`).
-        *   Add `require` directives for any dependencies used by this function.
-    *   **Example `api/posts/go.mod`:**
+3. **Create `go.mod` for the New Function:**
+    - Inside the new function directory (`api/posts/`), create a file named `go.mod`.
+    - **`go.mod` Content:**
+        - `module <function_directory_name>` (e.g., `module posts`).
+        - Specify the Go version (e.g., `go 1.21`).
+        - Add `require` directives for any dependencies used by this function.
+    - **Example `api/posts/go.mod`:**
+
     ```go
     module posts
 
@@ -446,14 +449,15 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     )
     ```
 
-4.  **Copy Shared Code (if any):**
-    *   If your new API function requires shared Go code (like database connection or models), copy the necessary `.go` files directly into the function's directory (`api/posts/`).
-    *   **Crucially, ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).**
-    *   Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory, or simply call `GetDB()` if `database.go` is in the same package).
+4. **Copy Shared Code (if any):**
+    - If your new API function requires shared Go code (like database connection or models), add a `replace` directive in `go.mod` pointing to the correct relative path.
+    - **Crucially, ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).**
+    - Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory, or simply call `GetDB()` if `database.go` is in the same package).
 
-5.  **Update `vercel.json`:**
-    *   Add a new entry in the `builds` section of `vercel.json` for your new API function.
-    *   **Example Addition in `vercel.json`:**
+5. **Update `vercel.json`:**
+    - Add a new entry in the `builds` section of `vercel.json` for your new API function.
+    - **Example Addition in `vercel.json`:**
+
     ```json
     {
       "version": 2,
@@ -469,44 +473,45 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-6.  **Run `go mod tidy`:**
-    *   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+6. **Run `go mod tidy`:**
+    - Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+
     ```bash
     cd api/posts
     go mod tidy
     ```
 
-7.  **Test Locally:**
-    *   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+7. **Test Locally:**
+    - From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
 
 ### 10.2. General File/Folder Creation Rules
 
 #### For Frontend (`apps/web`)
 
-*   **React Components:**
-    *   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
-    *   Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
-*   **Next.js Pages:**
-    *   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
-    *   Inside, create a `page.tsx` file as the entry point for that page.
-*   **Utilities/Hooks/Libs:**
-    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
-    *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
+  - Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
+- **Next.js Pages:**
+  - Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
+  - Inside, create a `page.tsx` file as the entry point for that page.
+- **Utilities/Hooks/Libs:**
+  - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
+  - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
 #### For Shared Go Modules (`packages/go-common`)
 
-*   **Structure:**
-    *   Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
-    *   Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
-*   **Dependencies:**
-    *   If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
-    *   After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
+- **Structure:**
+  - Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
+  - Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
+- **Dependencies:**
+  - If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
+  - After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
 #### For Shared UI Components (`packages/ui`)
 
-*   **React Components:**
-    *   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
-    *   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
-*   **Dependencies:**
-    *   Add new dependencies to `packages/ui/package.json`.
-    *   Run `npm install` at the project root after modifying `package.json`.
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
+  - Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
+- **Dependencies:**
+  - Add new dependencies to `packages/ui/package.json`.
+  - Run `npm install` at the project root after modifying `package.json`.
