@@ -104,7 +104,8 @@ export default function ProfileViewPage() {
         transition={{ duration: 0.5, ease: 'easeInOut' }}
         className="w-full max-w-2xl p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
       >
-        <div className="flex justify-between items-center mb-6">
+        {/* Header Section: Back to Home, Title, Edit Profile */}
+        <div className="flex justify-between items-center">
           <Link href="/home" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
             <ArrowLeft className="mr-2 h-5 w-5" />
             Back to Home
@@ -116,18 +117,19 @@ export default function ProfileViewPage() {
           </Link>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <UserCircle className="w-24 h-24 text-accent-main" />
-            <div>
-              <p className="text-2xl font-semibold text-text-light">{profile?.full_name}</p>
-              <p className="text-lg text-text-muted">@{profile?.username}</p>
-            </div>
+        {/* Profile Information Section */}
+        <div className="flex flex-col items-center space-y-6 py-4 border-y border-border-subtle">
+          <UserCircle className="w-32 h-32 text-accent-main" /> {/* Larger avatar */}
+          <div className="text-center">
+            <p className="text-3xl font-semibold text-text-light">{profile?.full_name}</p>
+            <p className="text-xl text-text-muted">@{profile?.username}</p>
+            {/* Future: Add email, etc. here */}
+            {/* <p className="text-lg text-text-muted mt-2">Email: {profile?.email}</p> */}
           </div>
-          {/* Add more profile fields here if needed */}
         </div>
 
-        <div className="flex justify-center mt-8">
+        {/* Actions Section */}
+        <div className="flex justify-center pt-4">
           <button
             onClick={handleSignOut}
             className="flex items-center py-3 px-6 bg-red-600 hover:bg-red-700 rounded-full font-semibold text-text-light transition-colors duration-300 shadow-lg"
