@@ -169,20 +169,18 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 4.2. Backend (`api/`)
 
-- **`/api/profile` endpoint returns 404 in `vercel dev` (Unresolved Locally):** Despite extensive debugging and restructuring to ensure correct Go module configuration and Vercel deployment patterns, the `/api/profile` endpoint continues to return a 404 when running `vercel dev`.
-  - **Investigation Summary:**
-    - Initial attempts focused on `vercel.json` routing (`routes` vs. `rewrites`).
-    - Restructured Go API to be self-contained (removed `packages/go-common` dependency, copied code directly into each function).
-    - Ensured all Go files within each function (`api/profile`, `api/health`) use `package <directory_name>` (e.g., `package profile`).
-    - Cleaned `go.mod` and `go.sum` files in both root and function directories.
-    - Verified `vercel.json` `builds` configuration for Go functions.
-  - **Current Hypothesis:** The issue is likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
-  - **Next Step:** Proceeding with deployment to Vercel production to verify if the issue persists in the deployed environment, which will help isolate the problem to either the local development environment or the build/runtime on Vercel.
-- **Vercel Deployment Failure (Go Build Error):** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Root Cause:** The primary cause was Vercel's specific behavior when building Go serverless functions. While Go allows multiple files within a single package, Vercel's build process for `@vercel/go` builder expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files were present in the function directory (even if they are in the same `package`), Vercel failed to correctly link or compile them, leading to `undefined` symbol errors during deployment.
+- [x] **`/api/profile` endpoint returns 404 in `vercel dev` (Solved)**
+  - **Description:** The `/api/profile` endpoint was returning a 404 when running `vercel dev`.
+  - **Resolution:** The issue was resolved by ensuring correct `vercel.json` configuration and Go module setup, allowing the endpoint to be properly deployed and accessed. The problem was likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
+
+- [x] **Vercel Deployment Failure (Go Build Error) (Solved)**
+  - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
-- **Database Error: Prepared Statement Already Exists in Vercel Preview:** Encountered `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` in Vercel preview environments.
-  - **Investigation Summary:** This error typically occurs in serverless environments due to GORM's prepared statement caching interacting with short-lived or reused database connections. Attempts to disable `DisablePreparedStmt` or configure `ConnMaxLifetime`/`MaxIdleConns` were made, but the issue persists, suggesting a deeper interaction with Vercel's build environment or Go runtime. Further investigation is needed to find a robust solution for this specific environment.
+
+- [ ] **Database Error: Prepared Statement Already Exists in Vercel Preview**
+  - **Description:** Encountered `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` in Vercel preview environments.
+  - **Investigation Summary:** This error typically occurs in serverless environments due to GORM's prepared statement caching interacting with short-lived or reused database connections. Attempts to disable `DisablePreparedStmt` or configure `ConnMaxLifetime`/`MaxIdleConns` were made, but the issue persists, suggesting a deeper interaction with Vercel's build environment or Go runtime.
+  - **Next Steps:** Further investigation is needed to find a robust solution for this specific environment.
 
 ## 5. Next Steps: Troubleshooting & Development
 
