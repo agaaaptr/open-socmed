@@ -113,31 +113,31 @@ export default function EditProfilePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-slate-900 text-white"
+        className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background-dark text-text-light"
       >
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-900 via-slate-900 to-blue-900/50 animate-background-pan -z-10" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-background-gradient-start via-background-gradient-end to-background-gradient-end animate-background-pan -z-10" />
         <div className="flex flex-col items-center justify-center">
-          <Loader className="w-12 h-12 text-accent-500 animate-spin" />
-          <p className="mt-4 text-primary-300">Loading profile data...</p>
+          <Loader className="w-12 h-12 text-accent-main animate-spin" />
+          <p className="mt-4 text-text-muted">Loading profile data...</p>
         </div>
       </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-slate-900 text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background-dark text-text-light">
       {/* Animated Background */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-900 via-slate-900 to-blue-900/50 animate-background-pan -z-10" />
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-background-gradient-start via-background-gradient-end to-background-gradient-end animate-background-pan -z-10" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-2xl p-8 space-y-6 bg-primary-900/50 backdrop-blur-md border border-primary-700/50 shadow-2xl rounded-2xl z-10"
+        className="w-full max-w-2xl p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
       >
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-bold text-white">Edit Profile</h1>
-          <Link href="/home" className="flex items-center text-primary-200 hover:text-accent-500 transition-colors duration-300">
+          <h1 className="text-4xl font-bold text-text-light">Edit Profile</h1>
+          <Link href="/profile" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
             <ArrowLeft className="mr-2 h-5 w-5" />
             Back to Home
           </Link>
@@ -156,7 +156,7 @@ export default function EditProfilePage() {
           <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-green-400 bg-green-900/30 p-3 rounded-md border border-green-700"
+            className="text-green-400 bg-green-900/30 p-3 rounded-md"
           >
             {success}
           </motion.p>
@@ -164,7 +164,7 @@ export default function EditProfilePage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="full_name" className="block text-primary-300 text-sm font-bold mb-2">
+            <label htmlFor="full_name" className="block text-text-muted text-sm font-bold mb-2">
               Full Name
             </label>
             <input
@@ -173,12 +173,12 @@ export default function EditProfilePage() {
               name="full_name"
               value={profile.full_name}
               onChange={handleChange}
-              className="shadow appearance-none border border-primary-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-primary-800/50 placeholder-primary-400 transition-all duration-300 focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
+              className="shadow appearance-none border border-border-medium rounded w-full py-2 px-3 text-text-light leading-tight focus:outline-none focus:shadow-outline bg-background-medium/50 placeholder-text-muted transition-all duration-300 focus:border-accent-main focus:ring-1 focus:ring-accent-main"
               placeholder="Your full name"
             />
           </div>
           <div>
-            <label htmlFor="username" className="block text-primary-300 text-sm font-bold mb-2">
+            <label htmlFor="username" className="block text-text-muted text-sm font-bold mb-2">
               Username
             </label>
             <input
@@ -187,7 +187,7 @@ export default function EditProfilePage() {
               name="username"
               value={profile.username}
               onChange={handleChange}
-              className="shadow appearance-none border border-primary-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-primary-800/50 placeholder-primary-400 transition-all duration-300 focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
+              className="shadow appearance-none border border-border-medium rounded w-full py-2 px-3 text-text-light leading-tight focus:outline-none focus:shadow-outline bg-background-medium/50 placeholder-text-muted transition-all duration-300 focus:border-accent-main focus:ring-1 focus:ring-accent-main"
               placeholder="Your unique username"
             />
           </div>
@@ -197,7 +197,7 @@ export default function EditProfilePage() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={submitting}
-            className="w-full flex items-center justify-center bg-accent-600 hover:bg-accent-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center bg-accent-main hover:bg-accent-hover text-text-light font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <Loader className="w-5 h-5 animate-spin mr-2" />

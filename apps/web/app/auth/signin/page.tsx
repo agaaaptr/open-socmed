@@ -11,7 +11,7 @@ import { LogIn } from 'lucide-react';
 const AccentSubmitButton = ({ children, className = '' }) => (
     <button
       type="submit"
-      className={`w-full inline-flex items-center justify-center text-primary-900 font-bold py-3 px-4 rounded-lg bg-accent-500 hover:bg-accent-400 transition-all duration-300 ease-in-out shadow-lg hover:shadow-accent-500/40 transform hover:scale-105 ${className}`}>
+      className={`w-full inline-flex items-center justify-center text-text-light font-bold py-3 px-4 rounded-lg bg-accent-main hover:bg-accent-hover transition-all duration-300 ease-in-out shadow-lg hover:shadow-accent-main/40 transform hover:scale-105 ${className}`}>
       {children}
     </button>
   );
@@ -99,27 +99,27 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-primary-900">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background-dark">
       {/* Animated Background */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-900 via-slate-900 to-primary-800/50 animate-background-pan -z-10" />
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-background-gradient-start via-background-gradient-end to-background-gradient-end animate-background-pan -z-10" />
 
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-md p-8 space-y-6 bg-primary-900/50 backdrop-blur-md border border-primary-700/50 shadow-2xl rounded-2xl"
+        className="w-full max-w-md p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl"
       >
         <div className="text-center">
-          <Link href="/" className="text-4xl font-bold inline-block mb-2 text-white">
+          <Link href="/" className="text-4xl font-bold inline-block mb-2 text-text-light">
             Cirqle
           </Link>
-          <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
-          <p className="text-primary-300">Sign in to continue your journey.</p>
+          <h2 className="text-2xl font-bold text-text-light">Welcome Back</h2>
+          <p className="text-text-muted">Sign in to continue your journey.</p>
         </div>
 
         <form onSubmit={handleSignIn} className="space-y-4">
           <div>
-            <label className="text-sm font-bold text-primary-200 block mb-2">Email</label>
+            <label className="text-sm font-bold text-text-light block mb-2">Email</label>
             <input
               type="email"
               placeholder="you@example.com"
@@ -129,12 +129,12 @@ export default function SignInPage() {
                 validateEmail(e.target.value); // Validate on change
               }}
               required
-              className="w-full p-3 rounded-lg bg-slate-800/50 border border-primary-700 text-white placeholder-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all duration-300"
+              className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
             />
             {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
           </div>
           <div>
-            <label className="text-sm font-bold text-primary-200 block mb-2">Password</label>
+            <label className="text-sm font-bold text-text-light block mb-2">Password</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -144,9 +144,9 @@ export default function SignInPage() {
                 validatePassword(e.target.value); // Validate on change
               }}
               required
-              className="w-full p-3 rounded-lg bg-slate-800/50 border border-primary-700 text-white placeholder-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all duration-300"
+              className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
             />
-            <p className="text-primary-400 text-xs mt-1">
+            <p className="text-text-muted text-xs mt-1">
               Password must be at least 6 characters, include uppercase, lowercase, number, and special character.
             </p>
             {passwordError && <p className="text-red-400 text-xs mt-1">{passwordError}</p>}
@@ -160,9 +160,9 @@ export default function SignInPage() {
           {error && <p className="text-red-400 bg-red-900/50 border border-red-400/50 p-3 rounded-lg text-sm text-center">{error}</p>}
         </form>
 
-        <p className="text-center text-sm text-primary-300">
+        <p className="text-center text-sm text-text-muted">
           Don&apos;t have an account? {' '}
-          <Link href="/auth/signup" className="font-semibold text-accent-500 hover:text-accent-400 transition-colors duration-300">
+          <Link href="/auth/signup" className="font-semibold text-accent-main hover:text-accent-hover transition-colors duration-300">
             Sign Up
           </Link>
         </p>

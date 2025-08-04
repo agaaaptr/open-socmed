@@ -4,11 +4,9 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-primary-50 text-slate-800;
-  }
+  
 
   .dark body {
-    @apply bg-primary-900 text-slate-50;
+    @apply bg-gradient-to-br from-background-gradient-start to-background-gradient-end text-text-light;
   }
 }

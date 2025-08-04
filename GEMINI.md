@@ -48,6 +48,31 @@
 - **GitHub Actions**: For Continuous Integration and Deployment.
 - **Vercel**: For frontend hosting and backend serverless functions.
 
+### 2.5. Color Palette: "Subtle Harmony"
+
+This project utilizes a custom color palette named "Subtle Harmony" designed for a modern, clean, and fresh aesthetic with smooth animations and interactive elements. The palette focuses on depth through subtle gradients and soft shadows, a calm and inviting base, and bright yet balanced accent colors.
+
+- **`background` (Base & Primary Elements):**
+    - `bg-dark`: `#0D0D1A` (Even darker base)
+    - `bg-medium`: `#1A1A2E` (Old primary-900, now medium dark)
+    - `bg-light`: `#28283A` (Old primary-800, now light dark)
+    - `bg-gradient-start`: `#0D0D1A` (Start of the background gradient)
+    - `bg-gradient-end`: `#1A0D2E` (A very dark purple for the end of the gradient)
+
+- **`text` (Typography):**
+    - `text-light`: `#E0E0EB` (Soft Off-White) - Primary text color for readability.
+    - `text-muted`: `#A0A0B0` (Desaturated Gray) - Secondary text, descriptions, placeholders.
+    - `text-accent`: `#8B5CF6` (Soft Violet/Purple) - For links, important labels, or subtle branding.
+
+- **`accent` (Interactive Elements & Highlights):**
+    - `accent-main`: `#8B5CF6` (Soft Violet/Purple) - Main accent color for buttons, active states, icons.
+    - `accent-hover`: `#9F7AEA` (Lighter Violet/Purple) - For hover states of accent elements.
+    - `accent-subtle`: `#8B5CF633` (Violet/Purple with 20% opacity) - For very subtle backgrounds, borders, or shadows related to accent elements.
+
+- **`border` (Subtle Separators):**
+    - `border-subtle`: `#1A1A2E` (Matches `background.medium` for subtle blend)
+    - `border-medium`: `#28283A` (Matches `background.light` for slightly more prominent borders)
+
 ## 3. Development Plan & Checkpoints
 
 This project is developed in structured stages to ensure organized progress.
@@ -94,10 +119,12 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
   - [x] Added `lucide-react` for a consistent and high-quality icon set.
   - [x] **UI/UX Enhancements for Home and Profile Pages:** Improved visual appeal and interactivity of home page placeholders and profile edit form, ensuring consistency with overall design, color scheme, and smooth animations.
-- [ ] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
+- [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
-  - [ ] **Home as Main Page:** Redesign the home page to be the main social media feed, incorporating placeholders for timeline, stories, and messages.
+  - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a sidebar, horizontal stories, a timeline, and suggested features. Removed the header for the home page.
+  - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
+  - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
@@ -118,7 +145,7 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
-  - [x] Configured `vercel.json` for Vercel deployment.
+  - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.
   - [x] Simplified `vercel.json` builds configuration to remove redundant entries.
 - [x] **Checkpoint 3.3: Backend Refactoring & Hardening (Completed)**
   - [x] Refactored database connection logic to be resilient in a serverless environment.
@@ -150,7 +177,7 @@ This project is developed in structured stages to ensure organized progress.
   - **Current Hypothesis:** The issue is likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
   - **Next Step:** Proceeding with deployment to Vercel production to verify if the issue persists in the deployed environment, which will help isolate the problem to either the local development environment or the build/runtime on Vercel.
 - **Vercel Deployment Failure (Go Build Error):** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Root Cause:** The primary cause was Vercel's specific behavior when building Go serverless functions. While Go allows multiple files within a single package, Vercel's build process for `@vercel/go` builder expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files were present in the function directory (e.g., `index.go`, `database.go`, `profile.go`), Vercel failed to correctly link or compile them, leading to `undefined` symbol errors.
+  - **Root Cause:** The primary cause was Vercel's specific behavior when building Go serverless functions. While Go allows multiple files within a single package, Vercel's build process for `@vercel/go` builder expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files were present in the function directory (even if they are in the same `package`), Vercel failed to correctly link or compile them, leading to `undefined` symbol errors during deployment.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
 ## 5. Next Steps: Troubleshooting & Development
@@ -185,7 +212,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
 - [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
-### 5.2. Feature: Post Feed (View & Create)
+## 5.2. Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
@@ -571,7 +598,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     -   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
     -   Inside, create a `page.tsx` file as the entry point for that page.
 -   **Utilities/Hooks/Libs:**
-    -   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
+    -   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
     -   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
 #### 10.2.2. For Shared Go Modules (`packages/go-common`)
@@ -586,7 +613,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 
 -   **React Components:**
-    -   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
+    -   Use **PascalCase** for component file names (e.g., `Button.tsx`).
     -   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
 -   **Dependencies:**
     -   Add new dependencies to `packages/ui/package.json`.

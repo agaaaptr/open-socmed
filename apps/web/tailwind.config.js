@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -9,30 +8,28 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          '50': '#f7f8f9',
-          '100': '#e1e3e6',
-          '200': '#c9cdd4',
-          '300': '#b1b7c1',
-          '400': '#99a1ae',
-          '500': '#808b9a',
-          '600': '#66707c',
-          '700': '#4d555e',
-          '800': '#33393f',
-          '900': '#191d20',
+        background: {
+          'dark': '#0D0D1A', // Even darker base
+          'medium': '#1A1A2E', // Old primary-900, now medium dark
+          'light': '#28283A', // Old primary-800, now light dark
+          'gradient-start': '#0D0D1A', // Start of the background gradient
+          'gradient-end': '#1A0D2E', // A very dark purple for the end of the gradient
+        },
+        text: {
+          'light': '#E0E0EB', // Off-White for light text
+          'muted': '#A0A0B0', // Soft Gray for muted text
+          'accent': '#8B5CF6', // For links, important labels, or subtle branding
         },
         accent: {
-          '50': '#f0fffc',
-          '100': '#d1fff8',
-          '200': '#a3fff4',
-          '300': '#75fef0',
-          '400': '#47feed',
-          '500': '#00FFDE',
-          '600': '#00e6c8',
-          '700': '#00b39d',
-          '800': '#008072',
-          '900': '#004d46',
+          'main': '#8B5CF6', // Vibrant Teal
+          'hover': '#9F7AEA', // Lighter Teal
+          'bold-hover': '#7A4CD4', // Darker, bolder violet for button hover
+          'subtle': '#8B5CF633', // Teal with 20% opacity
         },
+        border: {
+          'subtle': '#1A1A2E', // Same as background.medium for subtle blend
+          'medium': '#28283A', // Same as background.light for slightly more prominent
+        }
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',

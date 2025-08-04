@@ -1,0 +1,117 @@
+'use client';
+
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Home, Search, MessageSquare, Bell, UserCircle, LogOut } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState } from 'react';
+
+const navItems = [
+  { name: 'Home', href: '/home', icon: Home },
+  { name: 'Search', href: '/search', icon: Search },
+  { name: 'Messages', href: '/messages', icon: MessageSquare },
+  { name: 'Notifications', href: '/notifications', icon: Bell },
+  { name: 'Profile', href: '/profile', icon: UserCircle }, // Changed to /profile
+];
+
+const Sidebar = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClientComponentClient();
+  const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
+
+  useEffect(() => {
+    async function fetchUserProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        try {
+          const token = (await supabase.auth.getSession()).data.session?.access_token;
+          if (!token) {
+            throw new Error('No access token found.');
+          }
+
+          const response = await fetch('/api/profile', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile.');
+          }
+
+          const data = await response.json();
+          setUserProfile(data);
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
+    }
+    fetchUserProfile();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
+  return (
+    <motion.nav
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 flex flex-col shadow-xl z-50"
+    >
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="text-4xl font-extrabold text-text-light mb-10 tracking-tight"
+      >
+        Cirqle
+      </motion.div>
+      <ul className="space-y-4 flex-grow">
+        {navItems.map((item) => (
+          <motion.li
+            key={item.name}
+            whileHover={{ scale: 1.02, x: 5 }}
+            whileTap={{ scale: 0.98 }}
+            className="relative"
+          >
+            <Link href={item.href} className="block">
+              <div
+                className={`flex items-center p-3 rounded-xl transition-all duration-300 ease-in-out
+                  ${pathname === item.href
+                    ? 'bg-accent-main text-text-light shadow-lg transform translate-x-1'
+                    : 'text-text-light hover:bg-background-medium/50 hover:text-accent-main'
+                  }`}
+              >
+                <item.icon className="w-6 h-6 mr-4" />
+                <span className="text-lg font-semibold">{item.name}</span>
+              </div>
+            </Link>
+          </motion.li>
+        ))}
+      </ul>
+      {/* User profile summary at the bottom */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="mt-auto pt-6 border-t border-border-subtle flex items-center text-text-light"
+      >
+        <UserCircle className="w-10 h-10 mr-3 text-accent-main" />
+        <div>
+          <p className="font-semibold text-text-light">{userProfile?.full_name || 'Current User'}</p>
+          <p className="text-sm text-text-muted">@{userProfile?.username || 'username'}</p>
+        </div>
+      </motion.div>
+      
+    </motion.nav>
+  );
+};
+
+export default Sidebar;
