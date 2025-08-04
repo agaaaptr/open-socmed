@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/agaaaptr/open-socmed/internal/database"
+	"github.com/agaaaptr/open-socmed/packages/go-common/database"
 	"github.com/agaaaptr/open-socmed/packages/go-common/models"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"

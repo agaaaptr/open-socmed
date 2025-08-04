@@ -134,7 +134,7 @@ This project is developed in structured stages to ensure organized progress.
 
 ### Backend (`apps/api`)
 
-- **No known issues.** The `/api/profile` endpoint is expected to function correctly with the new structure and `vercel.json` configuration.
+- **Ongoing Issue: `/api/profile` endpoint returns 404.** Despite correct `vercel.json` configuration and `profile.go` having a `Handler` function, the Vercel deployment is not correctly routing requests to this Go serverless function. This suggests a deeper issue with Vercel's monorepo handling of Go serverless functions.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -142,104 +142,104 @@ This project is developed in structured stages to ensure organized progress.
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
-#### Frontend (`apps/web`) - Next.js:
+#### Frontend (`apps/web`) - Next.js
 
-*   [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
-*   [x] Fetch user profile data from the backend API when the dashboard page loads.
-*   [x] Handle loading and error states when fetching profile data.
-*   [x] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name and username.
-*   [x] Validate form input on the client-side.
-*   [x] Submit updated profile data to the backend API.
-*   [x] Handle loading and error states when submitting data.
-*   [x] Provide feedback to the user after successful or failed updates.
-*   [x] Ensure only authenticated users can view and edit their profiles.
-*   [x] Use Supabase authentication tokens to secure requests to the backend API.
+- [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
+- [x] Fetch user profile data from the backend API when the dashboard page loads.
+- [x] Handle loading and error states when fetching profile data.
+- [x] Create a UI form on a separate page (e.g., `/settings/profile`) that allows users to edit their full name and username.
+- [x] Validate form input on the client-side.
+- [x] Submit updated profile data to the backend API.
+- [x] Handle loading and error states when submitting data.
+- [x] Provide feedback to the user after successful or failed updates.
+- [x] Ensure only authenticated users can view and edit their profiles.
+- [x] Use Supabase authentication tokens to secure requests to the backend API.
 
 #### Backend (`apps/api`) - Go: - Completed
 
-*   [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
-*   [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
-*   [x] Implement logic to fetch data from the database using GORM.
-*   [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
-*   [x] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username).
-*   [x] Implement logic to update data in the database using GORM.
-*   [x] Validate input received from the frontend.
-*   [x] Secure this endpoint so only authenticated users can update their own profile.
-*   [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
-*   [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
+- [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
+- [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
+- [x] Implement logic to fetch data from the database using GORM.
+- [x] Secure this endpoint so only authenticated users can access it (JWT verification from Supabase).
+- [x] Create an API endpoint (`PUT /api/profile`) to update user profile data (only full_name and username).
+- [x] Implement logic to update data in the database using GORM.
+- [x] Validate input received from the frontend.
+- [x] Secure this endpoint so only authenticated users can update their own profile.
+- [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
+- [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
 ### Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
-#### Frontend (`apps/web`) - Next.js:
+#### Frontend (`apps/web`) - Next.js
 
-*   [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-*   [ ] Fetch post data from the backend API.
-*   [ ] Implement pagination or infinite scrolling for the feed.
-*   [ ] Create a form for users to compose and submit new posts.
-*   [ ] Handle form input and validation.
-*   [ ] Send new post data to the backend API.
-*   [ ] Implement UI for like/comment buttons (functionality will be added later).
+- [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
+- [ ] Fetch post data from the backend API.
+- [ ] Implement pagination or infinite scrolling for the feed.
+- [ ] Create a form for users to compose and submit new posts.
+- [ ] Handle form input and validation.
+- [ ] Send new post data to the backend API.
+- [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### Backend (`apps/api`) - Go:
+#### Backend (`apps/api`) - Go
 
-*   [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
-*   [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
-*   [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
-*   [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
-*   [ ] Implement logic to save new posts to the database.
-*   [ ] Validate post content.
-*   [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
+- [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+- [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+- [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
+- [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+- [ ] Implement logic to save new posts to the database.
+- [ ] Validate post content.
+- [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
 ### Feature: Timeline (Main Feed)
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
-#### Frontend (`apps/web`) - Next.js:
+#### Frontend (`apps/web`) - Next.js
 
-*   [ ] Integrate post feed display into the main dashboard layout.
-*   [ ] Implement a visually appealing and interactive timeline UI.
-*   [ ] Consider infinite scrolling or pagination for loading more posts.
-*   [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
-*   [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
+- [ ] Integrate post feed display into the main dashboard layout.
+- [ ] Implement a visually appealing and interactive timeline UI.
+- [ ] Consider infinite scrolling or pagination for loading more posts.
+- [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
+- [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### Backend (`apps/api`) - Go:
+#### Backend (`apps/api`) - Go
 
-*   [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-*   [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
+- [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
+- [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
 
 ### Feature: Stories
 
 **Goal:** Users can view and create short, ephemeral stories.
 
-#### Frontend (`apps/web`) - Next.js:
+#### Frontend (`apps/web`) - Next.js
 
-*   [ ] Create a UI component to display a carousel or list of active stories.
-*   [ ] Implement a full-screen viewer for individual stories.
-*   [ ] Create a form or interface for users to upload images/videos and create new stories.
-*   [ ] Add a placeholder UI element on the dashboard for stories.
+- [ ] Create a UI component to display a carousel or list of active stories.
+- [ ] Implement a full-screen viewer for individual stories.
+- [ ] Create a form or interface for users to upload images/videos and create new stories.
+- [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### Backend (`apps/api`) - Go:
+#### Backend (`apps/api`) - Go
 
-*   [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
-*   [ ] Create API endpoints for creating, fetching, and viewing stories.
+- [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
+- [ ] Create API endpoints for creating, fetching, and viewing stories.
 
 ### Feature: Direct Messages
 
 **Goal:** Users can send and receive direct messages with other users.
 
-#### Frontend (`apps/web`) - Next.js:
+#### Frontend (`apps/web`) - Next.js
 
-*   [ ] Create a UI to display a list of conversations/chats.
-*   [ ] Implement a real-time chat interface for sending and receiving messages.
-*   [ ] Add a placeholder UI element on the dashboard for direct messages.
+- [ ] Create a UI to display a list of conversations/chats.
+- [ ] Implement a real-time chat interface for sending and receiving messages.
+- [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### Backend (`apps/api`) - Go:
+#### Backend (`apps/api`) - Go
 
-*   [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
-*   [ ] Create API endpoints for sending, receiving, and retrieving messages.
-*   [ ] Consider WebSocket integration for real-time messaging.
+- [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
+- [ ] Create API endpoints for sending, receiving, and retrieving messages.
+- [ ] Consider WebSocket integration for real-time messaging.
 
 ## 6. Commit Rules (Semantic Commits)
 
@@ -291,20 +291,20 @@ At the end of each session, the agent must:
 
 When collaborating on database schema changes, it's crucial to keep your local Supabase CLI and the remote database in sync. Follow these steps:
 
-1.  **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
+1. **Pull Latest Changes:** Before making any schema changes, always pull the latest migrations from the remote repository.
 
     ```bash
     git pull origin develop # or master, depending on your branch
     ```
 
-2.  **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
+2. **Generate New Migration (for schema changes):** If you make changes to `supabase_schema.sql` or directly in your Supabase dashboard, generate a new migration file.
 
     ```bash
     supabase migration new <migration_name>
     ```
 
     Then, copy the relevant SQL from `supabase_schema.sql` or write your changes directly into the newly created migration file (`supabase/migrations/<timestamp>_<migration_name>.sql`).
-3.  **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
+3. **Push Migrations to Remote:** After creating and verifying your local migrations, push them to the remote Supabase database.
 
     ```bash
     supabase db push --yes
@@ -316,15 +316,19 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 - **Local Development:**
   - Create a `.env.local` file in the project root for frontend environment variables:
+
     ```
     NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
     NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
     ```
+
   - Create a `.env` file in the project root for backend environment variables:
+
     ```
     DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
     SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
     ```
+
   - **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
 - **CI/CD:** Supabase credentials for CI/CD are managed as GitHub Secrets (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `SUPABASE_JWT_SECRET`).
 
