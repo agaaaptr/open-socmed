@@ -2,7 +2,7 @@ module github.com/agaaaptr/open-socmed
 
 go 1.24.5
 
-replace github.com/agaaaptr/open-socmed/packages/go-common => ./packages/go-common
+replace github.com/agaaaptr/open-socmed/packages/go-common => /vercel/path0/packages/go-common
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
