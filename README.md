@@ -76,7 +76,7 @@ This project follows a monorepo structure managed by Turborepo. Understanding it
   - **`apps/web`**: The Next.js frontend application.
 - **`api/`**: Contains Go serverless functions deployed via Vercel.
   - Each subdirectory within `api/` (e.g., `api/profile`, `api/health`) represents a distinct serverless function.
-  - Each function directory must contain an `index.go` file with a `Handler` function and its own `go.mod`.
+  - Each function directory must contain a single `index.go` file with a `Handler` function and its own `go.mod`.
 - **`packages/`**: Contains shared code and components used across different applications.
   - **`packages/ui`**: Shared React/Tailwind components.
   
@@ -87,7 +87,7 @@ To maintain consistency and Vercel compatibility, please adhere to the following
 
 - **Go Serverless Functions (`api/`):**
   - **Directory Structure:** Each new API endpoint should reside in its own subdirectory under `api/` (e.g., `api/your_new_endpoint/`).
-  - **File Naming:** The main entry file for each function must be `index.go`.
+  - **File Naming:** The main entry file for each function must be `index.go`. **All Go code for a given serverless function (including database connection, GORM models, helper functions, and structs) must be consolidated into this single `index.go` file.**
   - **Package Naming:** The `index.go` file should use a package name that matches its directory (e.g., `package your_new_endpoint`).
   - **Handler Function:** The entry point for Vercel must be a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
   - **`go.mod`:** Each function directory (`api/your_new_endpoint/`) must have its own `go.mod` file, managing its specific dependencies.
@@ -117,26 +117,92 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     mkdir -p api/posts
     ```
 
-2.  **Create `index.go` File:**
+2.  **Create `index.go` File (Consolidated Code):**
     *   Inside the new function directory (`api/posts/`), create a file named `index.go`.
     *   **`index.go` Content:**
-        *   Use `package posts` (matching the directory name).
+        *   Use `package <function_directory_name>` (e.g., `package posts`).
         *   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-    *   **Example `api/posts/index.go`:**
+        *   **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
+    *   **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
+
     ```go
     package posts
 
     import (
         "encoding/json"
         "net/http"
-        // Import other necessary dependencies
+        "log"
+        "os"
+        "sync"
+        "time"
+
+        "github.com/joho/godotenv"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "github.com/google/uuid"
+        // Add other necessary imports here
     )
 
+    // Database connection variables (if needed for this function)
+    var (
+        db   *gorm.DB
+        once sync.Once
+    )
+
+    // Connect initializes the database connection (if needed for this function)
+    func Connect() (*gorm.DB, error) {
+        var err error
+        once.Do(func() {
+            if os.Getenv("VERCEL_ENV") == "" {
+                err = godotenv.Load()
+                if err != nil {
+                    log.Println("Warning: .env file not found, relying on environment variables")
+                }
+            }
+            dsn := os.Getenv("DATABASE_URL")
+            if dsn == "" {
+                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+            }
+            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+            if err != nil {
+                log.Fatalf("FATAL: Failed to connect to database: %v", err)
+            }
+            log.Println("Database connection successful and pool established.")
+        })
+        if err != nil {
+            return nil, err
+        }
+        return db, nil
+    }
+
+    // GetDB returns the existing database connection pool (if needed for this function)
+    func GetDB() (*gorm.DB, error) {
+        if db == nil {
+            return Connect()
+        }
+        return db
+    }
+
+    // Example GORM Model (if needed for this function)
+    type Post struct {
+        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+        Content   string    `json:"content"`
+        AuthorID  uuid.UUID `json:"author_id"`
+        CreatedAt time.Time `json:"created_at"`
+    }
+
+    // Handler is the main entry point for the serverless function
     func Handler(w http.ResponseWriter, r *http.Request) {
         if r.Method != http.MethodGet {
             http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
             return
         }
+        // Example: Fetch posts from DB
+        // db, err := GetDB()
+        // if err != nil { /* handle error */ }
+        // var posts []Post
+        // db.Find(&posts)
+
         w.WriteHeader(http.StatusOK)
         json.NewEncoder(w).Encode(map[string]string{"message": "Posts API endpoint"})
     }
@@ -145,10 +211,11 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 3.  **Create `go.mod` for the New Function:**
     *   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
     *   **`go.mod` Content:**
-        *   `module posts` (matching the directory name).
+        *   `module <function_directory_name>` (e.g., `module posts`).
         *   Specify the Go version (e.g., `go 1.21`).
         *   Add `require` directives for any dependencies used by this function.
     *   **Example `api/posts/go.mod`:**
+
     ```go
     module posts
 
@@ -157,17 +224,16 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     require (
         // Add your dependencies here, e.g.,
         // github.com/joho/godotenv v1.5.1
+        // gorm.io/gorm v1.30.1
+        // gorm.io/driver/postgres v1.6.0
+        // github.com/google/uuid v1.6.0
     )
     ```
 
-4.  **Copy Shared Code (if any):**
-    *   If your new API function requires shared Go code (like database connection or models), copy the necessary `.go` files directly into the function's directory (`api/posts/`).
-    *   Ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).
-    *   Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory).
-
-5.  **Update `vercel.json`:**
+4.  **Update `vercel.json`:**
     *   Add a new entry in the `builds` section of `vercel.json` for your new API function.
     *   **Example Addition in `vercel.json`:**
+
     ```json
     {
       "version": 2,
@@ -183,14 +249,15 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-6.  **Run `go mod tidy`:**
+5.  **Run `go mod tidy`:**
     *   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+
     ```bash
     cd api/posts
     go mod tidy
     ```
 
-7.  **Test Locally:**
+6.  **Test Locally:**
     *   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
 
 ### 2.5. General File/Folder Creation Rules
@@ -204,7 +271,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     *   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
     *   Inside, create a `page.tsx` file as the entry point for that page.
 *   **Utilities/Hooks/Libs:**
-    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`, `hooks/useAuth.ts`).
+    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
     *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
 
@@ -212,7 +279,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 #### For Shared UI Components (`packages/ui`)
 
 *   **React Components:**
-    *   Use **PascalCase** for component file names (e.g., `Button.tsx`, `Card.tsx`).
+    *   Use **PascalCase** for component file names (e.g., `Button.tsx`).
     *   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
 *   **Dependencies:**
     *   Add new dependencies to `packages/ui/package.json`.

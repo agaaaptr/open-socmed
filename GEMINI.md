@@ -150,10 +150,8 @@ This project is developed in structured stages to ensure organized progress.
   - **Current Hypothesis:** The issue is likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
   - **Next Step:** Proceeding with deployment to Vercel production to verify if the issue persists in the deployed environment, which will help isolate the problem to either the local development environment or the build/runtime on Vercel.
 - **Vercel Deployment Failure (Go Build Error):** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Root Cause:** Mismatched `package` declarations across Go files within the `api/profile` and `api/health` directories. Initially, `index.go`, `database.go`, and `profile.go` (for profile) and `index.go`, `database.go` (for health) were using `package handler` instead of their respective directory names.
-  - **Resolution:**
-    1.  Changed `package handler` to `package profile` in `api/profile/index.go`, `api/profile/database.go`, and `api/profile/profile.go`. Similarly, changed `package handler` to `package health` in `api/health/index.go` and `api/health/database.go`. (Initial attempt)
-    2.  **Further Refinement (Current):** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach is more robust for Vercel deployments as it avoids potential issues with how Vercel handles multiple Go files within a single serverless function directory.
+  - **Root Cause:** The primary cause was Vercel's specific behavior when building Go serverless functions. While Go allows multiple files within a single package, Vercel's build process for `@vercel/go` builder expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files were present in the function directory (e.g., `index.go`, `database.go`, `profile.go`), Vercel failed to correctly link or compile them, leading to `undefined` symbol errors.
+  - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -277,7 +275,7 @@ All commits in this project **must** adhere to the Semantic Commit Messages stan
 - **refactor**: A code change that neither fixes a bug nor adds a feature.
 - **perf**: A code change that improves performance.
 - **test**: Adding missing tests or correcting existing tests.
-- **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation.
+- **chore**: Changes to the build process or auxiliary tools and libraries suchs as documentation generation.
 
 **Scope (Scope of Change):**
 
@@ -398,6 +396,11 @@ This project has provided valuable insights into monorepo management, Vercel dep
 -   For Vercel deployments, a separate backend deployment job in GitHub Actions is often unnecessary if the backend is refactored into Vercel serverless functions. Vercel handles the build and deployment of these functions as part of the main project deployment.
 -   Keeping CI/CD configurations clean and focused improves maintainability and clarity.
 
+### 9.6. Vercel Go Serverless Function Build Behavior (Crucial Insight)
+
+-   **Problem:** Vercel's build process for Go serverless functions (using `@vercel/go` builder) expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files are present in the function directory (even if they are in the same `package`), Vercel may fail to correctly link or compile them, leading to `undefined` symbol errors during deployment.
+-   **Solution:** Always consolidate all Go code for a specific serverless function into its `index.go` file. This includes database connection logic, GORM models, and any other helper functions or structs directly used by that function. Remove any redundant `.go` files from the function directory after consolidation.
+
 ## 10. Development Guidelines & Conventions
 
 This section outlines the step-by-step process and rules for creating new API endpoints and other project components, ensuring consistency and Vercel compatibility.
@@ -414,12 +417,13 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     mkdir -p api/posts
     ```
 
-2.  **Create `index.go` File:**
+2.  **Create `index.go` File (Consolidated Code):**
     -   Inside the new function directory (`api/posts/`), create a file named `index.go`.
     -   **`index.go` Content:**
         -   Use `package <function_directory_name>` (e.g., `package posts`).
         -   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-    -   **Example `api/posts/index.go`:**
+        -   **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
+    -   **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
 
     ```go
     package posts
@@ -427,14 +431,78 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     import (
         "encoding/json"
         "net/http"
-        // Import other necessary dependencies
+        "log"
+        "os"
+        "sync"
+        "time"
+
+        "github.com/joho/godotenv"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "github.com/google/uuid"
+        // Add other necessary imports here
     )
 
+    // Database connection variables (if needed for this function)
+    var (
+        db   *gorm.DB
+        once sync.Once
+    )
+
+    // Connect initializes the database connection (if needed for this function)
+    func Connect() (*gorm.DB, error) {
+        var err error
+        once.Do(func() {
+            if os.Getenv("VERCEL_ENV") == "" {
+                err = godotenv.Load()
+                if err != nil {
+                    log.Println("Warning: .env file not found, relying on environment variables")
+                }
+            }
+            dsn := os.Getenv("DATABASE_URL")
+            if dsn == "" {
+                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+            }
+            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+            if err != nil {
+                log.Fatalf("FATAL: Failed to connect to database: %v", err)
+            }
+            log.Println("Database connection successful and pool established.")
+        })
+        if err != nil {
+            return nil, err
+        }
+        return db, nil
+    }
+
+    // GetDB returns the existing database connection pool (if needed for this function)
+    func GetDB() (*gorm.DB, error) {
+        if db == nil {
+            return Connect()
+        }
+        return db
+    }
+
+    // Example GORM Model (if needed for this function)
+    type Post struct {
+        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+        Content   string    `json:"content"`
+        AuthorID  uuid.UUID `json:"author_id"`
+        CreatedAt time.Time `json:"created_at"`
+    }
+
+    // Handler is the main entry point for the serverless function
     func Handler(w http.ResponseWriter, r *http.Request) {
         if r.Method != http.MethodGet {
             http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
             return
         }
+        // Example: Fetch posts from DB
+        // db, err := GetDB()
+        // if err != nil { /* handle error */ }
+        // var posts []Post
+        // db.Find(&posts)
+
         w.WriteHeader(http.StatusOK)
         json.NewEncoder(w).Encode(map[string]string{"message": "Posts API endpoint"})
     }
@@ -456,15 +524,13 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     require (
         // Add your dependencies here, e.g.,
         // github.com/joho/godotenv v1.5.1
+        // gorm.io/gorm v1.30.1
+        // gorm.io/driver/postgres v1.6.0
+        // github.com/google/uuid v1.6.0
     )
     ```
 
-4.  **Copy Shared Code (if any):**
-    -   If your new API function requires shared Go code (like database connection or models), add a `replace` directive in `go.mod` pointing to the correct relative path.
-    -   **Crucially, ensure the `package` declaration in these copied files is updated to match the function's package name (e.g., `package posts`).**
-    -   Update import paths in `index.go` to reflect the local files (e.g., `import "posts/database"` if `database.go` is in the same directory, or simply call `GetDB()` if `database.go` is in the same package).
-
-5.  **Update `vercel.json`:**
+4.  **Update `vercel.json`:**
     -   Add a new entry in the `builds` section of `vercel.json` for your new API function.
     -   **Example Addition in `vercel.json`:**
 
@@ -483,7 +549,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-6.  **Run `go mod tidy`:**
+5.  **Run `go mod tidy`:**
     -   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
 
     ```bash
@@ -491,7 +557,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     go mod tidy
     ```
 
-7.  **Test Locally:**
+6.  **Test Locally:**
     -   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
 
 ### 10.2. General File/Folder Creation Rules
