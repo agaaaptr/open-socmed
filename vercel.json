@@ -1,12 +1,15 @@
 {
+  "version": 2,
   "builds": [
-    {
-      "src": "apps/frontend/next.config.js",
-      "use": "@vercel/next"
-    },
     {
       "src": "apps/backend/api/**/*.go",
       "use": "@vercel/go"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     }
   ]
 }
