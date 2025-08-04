@@ -12,5 +12,11 @@
       "src": "apps/frontend/package.json",
       "use": "@vercel/next"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path((?!api/.*).*)",
+      "destination": "/:path"
+    }
   ]
 }
