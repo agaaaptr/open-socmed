@@ -1,4 +1,4 @@
-name: CI/CD for Develop Branch
+name: CI/CD for Develop Environment
 
 on:
   push:
