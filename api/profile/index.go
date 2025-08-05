@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,66 +16,58 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	db   *gorm.DB
-	once sync.Once
-)
-
-// Connect initializes the database connection.
-// It's designed to be called once to prevent connection leaks.
+// Connect creates a new database connection for each request
+// This approach is better for serverless functions to avoid prepared statement conflicts
 func Connect() (*gorm.DB, error) {
-	var err error
-	once.Do(func() {
-		// Load .env file (for local development)
-		if os.Getenv("VERCEL_ENV") == "" { // Simple check if not in Vercel
-			err = godotenv.Load()
-			if err != nil {
-				log.Println("Warning: .env file not found, relying on environment variables")
-			}
-		}
-
-		dsn := os.Getenv("DATABASE_URL")
-		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable not set")
-		}
-
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			PrepareStmt: false, // Disable prepared statement caching for serverless environment
-		})
+	// Load .env file (for local development)
+	if os.Getenv("VERCEL_ENV") == "" {
+		err := godotenv.Load()
 		if err != nil {
-			log.Fatalf("FATAL: Failed to connect to database: %v", err)
+			log.Println("Warning: .env file not found, relying on environment variables")
 		}
+	}
 
-		sqlDB, err := db.DB()
-		if err != nil {
-			log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		return nil, fmt.Errorf("DATABASE_URL environment variable not set")
+	}
+
+	// Add connection parameters to avoid prepared statement issues
+	if !strings.Contains(dsn, "statement_cache_mode") {
+		separator := "?"
+		if strings.Contains(dsn, "?") {
+			separator = "&"
 		}
-		sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
-		sqlDB.SetMaxOpenConns(1) // Limit total open connections
-		sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+		dsn += separator + "statement_cache_mode=describe"
+	}
 
-		log.Println("Database connection successful and pool established.")
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		PrepareStmt:                              false, // Disable prepared statements
+		DisableForeignKeyConstraintWhenMigrating: true,  // Additional safety for serverless
 	})
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
-	return db, nil
-}
 
-// GetDB returns the existing database connection pool.
-// If the connection hasn't been established, it will be initialized.
-func GetDB() (*gorm.DB, error) {
-	if db == nil {
-		return Connect()
+	// Configure connection pool for serverless environment
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get underlying sql.DB: %v", err)
 	}
+
+	// Minimal connection pooling for serverless
+	sqlDB.SetMaxIdleConns(0)                   // No idle connections
+	sqlDB.SetMaxOpenConns(1)                   // Only one connection at a time
+	sqlDB.SetConnMaxLifetime(time.Second * 30) // Short connection lifetime
+
+	log.Println("Database connection established successfully")
 	return db, nil
 }
 
 type Profile struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
-	Username  string    `gorm:"unique;not null" json:"username"`
-	FullName  string    `json:"full_name"`
+	ID        uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
+	Username  string     `gorm:"unique;not null" json:"username"`
+	FullName  *string    `json:"full_name"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	AvatarURL *string    `json:"avatar_url"`
 	Website   *string    `json:"website"`
@@ -85,11 +76,11 @@ type Profile struct {
 // UpdateProfileRequest defines the structure for incoming profile update data.
 // This ensures that users can only update specific, allowed fields.
 type UpdateProfileRequest struct {
-	FullName  *string `json:"full_name"`
-	Username  *string `json:"username"`
+	FullName *string `json:"full_name"`
+	Username *string `json:"username"`
 }
 
-// ProfileHandler is the entry point for the /api/profile serverless function.
+// Handler is the entry point for the /api/profile serverless function.
 func Handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[DEBUG] Received request: %s %s", r.Method, r.URL.Path)
 
@@ -113,12 +104,21 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[DEBUG] Token validated successfully for user ID: %s", userID)
 
-	    db, err := GetDB()
+	// Create new database connection for this request
+	db, err := Connect()
 	if err != nil {
 		log.Printf("[ERROR] Failed to connect to database: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	// Ensure connection is closed after request completes
+	defer func() {
+		if sqlDB, err := db.DB(); err == nil {
+			sqlDB.Close()
+			log.Println("[DEBUG] Database connection closed")
+		}
+	}()
 
 	switch r.Method {
 	case http.MethodGet:

@@ -185,7 +185,11 @@ This project is developed in structured stages to ensure organized progress.
 
 - [x] **Database Error: Prepared Statement Already Exists (Solved)**
   - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors occurred in serverless environments, leading to API access issues.
-  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and by configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)`. These settings ensure that database connections are managed more aggressively in a serverless environment, reducing the likelihood of prepared statement conflicts.
+  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and by configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(0)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Second * 30)`. These settings ensure that database connections are managed more aggressively in a serverless environment, reducing the likelihood of prepared statement conflicts.
+
+- [x] **`/api/check-username` Database Query Error (Solved)**
+  - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
+  - **Resolution:** The `Profile` struct in `api/check-username/index.go` was not accurately reflecting the `profiles` table schema in the database. Specifically, it was using `gorm.Model` which adds default fields that were not present or had different types in the actual database table. The `Profile` struct was updated to precisely match the database schema, including using `uuid.UUID` for the `ID` field and pointers for nullable fields, resolving the schema mismatch and allowing successful database queries.
 
 - [x] **`/api/check-username` Database Query Error (Solved)**
   - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
@@ -486,63 +490,61 @@ To create a new Go serverless API function that is compatible with Vercel and ad
         // Add other necessary imports here
     )
 
-    // Database connection variables (if needed for this function)
-    var (
-        db   *gorm.DB
-        once sync.Once
-    )
-
-    // Connect initializes the database connection (if needed for this function)
+    // Connect creates a new database connection for each request
+    // This approach is better for serverless functions to avoid prepared statement conflicts
     func Connect() (*gorm.DB, error) {
-        var err error
-        once.Do(func() {
-            if os.Getenv("VERCEL_ENV") == "" {
-                err = godotenv.Load()
-                if err != nil {
-                    log.Println("Warning: .env file not found, relying on environment variables")
-                }
-            }
-            dsn := os.Getenv("DATABASE_URL")
-            if dsn == "" {
-                log.Fatal("FATAL: DATABASE_URL environment variable not set")
-            }
-            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-                PrepareStmt: false, // Disable prepared statement caching for serverless environment
-            })
+        // Load .env file (for local development)
+        if os.Getenv("VERCEL_ENV") == "" {
+            err := godotenv.Load()
             if err != nil {
-                log.Fatalf("FATAL: Failed to connect to database: %v", err)
+                log.Println("Warning: .env file not found, relying on environment variables")
             }
+        }
 
-            sqlDB, err := db.DB()
-            if err != nil {
-                log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+        dsn := os.Getenv("DATABASE_URL")
+        if dsn == "" {
+            return nil, fmt.Errorf("DATABASE_URL environment variable not set")
+        }
+
+        // Add connection parameters to avoid prepared statement issues
+        if !strings.Contains(dsn, "statement_cache_mode") {
+            separator := "?"
+            if strings.Contains(dsn, "?") {
+                separator = "&"
             }
-            sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
-            sqlDB.SetMaxOpenConns(1) // Limit total open connections
-            sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+            dsn += separator + "statement_cache_mode=describe"
+        }
 
-            log.Println("Database connection successful and pool established.")
+        db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+            PrepareStmt:                              false, // Disable prepared statements
+            DisableForeignKeyConstraintWhenMigrating: true,  // Additional safety for serverless
         })
         if err != nil {
-            return nil, err
+            return nil, fmt.Errorf("failed to connect to database: %v", err)
         }
-        return db, nil
-    }
 
-    // GetDB returns the existing database connection pool (if needed for this function)
-    func GetDB() (*gorm.DB, error) {
-        if db == nil {
-            return Connect()
+        // Configure connection pool for serverless environment
+        sqlDB, err := db.DB()
+        if err != nil {
+            return nil, fmt.Errorf("failed to get underlying sql.DB: %v", err)
         }
-        return db
+
+        // Minimal connection pooling for serverless
+        sqlDB.SetMaxIdleConns(0)                   // No idle connections
+        sqlDB.SetMaxOpenConns(1)                   // Only one connection at a time
+        sqlDB.SetConnMaxLifetime(time.Second * 30) // Short connection lifetime
+
+        log.Println("Database connection established successfully")
+        return db, nil
     }
 
     // Example GORM Model (if needed for this function)
     type Post struct {
-        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"` // Ensure ID type matches database (e.g., uuid.UUID)
         Content   string    `json:"content"`
         AuthorID  uuid.UUID `json:"author_id"`
         CreatedAt time.Time `json:"created_at"`
+        // For nullable fields, use pointers (e.g., *string, *time.Time)
     }
 
     // Handler is the main entry point for the serverless function
