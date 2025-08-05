@@ -16,42 +16,52 @@ To set up the project locally, follow these steps:
 
 ### 1.2. Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/your-repo/open-socmed.git
     cd open-socmed
     ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
+
     ```bash
     npm install
     ```
 
-3.  **Set up environment variables:**
+3. **Set up environment variables:**
     Create a `.env.local` file in the project root for frontend environment variables:
+
     ```
     NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
     NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
     ```
+
     Create a `.env` file in the project root for backend environment variables:
+
     ```
     DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
     SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
     ```
+
     **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
 
-4.  **Set up Supabase (Local or Remote):**
-    *   **Remote Supabase:** Link your local project to a remote Supabase project:
+4. **Set up Supabase (Local or Remote):**
+    - **Remote Supabase:** Link your local project to a remote Supabase project:
+
         ```bash
         supabase login
         supabase link --project-ref your-project-ref
         ```
-    *   **Local Supabase (using Docker):**
+
+    - **Local Supabase (using Docker):**
+
         ```bash
         supabase start
         ```
 
-5.  **Push database migrations:**
+5. **Push database migrations:**
+
     ```bash
     supabase db push --yes
     ```
@@ -80,7 +90,6 @@ This project follows a monorepo structure managed by Turborepo. Understanding it
 - **`packages/`**: Contains shared code and components used across different applications.
   - **`packages/ui`**: Shared React/Tailwind components.
   
-
 ### 2.2. Naming Conventions & File Creation
 
 To maintain consistency and Vercel compatibility, please adhere to the following:
@@ -97,17 +106,26 @@ To maintain consistency and Vercel compatibility, please adhere to the following
   - Use PascalCase for React component files (e.g., `MyComponent.tsx`).
   - Use kebab-case for utility files or non-component modules (e.g., `utils/helpers.ts`).
 
-
+- **Next.js Metadata and Layouts:**
+  - Page titles and metadata are managed using Next.js 14's Metadata API.
+  - The root `apps/web/app/layout.tsx` is a Server Component and defines global metadata.
+  - Route-specific metadata is defined in `layout.tsx` files within each route's directory (e.g., `apps/web/app/auth/signin/layout.tsx`).
+  - Client-side logic (e.g., `usePathname`) from the root layout has been extracted into `apps/web/app/ClientLayoutContent.tsx` to allow the root layout to remain a Server Component.
 
 ### 2.3. Responsive Design & UI/UX
 
 The frontend has been significantly refactored to ensure a professional, clean, and fully responsive user experience across all devices. Key improvements include:
 
--   **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
--   **Responsive Components:** Core components like the `Sidebar` (which is now always visible on desktop and a mobile-only bottom navigation bar) and navigation elements adapt to different screen sizes.
--   **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
--   **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
--   **Conditional Rendering:** The sidebar and mobile navigation are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
+- **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
+- **Responsive Components:** Core components like the `Sidebar` (which is now always visible on desktop and a mobile-only bottom navigation bar) and navigation elements adapt to different screen sizes.
+- **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
+- **Home Page Enhancements:**
+  - **Desktop Suggested Features:** The "Suggested Features" section remains visible in its original position on desktop views.
+  - **Floating Suggested Features (Mobile):** On mobile devices, the "Suggested Features" section is now accessible via a floating icon in the bottom-left corner. Tapping the icon reveals a compact menu (max 3 items) with smooth, spring-like animations, ensuring it doesn't obstruct the main timeline.
+  - **Pull-to-Refresh (Mobile):** The mobile timeline now supports a "pull-to-refresh" gesture. Pulling down from the top of the timeline reveals a refresh icon with a fluid, semi-transparent background that expands as the screen is pulled, and releasing it triggers a page refresh.
+  - **Desktop Refresh:** On desktop, refreshing the home page can be done by clicking the "Cirqle" text in the sidebar.
+- **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
+- **Conditional Rendering:** The sidebar and mobile navigation are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
 
 ### 2.4. General Tips for Contributors
 
@@ -120,20 +138,21 @@ The frontend has been significantly refactored to ensure a professional, clean, 
 
 To create a new Go serverless API function that is compatible with Vercel and adheres to the project's conventions, follow these steps:
 
-1.  **Create Function Directory:**
-    *   Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
-    *   **Example:** For a `/api/posts` endpoint, create `api/posts/` (this will be the module name).
+1. **Create Function Directory:**
+    - Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
+    - **Example:** For a `/api/posts` endpoint, create `api/posts/` (this will be the module name).
+
     ```bash
     mkdir -p api/posts
     ```
 
-2.  **Create `index.go` File (Consolidated Code):**
-    *   Inside the new function directory (`api/posts/`), create a file named `index.go`.
-    *   **`index.go` Content:**
-        *   Use `package <function_directory_name>` (e.g., `package posts`).
-        *   Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-        *   **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
-    *   **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
+2. **Create `index.go` File (Consolidated Code):**
+    - Inside the new function directory (`api/posts/`), create a file named `index.go`.
+    - **`index.go` Content:**
+        - Use `package <function_directory_name>` (e.g., `package posts`).
+        - Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
+        - **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
+    - **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
 
     ```go
     package posts
@@ -230,13 +249,13 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-3.  **Create `go.mod` for the New Function:**
-    *   Inside the new function directory (`api/posts/`), create a file named `go.mod`.
-    *   **`go.mod` Content:**
-        *   `module <function_directory_name>` (e.g., `module posts`).
-        *   Specify the Go version (e.g., `go 1.21`).
-        *   Add `require` directives for any dependencies used by this function.
-    *   **Example `api/posts/go.mod`:**
+3. **Create `go.mod` for the New Function:**
+    - Inside the new function directory (`api/posts/`), create a file named `go.mod`.
+    - **`go.mod` Content:**
+        - `module <function_directory_name>` (e.g., `module posts`).
+        - Specify the Go version (e.g., `go 1.21`).
+        - Add `require` directives for any dependencies used by this function.
+    - **Example `api/posts/go.mod`:**
 
     ```go
     module posts
@@ -252,9 +271,9 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     )
     ```
 
-4.  **Update `vercel.json`:**
-    *   Add a new entry in the `builds` section of `vercel.json` for your new API function.
-    *   **Example Addition in `vercel.json`:**
+4. **Update `vercel.json`:**
+    - Add a new entry in the `builds` section of `vercel.json` for your new API function.
+    - **Example Addition in `vercel.json`:**
 
     ```json
     {
@@ -271,41 +290,39 @@ To create a new Go serverless API function that is compatible with Vercel and ad
     }
     ```
 
-5.  **Run `go mod tidy`:**
-    *   Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+5. **Run `go mod tidy`:**
+    - Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
 
     ```bash
     cd api/posts
     go mod tidy
     ```
 
-6.  **Test Locally:**
-    *   From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+6. **Test Locally:**
+    - From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
 
 ### 2.5. General File/Folder Creation Rules
 
 #### For Frontend (`apps/web`)
 
-*   **React Components:**
-    *   Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
-    *   Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
-*   **Next.js Pages:**
-    *   Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
-    *   Inside, create a `page.tsx` file as the entry point for that page.
-*   **Utilities/Hooks/Libs:**
-    *   Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
-    *   Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
-
-
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
+  - Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
+- **Next.js Pages:**
+  - Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
+  - Inside, create a `page.tsx` file as the entry point for that page.
+- **Utilities/Hooks/Libs:**
+  - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
+  - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
 #### For Shared UI Components (`packages/ui`)
 
-*   **React Components:**
-    *   Use **PascalCase** for component file names (e.g., `Button.tsx`).
-    *   Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
-*   **Dependencies:**
-    *   Add new dependencies to `packages/ui/package.json`.
-    *   Run `npm install` at the project root after modifying `package.json`.
+- **React Components:**
+  - Use **PascalCase** for component file names (e.g., `Button.tsx`).
+  - Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
+- **Dependencies:**
+  - Add new dependencies to `packages/ui/package.json`.
+  - Run `npm install` at the project root after modifying `package.json`.
 
 ## 3. Contributing
 

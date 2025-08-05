@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import { Loader } from 'lucide-react';
 
 import Timeline from '../../components/Timeline';
+import MobileSuggestedFeatures from '../../components/MobileSuggestedFeatures';
+import PullToRefresh from '../../components/PullToRefresh';
 import SuggestedFeatures from '../../components/SuggestedFeatures';
 
 // Loading Spinner Component
@@ -69,13 +71,16 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-screen-xl mx-auto">
           {/* Main Content Area */}
           <div className="lg:col-span-2 flex flex-col space-y-6 md:space-y-8">
-            <Timeline />
+            <PullToRefresh>
+              <Timeline />
+            </PullToRefresh>
           </div>
-
-          {/* Right Sidebar for Suggested Features */}
-          <div className="lg:col-span-1">
+          {/* Right Sidebar for Suggested Features (Desktop) */}
+          <div className="hidden lg:block lg:col-span-1">
             <SuggestedFeatures />
           </div>
+          {/* Floating Suggested Features (Mobile) */}
+          <MobileSuggestedFeatures />
         </div>
       )}
     </div>

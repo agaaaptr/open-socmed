@@ -123,21 +123,23 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
-  - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a sidebar, a timeline, and suggested features. Removed the header for the home page. The 'Stories' section has been removed as per user request.
+  - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a timeline. The 'Stories' section has been removed as per user request.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
-  - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages.
+  - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
   - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [x] **Profile View Layout Refactor:** Redesigned the profile view page (`apps/web/app/profile/page.tsx`) for better readability and future expansion, organizing content into clear header, profile information, and actions sections. Improved placement of "Back to Home", "Sign Out", and "Edit Profile" buttons.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
   - [x] **Enhanced Form Validation:** Switched form validation behavior from `onChange` to `onBlur` for a better user experience. Added new validation rules for profile editing (full name length) and implemented a real-time unique username check against the backend.
+  - [x] **Desktop Refresh:** Implemented page refresh functionality by clicking the "Cirqle" text in the desktop sidebar.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
-- [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
-  - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.
+- [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
+  - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
+  - [x] Refactored root `layout.tsx` to be a Server Component and moved client-side logic to a new `ClientLayoutContent.tsx` component to allow metadata export.
 
 ### 3.3. Backend Development Plan
 
@@ -183,9 +185,11 @@ This project is developed in structured stages to ensure organized progress.
   - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
-- [x] **Database Error: Prepared Statement Already Exists (Solved)**
-  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors occurred in serverless environments, leading to API access issues.
-  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and by configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)`. These settings ensure that database connections are managed more aggressively in a serverless environment, reducing the likelihood of prepared statement conflicts.
+- [ ] **Database Error: Prepared Statement Already Exists (Re-opened)**
+  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors continue to occur in serverless environments, leading to API access issues.
+  - **Previous Attempted Resolution:** Explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)` was implemented. While these settings aimed to manage database connections more aggressively, the issue persists.
+  - **Hypothesis:** This issue likely stems from the nature of serverless functions, where instances might be shared or experience 'warm starts'. In such scenarios, a database connection (and its prepared statements) from a previous invocation might still be active or in a state that conflicts with a new invocation attempting to create a prepared statement with the same name. This suggests that the serverless function's lifecycle and database connection management are not yet optimally configured for all edge cases, and further improvements are needed to ensure robust database interaction in a shared, ephemeral environment.
+  - **Next Steps:** Further investigation and potential re-architecture of database connection handling within the serverless functions are required to fully resolve this persistent issue.
 
 - [x] **`/api/check-username` Database Query Error (Solved)**
   - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
