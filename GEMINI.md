@@ -407,7 +407,7 @@ This project has provided valuable insights into monorepo management, Vercel dep
 ### 9.2. Go Serverless Function Naming Convention
 
 - For Vercel to correctly identify and execute a Go file as a serverless function, it must contain a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
-- **Crucial Insight:** All Go files within the *same package* (e.g., `package api`) cannot have functions with the same name. To have multiple `Handler` functions, each function must reside in its own distinct Go package (e.g., `package health`, `package profile`) within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). This also requires each function directory to have its own `go.mod` file.
+- **Crucial Insight:** Each serverless function must reside in its own distinct Go package within its own directory (e.g., `api/health/index.go`, `api/profile/index.go`). The package name declared in `index.go` **must match the directory name** (e.g., `package health` for `api/health/`, `package profile` for `api/profile/`). Using `package main` or a generic `package handler` will cause build failures. This also requires each function directory to have its own `go.mod` file.
 
 ### 9.3. Environment Variables in Monorepos
 

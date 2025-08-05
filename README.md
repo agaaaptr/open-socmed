@@ -88,7 +88,7 @@ To maintain consistency and Vercel compatibility, please adhere to the following
 - **Go Serverless Functions (`api/`):**
   - **Directory Structure:** Each new API endpoint should reside in its own subdirectory under `api/` (e.g., `api/your_new_endpoint/`).
   - **File Naming:** The main entry file for each function must be `index.go`. **All Go code for a given serverless function (including database connection, GORM models, helper functions, and structs) must be consolidated into this single `index.go` file.**
-  - **Package Naming:** The `index.go` file should use a package name that matches its directory (e.g., `package your_new_endpoint`).
+  - **Package Naming:** The `index.go` file must declare a package name that **exactly matches its parent directory name** (e.g., `package profile` inside `api/profile/`). Using `package main` or a generic `package handler` will cause build failures.
   - **Handler Function:** The entry point for Vercel must be a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
   - **`go.mod`:** Each function directory (`api/your_new_endpoint/`) must have its own `go.mod` file, managing its specific dependencies.
 
