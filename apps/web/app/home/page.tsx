@@ -9,6 +9,7 @@ import { Loader } from 'lucide-react';
 import Timeline from '../../components/Timeline';
 import MobileSuggestedFeatures from '../../components/MobileSuggestedFeatures';
 import PullToRefresh from '../../components/PullToRefresh';
+import SuggestedFeatures from '../../components/SuggestedFeatures';
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -74,6 +75,11 @@ export default function HomePage() {
               <Timeline />
             </PullToRefresh>
           </div>
+          {/* Right Sidebar for Suggested Features (Desktop) */}
+          <div className="hidden lg:block lg:col-span-1">
+            <SuggestedFeatures />
+          </div>
+          {/* Floating Suggested Features (Mobile) */}
           <MobileSuggestedFeatures />
         </div>
       )}

@@ -90,16 +90,20 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
         style={{ willChange: 'transform' }}
       >
         {isRefreshing || pullDistance > 0 ? (
-          <div className="absolute top-0 left-0 right-0 flex justify-center items-center"
-            style={{ height: pullDistance > 0 ? pullDistance : REFRESH_THRESHOLD / 2 }}
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: pullDistance > 0 ? pullDistance : REFRESH_THRESHOLD / 2, opacity: pullDistance > 0 ? 1 : 0 }}
+            exit={{ height: 0, opacity: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute top-0 left-0 right-0 flex justify-center items-center z-10 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-3xl"
           >
             <motion.div
               animate={{ rotate: isRefreshing ? 360 : pullDistance * 2 }}
-              transition={{ duration: isRefreshing ? 1 : 0, ease: "linear", repeat: isRefreshing ? Infinity : 0 }}
+              transition={{ duration: isRefreshing ? 0.5 : 0.1, ease: "linear", repeat: isRefreshing ? Infinity : 0 }}
             >
               <RefreshCw className="text-accent-main" size={24} />
             </motion.div>
-          </div>
+          </motion.div>
         ) : null}
         {children}
       </motion.div>

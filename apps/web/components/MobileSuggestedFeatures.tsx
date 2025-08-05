@@ -15,13 +15,13 @@ export default function MobileSuggestedFeatures() {
       opacity: 0,
       y: 50,
       scale: 0.8,
-      transition: { duration: 0.3, ease: 'easeOut' },
+      transition: { type: "spring", stiffness: 300, damping: 20, mass: 0.5 },
     },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.3, ease: 'easeOut' },
+      transition: { type: "spring", stiffness: 300, damping: 20, mass: 0.5 },
     },
   };
 
