@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Users, TrendingUp, Compass } from 'lucide-react';
 
-const SuggestedFeatures = () => {
+const SuggestedFeatures = ({ limit }: { limit?: number }) => {
   const featureVariants = {
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
@@ -23,7 +23,7 @@ const SuggestedFeatures = () => {
     >
       <h2 className="text-xl md:text-2xl font-bold text-text-light mb-4">Suggested Features</h2>
       <div className="space-y-4">
-        {features.map((feature) => (
+        {features.slice(0, limit).map((feature) => (
           <motion.div
             key={feature.id}
             variants={featureVariants}

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Home, Search, MessageSquare, Bell, UserCircle } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 
@@ -15,6 +15,7 @@ const navItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const supabase = createClientComponentClient();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
 
@@ -61,7 +62,8 @@ const Sidebar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className="text-4xl font-extrabold text-text-light mb-10 tracking-tight"
+        className="text-4xl font-extrabold text-text-light mb-10 tracking-tight cursor-pointer"
+        onClick={() => router.refresh()}
       >
         Cirqle
       </motion.div>

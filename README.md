@@ -112,6 +112,10 @@ The frontend has been significantly refactored to ensure a professional, clean, 
 -   **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
 -   **Responsive Components:** Core components like the `Sidebar` (which is now always visible on desktop and a mobile-only bottom navigation bar) and navigation elements adapt to different screen sizes.
 -   **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
+-   **Home Page Mobile Enhancements:**
+    -   **Floating Suggested Features:** On mobile devices, the "Suggested Features" section is now accessible via a floating icon in the bottom-left corner. Tapping the icon reveals a compact menu (max 3 items) with smooth, fluid animations, ensuring it doesn't obstruct the main timeline.
+    -   **Pull-to-Refresh:** The mobile timeline now supports a "pull-to-refresh" gesture. Pulling down from the top of the timeline reveals a refresh icon, and releasing it triggers a page refresh.
+    -   **Desktop Refresh:** On desktop, refreshing the home page can be done by clicking the "Cirqle" text in the sidebar.
 -   **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
 -   **Conditional Rendering:** The sidebar and mobile navigation are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
 
