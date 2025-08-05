@@ -17,7 +17,7 @@ const LoadingSpinner = () => (
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex flex-col items-center justify-center min-h-screen w-full"
+        className="flex flex-col items-center justify-center min-h-screen w-full absolute inset-0"
     >
         <Loader className="w-12 h-12 text-accent-main animate-spin" />
         <p className="mt-4 text-text-muted">Loading your home feed...</p>
@@ -30,24 +30,36 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function checkUser() {
+    const checkUser = async () => {
+      console.log('Checking user...');
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
+        console.log('No user found, redirecting to signin.');
         router.push('/auth/signin');
-      } else {
-        // Prevent going back to landing page if already logged in
-        const handlePopState = () => {
-          if (window.location.pathname === '/') {
-            router.replace('/home');
-          }
-        };
-        window.addEventListener('popstate', handlePopState);
-        return () => {
-          window.removeEventListener('popstate', handlePopState);
-        };
+        return; // Stop execution if no user
       }
-      setLoading(false);
-    }
+
+      console.log('User found:', user);
+      setLoading(false); // Set loading to false once user is confirmed
+
+      // Prevent going back to landing page if already logged in
+      const handlePopState = () => {
+        console.log('Popstate event triggered. Current path:', window.location.pathname);
+        if (window.location.pathname === '/') {
+          console.log('Attempting to go back to landing page, redirecting to home.');
+          router.replace('/home');
+        }
+      };
+
+      window.addEventListener('popstate', handlePopState);
+
+      return () => {
+        console.log('Removing popstate listener.');
+        window.removeEventListener('popstate', handlePopState);
+      };
+    };
+
     checkUser();
   }, [supabase, router]);
 

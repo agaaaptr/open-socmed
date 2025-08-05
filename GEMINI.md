@@ -166,6 +166,7 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 4.1. Frontend (`apps/web`)
 
+- [x] **Loading Screen & Back Button Behavior:** Resolved issues where the home page would only display a loading screen after login and the back button would incorrectly navigate to the landing page. The loading screen is now correctly centered, and navigation flow is as expected.
 - **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
 ### 4.2. Backend (`api/`)
