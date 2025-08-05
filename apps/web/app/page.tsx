@@ -151,7 +151,7 @@ const FeaturesSection = () => (
 );
 
 // CTA Section Component
-const CTASection = () => (
+const CTASection = ({ user }) => (
   <section className="w-full text-center p-16">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -161,9 +161,11 @@ const CTASection = () => (
     >
       <h2 className="text-4xl font-bold text-text-light mb-4">Ready to <AccentText>Dive In?</AccentText></h2>
       <p className="text-text-muted mb-8 max-w-xl mx-auto">Become a part of the fastest-growing social platform. Your new community is just one click away.</p>
-      <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
-        Sign Up Now
-      </AccentButton>
+      {!user && (
+        <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
+          Sign Up Now
+        </AccentButton>
+      )}
     </motion.div>
   </section>
 );
@@ -202,7 +204,7 @@ export default function HomePage() {
       <Header user={user} onSignOut={handleSignOut} />
       <HeroSection user={user} />
       <FeaturesSection />
-      <CTASection />
+      <CTASection user={user} />
       <Footer />
     </div>
   );

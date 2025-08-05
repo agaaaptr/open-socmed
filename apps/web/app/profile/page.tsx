@@ -94,48 +94,48 @@ export default function ProfileViewPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background-dark text-text-light">
-      {/* Animated Background */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-background-dark text-text-light">
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-background-gradient-start via-background-gradient-end to-background-gradient-end animate-background-pan -z-10" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-xl md:max-w-2xl p-6 md:p-8 space-y-4 md:space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
+        className="w-full max-w-md md:max-w-lg p-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
       >
-        {/* Header Section: Back to Home, Title, Edit Profile */}
-        <div className="flex justify-between items-center">
-          <Link href="/home" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
-            <ArrowLeft className="mr-2 h-5 w-5" />
+        {/* --- Header Section --- */}
+        <div className="flex justify-between items-center pb-4 border-b border-border-subtle">
+          <h1 className="text-2xl md:text-3xl font-bold text-text-light">Profile</h1>
+          <Link href="/home" className="flex items-center text-sm text-accent-main hover:underline">
+            <ArrowLeft className="mr-1 h-4 w-4" />
             Back to Home
-          </Link>
-          <h1 className="text-4xl font-bold text-text-light">Your Profile</h1>
-          <Link href="/settings/profile" className="flex items-center text-text-light hover:text-accent-main transition-colors duration-300">
-            <Edit className="mr-2 h-5 w-5" />
-            Edit Profile
           </Link>
         </div>
 
-        {/* Profile Information Section */}
-        <div className="flex flex-col items-center space-y-6 py-4 border-y border-border-subtle">
-          <UserCircle className="w-32 h-32 text-accent-main" /> {/* Larger avatar */}
-          <div className="text-center">
-            <p className="text-3xl font-semibold text-text-light">{profile?.full_name}</p>
-            <p className="text-xl text-text-muted">@{profile?.username}</p>
-            {/* Future: Add email, etc. here */}
-            {/* <p className="text-lg text-text-muted mt-2">Email: {profile?.email}</p> */}
+        {/* --- Profile Information Section --- */}
+        <div className="flex flex-col items-center space-y-4 py-6 text-center">
+          <UserCircle className="w-24 h-24 md:w-28 md:h-28 text-accent-main" />
+          <div>
+            <p className="text-xl md:text-2xl font-bold text-text-light">{profile?.full_name}</p>
+            <p className="text-md md:text-lg text-text-muted">@{profile?.username}</p>
           </div>
         </div>
 
-        {/* Actions Section */}
-        <div className="flex justify-center pt-4">
+        {/* --- Actions Section --- */}
+        <div className="flex flex-col md:flex-row md:justify-center space-y-3 md:space-y-0 md:space-x-4 pt-4 border-t border-border-subtle">
+          <Link
+            href="/settings/profile"
+            className="w-full md:w-auto flex items-center justify-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md"
+          >
+            <Edit className="mr-2 h-5 w-5" />
+            Edit Profile
+          </Link>
           <button
             onClick={handleSignOut}
-            className="flex items-center py-3 px-6 bg-red-600 hover:bg-red-700 rounded-full font-semibold text-text-light transition-colors duration-300 shadow-lg"
+            className="w-full md:w-auto flex items-center justify-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md"
           >
             <LogOut className="mr-2 h-5 w-5" />
-            <span>Sign Out</span>
+            Sign Out
           </button>
         </div>
       </motion.div>

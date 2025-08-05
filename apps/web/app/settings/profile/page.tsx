@@ -18,6 +18,10 @@ export default function EditProfilePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fullNameError, setFullNameError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -69,10 +73,73 @@ export default function EditProfilePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
+    if (name === 'username') {
+      setUsernameAvailable(null); // Reset availability on change
+      validateUsername(value);
+    }
+    if (name === 'full_name') {
+      validateFullName(value);
+    }
+  };
+
+  const validateFullName = (name: string) => {
+    if (name.trim().length < 3) {
+      setFullNameError('Full Name must be at least 3 characters long.');
+      return false;
+    }
+    setFullNameError(null);
+    return true;
+  };
+
+  const validateUsername = (username: string) => {
+    const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
+    if (!usernameRegex.test(username)) {
+      setUsernameError('Username must be 3-20 characters, alphanumeric, _, -, or .');
+      return false;
+    }
+    setUsernameError(null);
+    return true;
+  };
+
+  const checkUsernameAvailability = async () => {
+    if (!validateUsername(profile.username)) return;
+    setCheckingUsername(true);
+    setUsernameError(null);
+    setUsernameAvailable(null);
+    try {
+      const response = await fetch(`/api/check-username?username=${profile.username}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Error checking username');
+      }
+      setUsernameAvailable(data.available);
+      if (!data.available) {
+        setUsernameError('Username is already taken.');
+      }
+    } catch (err: any) {
+      setUsernameError(err.message);
+    } finally {
+      setCheckingUsername(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const isFullNameValid = validateFullName(profile.full_name);
+    const isUsernameValid = validateUsername(profile.username);
+
+    if (!isFullNameValid || !isUsernameValid) {
+      setError('Please fix the errors before submitting.');
+      return;
+    }
+
+    // Check one last time if the username is available if it hasn't been confirmed
+    if (usernameAvailable !== true) {
+      setError('Please check the availability of your chosen username.');
+      return;
+    }
+
     setSubmitting(true);
     setError('');
     setSuccess('');
@@ -173,23 +240,40 @@ export default function EditProfilePage() {
               name="full_name"
               value={profile.full_name}
               onChange={handleChange}
+              onBlur={() => validateFullName(profile.full_name)}
               className="shadow appearance-none border border-border-medium rounded w-full py-2 px-3 text-text-light leading-tight focus:outline-none focus:shadow-outline bg-background-medium/50 placeholder-text-muted transition-all duration-300 focus:border-accent-main focus:ring-1 focus:ring-accent-main"
               placeholder="Your full name"
             />
+            {fullNameError && <p className="text-red-400 text-xs mt-1">{fullNameError}</p>}
           </div>
           <div>
             <label htmlFor="username" className="block text-text-muted text-sm font-bold mb-2">
               Username
             </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={profile.username}
-              onChange={handleChange}
-              className="shadow appearance-none border border-border-medium rounded w-full py-2 px-3 text-text-light leading-tight focus:outline-none focus:shadow-outline bg-background-medium/50 placeholder-text-muted transition-all duration-300 focus:border-accent-main focus:ring-1 focus:ring-accent-main"
-              placeholder="Your unique username"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={profile.username}
+                onChange={handleChange}
+                onBlur={() => validateUsername(profile.username)}
+                className="shadow appearance-none border border-border-medium rounded w-full py-2 px-3 text-text-light leading-tight focus:outline-none focus:shadow-outline bg-background-medium/50 placeholder-text-muted transition-all duration-300 focus:border-accent-main focus:ring-1 focus:ring-accent-main pr-24"
+                placeholder="Your unique username"
+              />
+              <button
+                type="button"
+                onClick={checkUsernameAvailability}
+                disabled={checkingUsername || !profile.username || !!usernameError}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {checkingUsername ? <Loader className="w-4 h-4 animate-spin" /> : 'Check'}
+              </button>
+            </div>
+            <p className="text-text-muted text-xs mt-1">Username must be unique.</p>
+            {usernameError && <p className="text-red-400 text-xs mt-1">{usernameError}</p>}
+            {usernameAvailable === true && <p className="text-green-400 text-xs mt-1">Username is available!</p>}
+            {usernameAvailable === false && !usernameError && <p className="text-red-400 text-xs mt-1">Username is already taken.</p>}
           </div>
           
           <motion.button

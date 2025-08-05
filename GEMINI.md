@@ -119,6 +119,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
   - [x] Added `lucide-react` for a consistent and high-quality icon set.
   - [x] **UI/UX Enhancements for Home and Profile Pages:** Improved visual appeal and interactivity of home page placeholders and profile edit form, ensuring consistency with overall design, color scheme, and smooth animations.
+  - [x] **Major UI/UX Refactor & Responsiveness:** Overhauled the entire frontend to be fully responsive. Refactored Profile, Home, and Authentication pages with a mobile-first approach, creating clear, readable, and professional layouts across all device sizes.
 - [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
@@ -132,6 +133,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [x] **Profile View Layout Refactor:** Redesigned the profile view page (`apps/web/app/profile/page.tsx`) for better readability and future expansion, organizing content into clear header, profile information, and actions sections. Improved placement of "Back to Home", "Sign Out", and "Edit Profile" buttons.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
+  - [x] **Enhanced Form Validation:** Switched form validation behavior from `onChange` to `onBlur` for a better user experience. Added new validation rules for profile editing (full name length) and implemented a real-time unique username check against the backend.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
   - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.
@@ -142,6 +144,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
+  - [x] **Username Uniqueness Check API:** Added a new endpoint (`/api/check-username`) to verify if a username is already taken.
   - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
   - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).

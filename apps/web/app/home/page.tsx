@@ -64,29 +64,22 @@ export default function HomePage() {
   }, [supabase, router]);
 
   return (
-    <div className="min-h-screen flex text-text-light">
-      {/* Animated Background */}
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-primary-900 via-primary-900 to-blue-900/50 animate-background-pan -z-10" />
-      
-      <Sidebar />
-
-      <main className="flex-grow flex flex-col md:ml-64 p-8">
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-screen-xl mx-auto">
-            {/* Main Content Area */}
-            <div className="lg:col-span-2 flex flex-col space-y-8">
-              <Timeline />
-            </div>
-
-            {/* Right Sidebar for Suggested Features */}
-            <div className="lg:col-span-1">
-              <SuggestedFeatures />
-            </div>
+    <div className="w-full p-4 md:p-8">
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-screen-xl mx-auto">
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 flex flex-col space-y-6 md:space-y-8">
+            <Timeline />
           </div>
-        )}
-      </main>
+
+          {/* Right Sidebar for Suggested Features */}
+          <div className="lg:col-span-1">
+            <SuggestedFeatures />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

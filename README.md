@@ -99,12 +99,14 @@ To maintain consistency and Vercel compatibility, please adhere to the following
 
 
 
-### 2.3. Responsive Design
+### 2.3. Responsive Design & UI/UX
 
-The frontend (`apps/web`) has been updated to be responsive across various devices. This includes:
--   **Sidebar:** Now features a hamburger menu for mobile views and adapts its visibility based on screen size.
--   **Authentication Pages (Sign In, Sign Up):** Forms and layouts are optimized for smaller screens.
--   **Profile Pages (View, Edit):** Layouts and element sizing adjust to provide a better user experience on mobile devices.
+The frontend has been significantly refactored to ensure a professional, clean, and fully responsive user experience across all devices. Key improvements include:
+
+-   **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
+-   **Responsive Components:** Core components like the `Sidebar` (which now features a hamburger menu for mobile) and navigation elements adapt to different screen sizes.
+-   **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
+-   **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
 
 ### 2.4. General Tips for Contributors
 

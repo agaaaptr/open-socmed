@@ -129,14 +129,14 @@ export default function SignUpPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-sm md:max-w-md p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl"
+        className="w-full max-w-sm p-6 md:p-8 space-y-4 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl"
       >
         <div className="text-center">
-          <Link href="/" className="text-4xl font-bold inline-block mb-2 text-text-light">
+          <Link href="/" className="text-3xl md:text-4xl font-bold inline-block mb-2 text-text-light">
             Cirqle
           </Link>
-          <h2 className="text-2xl font-bold text-text-light">Create Your Account</h2>
-          <p className="text-text-muted">Join the community and start sharing.</p>
+          <h2 className="text-xl md:text-2xl font-bold text-text-light">Create Your Account</h2>
+          <p className="text-sm text-text-muted">Join the community and start sharing.</p>
         </div>
 
         {message ? (
@@ -149,10 +149,8 @@ export default function SignUpPage() {
                 type="text"
                 placeholder="John Doe"
                 value={fullName}
-                onChange={(e) => {
-                  setFullName(e.target.value);
-                  validateFullName(e.target.value);
-                }}
+                onChange={(e) => setFullName(e.target.value)}
+                onBlur={(e) => validateFullName(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
@@ -164,10 +162,8 @@ export default function SignUpPage() {
                 type="text"
                 placeholder="johndoe"
                 value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  validateUsername(e.target.value);
-                }}
+                onChange={(e) => setUsername(e.target.value)}
+                onBlur={(e) => validateUsername(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
@@ -179,10 +175,8 @@ export default function SignUpPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  validateEmail(e.target.value);
-                }}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={(e) => validateEmail(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
@@ -194,10 +188,8 @@ export default function SignUpPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  validatePassword(e.target.value);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={(e) => validatePassword(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
