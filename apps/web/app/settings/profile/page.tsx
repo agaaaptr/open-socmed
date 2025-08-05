@@ -117,7 +117,7 @@ export default function EditProfilePage() {
         setUsernameError('Username is already taken.');
       }
     } catch (err: any) {
-      setUsernameError(err.message);
+      setUsernameError(err.message || 'Failed to check username availability. Please try again.');
     } finally {
       setCheckingUsername(false);
     }
@@ -161,7 +161,20 @@ export default function EditProfilePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile.');
+        let userFriendlyMessage = 'Failed to update profile. Please try again.';
+
+        if (errorData.message) {
+          if (errorData.message.includes('username already taken')) {
+            userFriendlyMessage = 'The username you entered is already taken. Please choose a different one.';
+          } else if (errorData.message.includes('invalid full name')) {
+            userFriendlyMessage = 'Full name is invalid. It must be at least 3 characters long.';
+          } else if (errorData.message.includes('Unauthorized')) {
+            userFriendlyMessage = 'You are not authorized to perform this action. Please sign in again.';
+          } else {
+            userFriendlyMessage = errorData.message; // Fallback to backend message if not specific
+          }
+        }
+        throw new Error(userFriendlyMessage);
       }
 
       setSuccess('Profile updated successfully!');

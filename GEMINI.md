@@ -184,8 +184,12 @@ This project is developed in structured stages to ensure organized progress.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
 - [x] **Database Error: Prepared Statement Already Exists (Solved)**
-  - **Description:** Encountered `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` in Vercel preview and production environments, leading to intermittent API access issues.
-  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM by setting `PrepareStmt: false` in `gorm.Config` for all Go serverless functions. This prevents the database from complaining about existing prepared statements when connections are reused in a serverless environment.
+  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors occurred in serverless environments, leading to API access issues.
+  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and by configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)`. These settings ensure that database connections are managed more aggressively in a serverless environment, reducing the likelihood of prepared statement conflicts.
+
+- [x] **`/api/check-username` Database Query Error (Solved)**
+  - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
+  - **Resolution:** The `Profile` struct in `api/check-username/index.go` was not accurately reflecting the `profiles` table schema in the database. Specifically, it was using `gorm.Model` which adds default fields that were not present or had different types in the actual database table. The `Profile` struct was updated to precisely match the database schema, including using `uuid.UUID` for the `ID` field and pointers for nullable fields, resolving the schema mismatch and allowing successful database queries.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -508,6 +512,15 @@ To create a new Go serverless API function that is compatible with Vercel and ad
             if err != nil {
                 log.Fatalf("FATAL: Failed to connect to database: %v", err)
             }
+
+            sqlDB, err := db.DB()
+            if err != nil {
+                log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+            }
+            sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
+            sqlDB.SetMaxOpenConns(1) // Limit total open connections
+            sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+
             log.Println("Database connection successful and pool established.")
         })
         if err != nil {

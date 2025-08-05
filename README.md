@@ -179,6 +179,15 @@ To create a new Go serverless API function that is compatible with Vercel and ad
             if err != nil {
                 log.Fatalf("FATAL: Failed to connect to database: %v", err)
             }
+
+            sqlDB, err := db.DB()
+            if err != nil {
+                log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+            }
+            sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
+            sqlDB.SetMaxOpenConns(1) // Limit total open connections
+            sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+
             log.Println("Database connection successful and pool established.")
         })
         if err != nil {
@@ -197,10 +206,11 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 
     // Example GORM Model (if needed for this function)
     type Post struct {
-        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"` // Ensure ID type matches database (e.g., uuid.UUID)
         Content   string    `json:"content"`
         AuthorID  uuid.UUID `json:"author_id"`
         CreatedAt time.Time `json:"created_at"`
+        // For nullable fields, use pointers (e.g., *string, *time.Time)
     }
 
     // Handler is the main entry point for the serverless function

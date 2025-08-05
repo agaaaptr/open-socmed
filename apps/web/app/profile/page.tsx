@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default function ProfileViewPage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
-  const [profile, setProfile] = useState<{ full_name: string; username: string; avatar_url?: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string; username: string; email: string; avatar_url?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -45,7 +45,7 @@ export default function ProfileViewPage() {
         }
 
         const data = await response.json();
-        setProfile(data);
+        setProfile({ ...data, email: user.email });
       } catch (err: any) {
         console.error('Error fetching profile:', err);
         setError(err.message || 'Failed to load profile.');
@@ -115,9 +115,10 @@ export default function ProfileViewPage() {
         {/* --- Profile Information Section --- */}
         <div className="flex flex-col items-center space-y-4 py-6 text-center">
           <UserCircle className="w-24 h-24 md:w-28 md:h-28 text-accent-main" />
-          <div>
+          <div className="space-y-2">
             <p className="text-xl md:text-2xl font-bold text-text-light">{profile?.full_name}</p>
             <p className="text-md md:text-lg text-text-muted">@{profile?.username}</p>
+            <p className="text-sm md:text-md text-text-muted">{profile?.email}</p>
           </div>
         </div>
 

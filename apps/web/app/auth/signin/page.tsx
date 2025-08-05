@@ -82,7 +82,13 @@ export default function SignInPage() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        let userFriendlyMessage = 'An unexpected error occurred. Please try again.';
+        if (signInError.message.includes('Invalid login credentials')) {
+          userFriendlyMessage = 'Email or password incorrect. Please check your credentials.';
+        } else if (signInError.message.includes('Email not confirmed')) {
+          userFriendlyMessage = 'Please confirm your email address to sign in.';
+        }
+        setError(userFriendlyMessage);
         return;
       }
 

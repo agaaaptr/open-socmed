@@ -114,7 +114,15 @@ export default function SignUpPage() {
       },
     });
     if (error) {
-      setError(error.message);
+      let userFriendlyMessage = 'An unexpected error occurred during sign-up. Please try again.';
+      if (error.message.includes('User already registered')) {
+        userFriendlyMessage = 'This email address is already registered. Please try signing in or use a different email.';
+      } else if (error.message.includes('Password should be at least 6 characters')) {
+        userFriendlyMessage = 'Password is too short. Please ensure it meets the requirements.';
+      } else if (error.message.includes('invalid_grant')) {
+        userFriendlyMessage = 'Invalid credentials. Please check your email and password.';
+      }
+      setError(userFriendlyMessage);
     } else {
       setMessage('Check your email for a verification link!');
     }
