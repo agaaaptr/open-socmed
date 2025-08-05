@@ -87,7 +87,7 @@ export default function SignInPage() {
       }
 
       if (data.user) {
-        router.push('/home');
+        router.replace('/home');
         router.refresh();
       } else {
         setError('Sign-in failed: No user data returned.');
@@ -107,7 +107,7 @@ export default function SignInPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-md p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl"
+        className="w-full max-w-sm md:max-w-md p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl"
       >
         <div className="text-center">
           <Link href="/" className="text-4xl font-bold inline-block mb-2 text-text-light">

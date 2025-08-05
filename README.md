@@ -73,7 +73,7 @@ This project follows a monorepo structure managed by Turborepo. Understanding it
 ### 2.1. Core Directories
 
 - **`apps/`**: Contains independent applications within the monorepo.
-  - **`apps/web`**: The Next.js frontend application.
+  - **`apps/web`**: The Next.js frontend application. The 'Stories' section has been removed from the home page.
 - **`api/`**: Contains Go serverless functions deployed via Vercel.
   - Each subdirectory within `api/` (e.g., `api/profile`, `api/health`) represents a distinct serverless function.
   - Each function directory must contain a single `index.go` file with a `Handler` function and its own `go.mod`.
@@ -99,7 +99,14 @@ To maintain consistency and Vercel compatibility, please adhere to the following
 
 
 
-### 2.3. General Tips for Contributors
+### 2.3. Responsive Design
+
+The frontend (`apps/web`) has been updated to be responsive across various devices. This includes:
+-   **Sidebar:** Now features a hamburger menu for mobile views and adapts its visibility based on screen size.
+-   **Authentication Pages (Sign In, Sign Up):** Forms and layouts are optimized for smaller screens.
+-   **Profile Pages (View, Edit):** Layouts and element sizing adjust to provide a better user experience on mobile devices.
+
+### 2.4. General Tips for Contributors
 
 - **`vercel dev`:** When running locally, ensure your `vercel.json` is correctly configured to route requests to both frontend and Go API functions.
 - **`go.mod` Management:** Always run `go mod tidy` within the specific Go module directory after adding or removing dependencies.

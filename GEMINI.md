@@ -122,15 +122,16 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
-  - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a sidebar, horizontal stories, a timeline, and suggested features. Removed the header for the home page.
+  - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a sidebar, a timeline, and suggested features. Removed the header for the home page. The 'Stories' section has been removed as per user request.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [ ] **Post Creation UI:** Create a form for users to create new posts.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
-  - [ ] **Responsive Design:** Ensure all pages are responsive across devices.
+  - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [x] **Profile View Layout Refactor:** Redesigned the profile view page (`apps/web/app/profile/page.tsx`) for better readability and future expansion, organizing content into clear header, profile information, and actions sections. Improved placement of "Back to Home", "Sign Out", and "Edit Profile" buttons.
+  - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
   - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.
@@ -165,7 +166,7 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 4.1. Frontend (`apps/web`)
 
-- **No known issues.** The `npm run dev` command now runs successfully, and Vercel deployment is expected to be stable with the new configuration.
+- **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
 ### 4.2. Backend (`api/`)
 
@@ -380,7 +381,7 @@ When collaborating on database schema changes, it's crucial to keep your local S
 
 ### 8.3. Code Style & Linting
 
-- Always run `npm run lint` and `npm run format` before committing to ensure code consistency.
+- Always run `npm run lint`, `npm run format`, and `npm run build` before committing or pushing to ensure code consistency and successful compilation.
 
 ### 8.4. Branching Strategy
 

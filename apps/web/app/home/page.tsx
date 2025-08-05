@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Loader } from 'lucide-react';
 
 import Sidebar from '../../components/Sidebar';
-import Stories from '../../components/Stories';
+
 import Timeline from '../../components/Timeline';
 import SuggestedFeatures from '../../components/SuggestedFeatures';
 
@@ -34,6 +34,17 @@ export default function HomePage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/auth/signin');
+      } else {
+        // Prevent going back to landing page if already logged in
+        const handlePopState = () => {
+          if (window.location.pathname === '/') {
+            router.replace('/home');
+          }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => {
+          window.removeEventListener('popstate', handlePopState);
+        };
       }
       setLoading(false);
     }
@@ -47,19 +58,18 @@ export default function HomePage() {
       
       <Sidebar />
 
-      <main className="flex-grow flex flex-col ml-64 p-8">
+      <main className="flex-grow flex flex-col md:ml-64 p-8">
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-screen-xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-screen-xl mx-auto">
             {/* Main Content Area */}
-            <div className="md:col-span-2 flex flex-col space-y-8">
-              <Stories />
+            <div className="lg:col-span-2 flex flex-col space-y-8">
               <Timeline />
             </div>
 
             {/* Right Sidebar for Suggested Features */}
-            <div className="md:col-span-1">
+            <div className="lg:col-span-1">
               <SuggestedFeatures />
             </div>
           </div>

@@ -102,7 +102,7 @@ export default function ProfileViewPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
-        className="w-full max-w-2xl p-8 space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
+        className="w-full max-w-xl md:max-w-2xl p-6 md:p-8 space-y-4 md:space-y-6 bg-background-medium/50 backdrop-blur-md border border-border-medium shadow-lg rounded-2xl z-10"
       >
         {/* Header Section: Back to Home, Title, Edit Profile */}
         <div className="flex justify-between items-center">
