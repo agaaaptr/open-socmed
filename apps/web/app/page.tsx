@@ -159,12 +159,22 @@ const CTASection = ({ user }) => (
       viewport={{ once: true }}
       transition={{ duration: 0.7 }}
     >
-      <h2 className="text-4xl font-bold text-text-light mb-4">Ready to <AccentText>Dive In?</AccentText></h2>
-      <p className="text-text-muted mb-8 max-w-xl mx-auto">Become a part of the fastest-growing social platform. Your new community is just one click away.</p>
-      {!user && (
-        <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
-          Sign Up Now
-        </AccentButton>
+      {user ? (
+        <>
+          <h2 className="text-4xl font-bold text-text-light mb-4">Welcome Back to <AccentText>Cirqle!</AccentText></h2>
+          <p className="text-text-muted mb-8 max-w-xl mx-auto">Continue exploring and connecting with your community.</p>
+          <AccentButton href="/home" className="py-3 px-8 text-lg">
+            Go to Home <ArrowRight className="inline-block ml-2 h-5 w-5" />
+          </AccentButton>
+        </>
+      ) : (
+        <>
+          <h2 className="text-4xl font-bold text-text-light mb-4">Ready to <AccentText>Dive In?</AccentText></h2>
+          <p className="text-text-muted mb-8 max-w-xl mx-auto">Become a part of the fastest-growing social platform. Your new community is just one click away.</p>
+          <AccentButton href="/auth/signup" className="py-3 px-8 text-lg">
+            Sign Up Now
+          </AccentButton>
+        </>
       )}
     </motion.div>
   </section>

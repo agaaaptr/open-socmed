@@ -119,7 +119,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Redesigned the Landing Page, Login, Signup, and Dashboard pages to be modern, interactive, and visually cohesive using glassmorphism effects.
   - [x] Added `lucide-react` for a consistent and high-quality icon set.
   - [x] **UI/UX Enhancements for Home and Profile Pages:** Improved visual appeal and interactivity of home page placeholders and profile edit form, ensuring consistency with overall design, color scheme, and smooth animations.
-  - [x] **Major UI/UX Refactor & Responsiveness:** Overhauled the entire frontend to be fully responsive. Refactored Profile, Home, and Authentication pages with a mobile-first approach, creating clear, readable, and professional layouts across all device sizes.
+  - [x] **Major UI/UX Refactor & Responsiveness:** Overhauled the entire frontend to be fully responsive. Refactored Profile, Home, and Authentication pages with a mobile-first approach, creating clear, readable, and professional layouts across all device sizes. Ensured the base background color of the `html` element is dark for consistent visual experience.
 - [x] **Checkpoint 2.4: Frontend Core Feature Implementation (In Progress)**
   - [x] **User Profile Display:** Display user's `full_name` and `username` on the home page.
   - [x] **Login with Email/Password:** Implemented frontend logic to allow users to sign in using email and password.
@@ -130,6 +130,7 @@ This project is developed in structured stages to ensure organized progress.
   - [ ] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages.
+  - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [x] **Profile View Layout Refactor:** Redesigned the profile view page (`apps/web/app/profile/page.tsx`) for better readability and future expansion, organizing content into clear header, profile information, and actions sections. Improved placement of "Back to Home", "Sign Out", and "Edit Profile" buttons.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.

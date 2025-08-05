@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader } from 'lucide-react';
 
-import Sidebar from '../../components/Sidebar';
-
 import Timeline from '../../components/Timeline';
 import SuggestedFeatures from '../../components/SuggestedFeatures';
 

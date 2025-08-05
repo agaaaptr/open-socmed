@@ -104,9 +104,10 @@ To maintain consistency and Vercel compatibility, please adhere to the following
 The frontend has been significantly refactored to ensure a professional, clean, and fully responsive user experience across all devices. Key improvements include:
 
 -   **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
--   **Responsive Components:** Core components like the `Sidebar` (which now features a hamburger menu for mobile) and navigation elements adapt to different screen sizes.
+-   **Responsive Components:** Core components like the `Sidebar` (which is now always visible on desktop and a mobile-only bottom navigation bar) and navigation elements adapt to different screen sizes.
 -   **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
 -   **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
+-   **Conditional Rendering:** The sidebar and mobile navigation are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
 
 ### 2.4. General Tips for Contributors
 
