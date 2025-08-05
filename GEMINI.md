@@ -136,8 +136,9 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
   - [x] **Enhanced Form Validation:** Switched form validation behavior from `onChange` to `onBlur` for a better user experience. Added new validation rules for profile editing (full name length) and implemented a real-time unique username check against the backend.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
-- [ ] **Checkpoint 2.5: Frontend Title and Icon (Next Steps)**
-  - [ ] **To Do:** Add favicon and other app icons to `apps/web/public/` directory.
+- [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
+  - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
+  - [x] Refactored root `layout.tsx` to be a Server Component and moved client-side logic to a new `ClientLayoutContent.tsx` component to allow metadata export.
 
 ### 3.3. Backend Development Plan
 

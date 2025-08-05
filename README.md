@@ -97,6 +97,12 @@ To maintain consistency and Vercel compatibility, please adhere to the following
   - Use PascalCase for React component files (e.g., `MyComponent.tsx`).
   - Use kebab-case for utility files or non-component modules (e.g., `utils/helpers.ts`).
 
+- **Next.js Metadata and Layouts:**
+  - Page titles and metadata are managed using Next.js 14's Metadata API.
+  - The root `apps/web/app/layout.tsx` is a Server Component and defines global metadata.
+  - Route-specific metadata is defined in `layout.tsx` files within each route's directory (e.g., `apps/web/app/auth/signin/layout.tsx`).
+  - Client-side logic (e.g., `usePathname`) from the root layout has been extracted into `apps/web/app/ClientLayoutContent.tsx` to allow the root layout to remain a Server Component.
+
 
 
 ### 2.3. Responsive Design & UI/UX
