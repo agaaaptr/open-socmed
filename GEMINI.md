@@ -183,10 +183,9 @@ This project is developed in structured stages to ensure organized progress.
   - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
-- [ ] **Database Error: Prepared Statement Already Exists in Vercel Preview**
-  - **Description:** Encountered `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` in Vercel preview environments.
-  - **Investigation Summary:** This error typically occurs in serverless environments due to GORM's prepared statement caching interacting with short-lived or reused database connections. Attempts to disable `DisablePreparedStmt` or configure `ConnMaxLifetime`/`MaxIdleConns` were made, but the issue persists, suggesting a deeper interaction with Vercel's build environment or Go runtime.
-  - **Next Steps:** Further investigation is needed to find a robust solution for this specific environment.
+- [x] **Database Error: Prepared Statement Already Exists (Solved)**
+  - **Description:** Encountered `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` in Vercel preview and production environments, leading to intermittent API access issues.
+  - **Resolution:** This issue was resolved by explicitly disabling prepared statement caching in GORM by setting `PrepareStmt: false` in `gorm.Config` for all Go serverless functions. This prevents the database from complaining about existing prepared statements when connections are reused in a serverless environment.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -436,6 +435,11 @@ This project has provided valuable insights into monorepo management, Vercel dep
 - **Problem:** Vercel's build process for Go serverless functions (using `@vercel/go` builder) expects all code for a given serverless function to be consolidated into a single `index.go` file. When multiple `.go` files are present in the function directory (even if they are in the same `package`), Vercel may fail to correctly link or compile them, leading to `undefined` symbol errors during deployment.
 - **Solution:** Always consolidate all Go code for a specific serverless function into its `index.go` file. This includes database connection logic, GORM models, and any other helper functions or structs directly used by that function. Remove any redundant `.go` files from the function directory after consolidation.
 
+### 9.7. GORM Prepared Statements in Serverless
+
+- **Problem:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists` errors occur in serverless environments when GORM attempts to reuse prepared statements across function invocations, especially with connection pooling.
+- **Solution:** Explicitly disable prepared statement caching in GORM by setting `PrepareStmt: false` in `gorm.Config` when opening the database connection. This ensures that GORM does not attempt to create or reuse prepared statements that might conflict with the database's state in a short-lived, connection-reusing serverless environment.
+
 ## 10. Development Guidelines & Conventions
 
 This section outlines the step-by-step process and rules for creating new API endpoints and other project components, ensuring consistency and Vercel compatibility.
@@ -498,7 +502,9 @@ To create a new Go serverless API function that is compatible with Vercel and ad
             if dsn == "" {
                 log.Fatal("FATAL: DATABASE_URL environment variable not set")
             }
-            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+                PrepareStmt: false, // Disable prepared statement caching for serverless environment
+            })
             if err != nil {
                 log.Fatalf("FATAL: Failed to connect to database: %v", err)
             }

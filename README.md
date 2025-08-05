@@ -173,7 +173,9 @@ To create a new Go serverless API function that is compatible with Vercel and ad
             if dsn == "" {
                 log.Fatal("FATAL: DATABASE_URL environment variable not set")
             }
-            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+                PrepareStmt: false, // Disable prepared statement caching for serverless environment
+            })
             if err != nil {
                 log.Fatalf("FATAL: Failed to connect to database: %v", err)
             }
