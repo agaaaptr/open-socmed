@@ -22,6 +22,7 @@ export default function EditProfilePage() {
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const [initialUsername, setInitialUsername] = useState('');
 
   useEffect(() => {
     async function fetchProfile() {
@@ -59,6 +60,7 @@ export default function EditProfilePage() {
           full_name: data.full_name || '',
           username: data.username || '',
         });
+        setInitialUsername(data.username || '');
       } catch (err: any) {
         console.error('Error fetching profile:', err);
         setError(err.message || 'Failed to load profile.');
@@ -75,6 +77,7 @@ export default function EditProfilePage() {
     setProfile((prev) => ({ ...prev, [name]: value }));
     if (name === 'username') {
       setUsernameAvailable(null); // Reset availability on change
+      setUsernameError(null); // Clear username error on change
       validateUsername(value);
     }
     if (name === 'full_name') {
@@ -277,7 +280,7 @@ export default function EditProfilePage() {
               <button
                 type="button"
                 onClick={checkUsernameAvailability}
-                disabled={checkingUsername || !profile.username || !!usernameError}
+                disabled={checkingUsername || !profile.username || !!usernameError || profile.username === initialUsername}
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {checkingUsername ? <Loader className="w-4 h-4 animate-spin" /> : 'Check'}
