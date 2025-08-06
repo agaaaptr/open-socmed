@@ -11,7 +11,7 @@
 - **`apps/web`**: The main frontend application built with Next.js (TypeScript).
 - **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
-- **`packages/go-common`**: A shared Go module for common functionalities like database connection and models.
+
 
 ## 2. Technologies Used
 
@@ -38,7 +38,7 @@
 - **Language**: Go (Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
 - **Database**: Supabase PostgreSQL (via `DATABASE_URL`)
-- **Supabase Client**: `supabase-go`
+
 - **Environment Variables**: `godotenv` for local development.
 
 ### 2.4. Database & CI/CD
@@ -82,11 +82,9 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 1.1: Initial Monorepo & App Setup (Completed)**
 - [x] **Checkpoint 1.2: Project Restructuring & Initial Fixes (Completed)**
   - [x] Initial monorepo setup with `apps/frontend`, `apps/backend`, `packages/ui`.
-  - [x] Refactored to standard monorepo structure: `apps/web`, `apps/api`, `packages/go-common`, `packages/ui`.
+  - [x] Refactored to standard monorepo structure: `apps/web`, `apps/api`, `packages/ui`.
   - [x] Moved frontend code to `apps/web`.
   - [x] Moved Go serverless functions to `apps/api`.
-  - [x] Moved shared Go code (database, models) to `packages/go-common`.
-  - [x] Updated `go.mod` and import paths for new Go module structure.
 - [x] **Checkpoint 1.3: Supabase Project Integration (Completed)**
   - [x] Created and linked remote Supabase project.
   - [x] Configured `.env` files for both `web` and `api` with actual credentials.
@@ -165,7 +163,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Moved Go serverless functions from `apps/api` to `api/` at the project root.
   - [x] Updated `vercel.json` to reflect the new API directory structure.
   - [x] Updated Go package names to `main` for Vercel compatibility.
-  - [x] Updated `go.mod` to use relative path for `packages/go-common`.
+  
   - [x] Restructured Go API functions into individual subdirectories with their own `go.mod` files.
 
 ## 4. Current Known Issues
@@ -185,10 +183,9 @@ This project is developed in structured stages to ensure organized progress.
   - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
-- [ ] **Database Error: Prepared Statement Already Exists (Debugging - Testing Direct URL)**
-  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors continue to occur in serverless environments, leading to API access issues.
-  - **Attempted Resolution:** The Go backend API functions (`api/profile/index.go`, `api/check-username/index.go`, `api/health/index.go`) have been modified to use `DIRECT_URL` for database connections instead of `DATABASE_URL` (which uses `pgbouncer`). This is an attempt to bypass the connection pooler and see if it resolves the prepared statement conflict in serverless environments.
-  - **Next Steps:** The changes need to be deployed and thoroughly tested to verify if using `DIRECT_URL` resolves the issue. The `DIRECT_URL` environment variable must be configured in Vercel for the backend API to function correctly. If this does not resolve the issue, further investigation into GORM's behavior or serverless connection management will be required.
+- [x] **Database Error: Prepared Statement Already Exists (Solved)**
+  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors were occurring in serverless environments, leading to API access issues.
+  - **Resolution:** The Go backend API functions (`api/profile/index.go`, `api/check-username/index.go`, `api/health/index.go`) have been updated to prioritize `DIRECT_URL` for database connections and fallback to `DATABASE_URL` if `DIRECT_URL` is not set. Additionally, `PrepareStmt: false` has been explicitly set in GORM's configuration to disable prepared statement caching, which resolves the conflict in serverless environments. The `DIRECT_URL` environment variable must be configured in Vercel for the backend API to function correctly.
 
 - [x] **`/api/check-username` Database Query Error (Solved)**
   - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
@@ -636,14 +633,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
   - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
   - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
-#### 10.2.2. For Shared Go Modules (`packages/go-common`)
 
-- **Structure:**
-  - Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
-  - Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
-- **Dependencies:**
-  - If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
-  - After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 
