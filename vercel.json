@@ -17,6 +17,22 @@
     {
       "src": "api/check-username/index.go",
       "use": "@vercel/go"
+    },
+    {
+      "src": "api/follow/index.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "api/search-users/index.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "api/followers/index.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "api/following/index.go",
+      "use": "@vercel/go"
     }
   ],
   "rewrites": [

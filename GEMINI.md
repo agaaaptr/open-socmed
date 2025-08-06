@@ -193,11 +193,32 @@ This project is developed in structured stages to ensure organized progress.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### 5.1. Feature: User Profile (View & Edit) - Completed
+### 5.1. Feature: Social Graph (Follow/Unfollow) - COMPLETED
+
+**Goal:** Allow users to search for other users, follow them, and see lists of followers and following on profile pages. This is a prerequisite for a meaningful timeline feed.
+
+#### 5.1.1. Frontend (`apps/web`) - Next.js
+
+- [x] **Search Page:** Create a dedicated page at `/search` for finding users by username or full name.
+- [x] **Profile Page Redesign:** Update the profile page to display user stats (Posts, Followers, Following) and include tabs for viewing lists of followers and following.
+- [x] **Follow Button UI:** Implement a reusable "Follow/Following" button with interactive states.
+- [x] **API Integration:** Connect the search page, profile stats, and follow buttons to the backend API.
+- [x] **Display User Lists:** Fetch and display real data in the "Followers" and "Following" tabs.
+
+#### 5.1.2. Backend (`api/`) - Go
+
+- [x] **Database Schema:** Create a `follows` table to store follower/following relationships.
+- [x] **Search API:** Implement an API endpoint (`GET /api/search-users?q=...`) to search for users.
+- [x] **Follow/Unfollow API:** Implement endpoints to create and delete follow relationships (`POST /api/follow`, `DELETE /api/follow`).
+- [x] **Follower/Following List API:** Implement endpoints to retrieve lists of a user's followers (`GET /api/followers`) and the users they are following (`GET /api/following`).
+- [x] **Authentication:** Secure all endpoints to ensure only authenticated users can perform actions.
+- [x] **API Refactoring:** Ensured all new API endpoints (`search-users`, `follow`, `followers`, `following`) follow the established one-directory-per-function structure for stability and consistency.
+
+### 5.2. Feature: User Profile (View & Edit) - Completed
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
-#### 5.1.1. Frontend (`apps/web`) - Next.js
+#### 5.2.1. Frontend (`apps/web`) - Next.js
 
 - [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
 - [x] Fetch user profile data from the backend API when the dashboard page loads.
@@ -210,7 +231,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### 5.1.2. Backend (`api/`) - Go: - Completed
+#### 5.2.2. Backend (`api/`) - Go: - Completed
 
 - [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 - [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
@@ -223,11 +244,11 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
 - [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
-## 5.2. Feature: Post Feed (View & Create)
+### 5.3. Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
-#### 5.2.1. Frontend (`apps/web`) - Next.js
+#### 5.3.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
 - [ ] Fetch post data from the backend API.
@@ -237,7 +258,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Send new post data to the backend API.
 - [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### 5.2.2. Backend (`api/`) - Go
+#### 5.3.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
 - [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
@@ -247,11 +268,11 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Validate post content.
 - [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
-### 5.3. Feature: Timeline (Main Feed)
+### 5.4. Feature: Timeline (Main Feed)
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
-#### 5.3.1. Frontend (`apps/web`) - Next.js
+#### 5.4.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Integrate post feed display into the main dashboard layout.
 - [ ] Implement a visually appealing and interactive timeline UI.
@@ -259,38 +280,38 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### 5.3.2. Backend (`api/`) - Go
+#### 5.4.2. Backend (`api/`) - Go
 
 - [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
 - [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
 
-### 5.4. Feature: Stories
+### 5.5. Feature: Stories
 
 **Goal:** Users can view and create short, ephemeral stories.
 
-#### 5.4.1. Frontend (`apps/web`) - Next.js
+#### 5.5.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI component to display a carousel or list of active stories.
 - [ ] Implement a full-screen viewer for individual stories.
 - [ ] Create a form or interface for users to upload images/videos and create new stories.
 - [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### 5.4.2. Backend (`api/`) - Go
+#### 5.5.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
 - [ ] Create API endpoints for creating, fetching, and viewing stories.
 
-### 5.5. Feature: Direct Messages
+### 5.6. Feature: Direct Messages
 
 **Goal:** Users can send and receive direct messages with other users.
 
-#### 5.5.1. Frontend (`apps/web`) - Next.js
+#### 5.6.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI to display a list of conversations/chats.
 - [ ] Implement a real-time chat interface for sending and receiving messages.
 - [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### 5.5.2. Backend (`api/`) - Go
+#### 5.6.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.

@@ -77,7 +77,14 @@ npm run dev
 
 This will typically run the Next.js frontend on `http://localhost:3000` (or `3001` if `3000` is in use) and the Go API functions will be served by Vercel CLI.
 
-## 2. Project Structure & Conventions
+## 2. Features
+
+- **Authentication:** Secure user sign-up and sign-in using Supabase Auth.
+- **User Profiles:** View and edit user profiles with custom information.
+- **Social Graph:** Users can search for, follow, and unfollow other users.
+- **Dynamic Content:** Profile pages display dynamic lists of followers and following.
+
+## 3. Project Structure & Conventions
 
 This project follows a monorepo structure managed by Turborepo. Understanding its layout and conventions is crucial for effective contribution.
 
