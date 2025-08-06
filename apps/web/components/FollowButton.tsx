@@ -1,18 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface FollowButtonProps {
   userIdToFollow: string;
   initialIsFollowing: boolean;
+  onToggleFollow?: (userId: string, newStatus: boolean) => void;
 }
 
-const FollowButton = ({ userIdToFollow, initialIsFollowing }: FollowButtonProps) => {
+const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: FollowButtonProps) => {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
 
   const handleFollowToggle = async () => {
     setIsLoading(true);
@@ -41,6 +46,9 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing }: FollowButtonProps)
       }
 
       setIsFollowing(!isFollowing);
+      if (onToggleFollow) {
+        onToggleFollow(userIdToFollow, !isFollowing);
+      }
     } catch (error) {
       console.error('Error toggling follow:', error);
     } finally {
@@ -54,11 +62,10 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing }: FollowButtonProps)
       disabled={isLoading}
       whileHover={{ scale: isLoading ? 1 : 1.05 }}
       whileTap={{ scale: isLoading ? 1 : 0.95 }}
-      className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 ${
-        isFollowing
+      className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 ${isFollowing
           ? 'bg-transparent border border-accent-main text-accent-main'
           : 'bg-accent-main text-text-light'
-      } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
       {isLoading ? '...' : (isFollowing ? 'Following' : 'Follow')}
     </motion.button>
   );

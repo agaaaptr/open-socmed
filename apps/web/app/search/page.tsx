@@ -82,6 +82,14 @@ const SearchPage = () => {
     searchUsers(debouncedSearchTerm);
   }, [debouncedSearchTerm, searchUsers]);
 
+  const handleToggleFollow = useCallback((userId: string, newStatus: boolean) => {
+    setResults(prevResults =>
+      prevResults.map(user =>
+        user.id === userId ? { ...user, is_following: newStatus } : user
+      )
+    );
+  }, []);
+
   return (
     <div className="min-h-screen bg-background-dark text-text-light p-4 sm:p-6 md:p-8">
       <div className="max-w-2xl mx-auto">
@@ -135,7 +143,7 @@ const SearchPage = () => {
                 </div>
               </Link>
               {user.id !== currentUserId && (
-                <FollowButton userIdToFollow={user.id} initialIsFollowing={user.is_following} />
+                <FollowButton userIdToFollow={user.id} initialIsFollowing={user.is_following} onToggleFollow={handleToggleFollow} />
               )}
             </motion.div>
           ))}
