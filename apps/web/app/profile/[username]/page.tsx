@@ -16,7 +16,7 @@ interface User {
 }
 
 // Reusable component for a list of users
-const UserList = ({ users, isLoading, error }: { users: User[], isLoading: boolean, error: string | null }) => {
+const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoading: boolean, error: string | null, listType?: 'followers' | 'following' }) => {
   if (isLoading) {
     return <div className="flex justify-center items-center py-10"><Loader className="w-8 h-8 text-accent-main animate-spin" /></div>;
   }
@@ -26,10 +26,11 @@ const UserList = ({ users, isLoading, error }: { users: User[], isLoading: boole
   }
   
   if (!users || users.length === 0) {
+    const message = listType === 'followers' ? 'No followers yet.' : listType === 'following' ? 'Not following anyone yet.' : 'No users found.';
     return (
         <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
             <Users className="mx-auto w-10 h-10 mb-4" />
-            <h3 className="text-lg font-semibold">No users found</h3>
+            <h3 className="text-lg font-semibold">{message}</h3>
             <p>This list is currently empty.</p>
         </div>
     );
@@ -91,8 +92,10 @@ export default function ProfileViewPage({ params }: { params: { username: string
       }
       const data = await response.json();
       if (!Array.isArray(data)) {
-        throw new Error(`API returned invalid data for ${type}`);
+        // If data is not an array, it's an unexpected response, treat as error
+        throw new Error(`API returned unexpected data for ${type}`);
       }
+      // If data is an empty array, it means no followers/following, which is a valid state
       setTabData(prev => ({ ...prev, [type]: { data, isLoading: false, error: null } }));
     } catch (err: any) {
       setTabData(prev => ({ ...prev, [type]: { ...prev[type], isLoading: false, error: err.message } }));
@@ -243,8 +246,8 @@ export default function ProfileViewPage({ params }: { params: { username: string
                     <p>Posts from this user will appear here.</p>
                   </div>
                 )}
-                {activeTab === 'followers' && <UserList users={tabData.followers.data} isLoading={tabData.followers.isLoading} error={tabData.followers.error} />}
-                {activeTab === 'following' && <UserList users={tabData.following.data} isLoading={tabData.following.isLoading} error={tabData.following.error} />}
+                {activeTab === 'followers' && <UserList users={tabData.followers.data} isLoading={tabData.followers.isLoading} error={tabData.followers.error} listType="followers" />}
+                {activeTab === 'following' && <UserList users={tabData.following.data} isLoading={tabData.following.isLoading} error={tabData.following.error} listType="following" />}
               </motion.div>
             </AnimatePresence>
           </div>

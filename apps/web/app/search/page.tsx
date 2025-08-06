@@ -37,6 +37,10 @@ const SearchPage = () => {
   }, [supabase]);
 
   const searchUsers = useCallback(async (query: string) => {
+    // Ensure currentUserId and supabase are available before proceeding
+    if (!currentUserId) {
+      return;
+    }
     if (query.trim().length < 2) {
       setResults([]);
       return;
@@ -51,14 +55,28 @@ const SearchPage = () => {
         throw new Error('Failed to fetch search results.');
       }
       const data = await response.json();
-      const usersWithFollowStatus = data.map((user: any) => ({ ...user, is_following: false }));
+
+      // Fetch current user's following list
+      const followingResponse = await fetch(`/api/following?user_id=${currentUserId}`, {
+        headers: { 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
+      });
+      let followingIds: Set<string> = new Set();
+      if (followingResponse.ok) {
+        const followingData = await followingResponse.json();
+        followingData.forEach((f: any) => followingIds.add(f.id));
+      }
+
+      const usersWithFollowStatus = data.map((user: any) => ({
+        ...user,
+        is_following: followingIds.has(user.id),
+      }));
       setResults(usersWithFollowStatus);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentUserId, supabase]);
 
   useEffect(() => {
     searchUsers(debouncedSearchTerm);
