@@ -25,7 +25,7 @@ const UserList = ({ users, isLoading, error }: { users: User[], isLoading: boole
     return <p className="text-center text-red-400">{error}</p>;
   }
   
-  if (users.length === 0) {
+  if (!users || users.length === 0) {
     return (
         <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
             <Users className="mx-auto w-10 h-10 mb-4" />
@@ -77,9 +77,12 @@ export default function ProfileViewPage() {
   });
 
   const fetchFollowData = useCallback(async (type: 'followers' | 'following', userId: string) => {
-    if (tabData[type].data.length > 0 && !tabData[type].isLoading) return;
-
-    setTabData(prev => ({ ...prev, [type]: { ...prev[type], isLoading: true, error: null } }));
+    setTabData(prev => {
+      if (prev[type].data.length > 0 && !prev[type].isLoading && !prev[type].error) {
+        return prev; 
+      }
+      return { ...prev, [type]: { ...prev[type], isLoading: true, error: null } };
+    });
 
     try {
       const response = await fetch(`/api/${type}?user_id=${userId}`);
@@ -87,11 +90,14 @@ export default function ProfileViewPage() {
         throw new Error(`Failed to fetch ${type}`);
       }
       const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error(`API returned invalid data for ${type}`);
+      }
       setTabData(prev => ({ ...prev, [type]: { data, isLoading: false, error: null } }));
     } catch (err: any) {
       setTabData(prev => ({ ...prev, [type]: { ...prev[type], isLoading: false, error: err.message } }));
     }
-  }, [tabData]);
+  }, []);
 
   useEffect(() => {
     async function fetchProfile() {

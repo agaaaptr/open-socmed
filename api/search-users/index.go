@@ -77,35 +77,45 @@ func GetDB() (*gorm.DB, error) {
 // Handler is the entry point for the Vercel serverless function
 func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[%s] Request received for /api/search-users", r.Method)
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		log.Printf("[ERROR] Method %s not allowed for /api/search-users", r.Method)
 		return
 	}
 
 	query := r.URL.Query().Get("q")
 	if query == "" {
 		http.Error(w, "Search query 'q' is required", http.StatusBadRequest)
+		log.Println("[ERROR] Search query 'q' is missing")
 		return
 	}
 
+	log.Printf("[INFO] Searching for users with query: %s", query)
 	db, err := GetDB()
 	if err != nil {
 		http.Error(w, "Database connection error", http.StatusInternalServerError)
+		log.Printf("[ERROR] Database connection error: %v", err)
 		return
 	}
 
 	var users []Profile
 	searchQuery := "%" + query + "%"
 
+	log.Printf("[INFO] Executing database query: username ILIKE %s OR full_name ILIKE %s", searchQuery, searchQuery)
 	result := db.Where("username ILIKE ? OR full_name ILIKE ?", searchQuery, searchQuery).Find(&users)
 	if result.Error != nil {
 		http.Error(w, "Database query error", http.StatusInternalServerError)
+		log.Printf("[ERROR] Database query error: %v", result.Error)
 		return
 	}
 
+	log.Printf("[INFO] Found %d users for query: %s", len(users), query)
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(users); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		log.Printf("[ERROR] Failed to encode response: %v", err)
 	}
+	log.Println("[INFO] Response sent successfully.")
 }
