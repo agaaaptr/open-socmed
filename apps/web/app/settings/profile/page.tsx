@@ -137,8 +137,8 @@ export default function EditProfilePage() {
       return;
     }
 
-    // Check one last time if the username is available if it hasn't been confirmed
-    if (usernameAvailable !== true) {
+    // Only check username availability if the username has changed
+    if (profile.username !== initialUsername && usernameAvailable !== true) {
       setError('Please check the availability of your chosen username.');
       return;
     }
