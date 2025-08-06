@@ -63,7 +63,9 @@ const SearchPage = () => {
       let followingIds: Set<string> = new Set();
       if (followingResponse.ok) {
         const followingData = await followingResponse.json();
-        followingData.forEach((f: any) => followingIds.add(f.id));
+        if (Array.isArray(followingData)) {
+          followingData.forEach((f: any) => followingIds.add(f.id));
+        }
       }
 
       const usersWithFollowStatus = data.map((user: any) => ({
