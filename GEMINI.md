@@ -134,7 +134,8 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
   - [x] **Enhanced Form Validation:** Switched form validation behavior from `onChange` to `onBlur` for a better user experience. Added new validation rules for profile editing (full name length) and implemented a real-time unique username check against the backend.
   - [x] **Desktop Refresh:** Implemented page refresh functionality by clicking the "Cirqle" text in the desktop sidebar.
-  - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
+  - [x] **Search Bar UI Enhancement:** Updated the search bar placeholder to "Search for users by username..." and added a back button with an `ArrowLeft` icon to the left of the search bar, linking back to the `/home` page.
+- [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
   - [x] Refactored root `layout.tsx` to be a Server Component and moved client-side logic to a new `ClientLayoutContent.tsx` component to allow metadata export.
@@ -170,14 +171,16 @@ This project is developed in structured stages to ensure organized progress.
 
 - [x] **Loading Screen & Back Button Behavior:** Resolved issues where the home page would only display a loading screen after login and the back button would incorrectly navigate to the landing page. The loading screen is now correctly centered, and navigation flow is as expected.
 - [x] **Profile Page Data Fetching:** Fixed the profile page (`/profile/[username]`) to correctly fetch and display profile data based on the username in the URL. The backend API (`/api/profile`) was updated to support fetching profiles by username, and the frontend (`apps/web/app/profile/page.tsx`) was modified to pass the username to the API and handle conditional email display for the authenticated user.
+- [x] **Profile Routing Refactor:** Implemented dynamic routing for user profiles. The `/profile` route now redirects to the authenticated user's profile (e.g., `/profile/your_username`), and `/profile/[username]` handles displaying any user's profile. This involved creating `apps/web/app/profile/[username]/page.tsx` and a new `apps/web/app/profile/page.tsx` for redirection.
 - **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
-### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Diagnosed)
-  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `401 Unauthorized` or prolonged requests.
-  - **Diagnosis:**
-    1.  The `401 Unauthorized` error from `web_fetch` indicated a potential misconfiguration in Vercel's routing or an unintended authentication layer on the `search-users` endpoint, despite the Go code not explicitly requiring authentication.
-    2.  Prolonged requests and indefinite loading suggest database connection issues or slow query performance.
-  - **Current Status:** Detailed logging has been added to `api/search-users/index.go` to provide more insights into database interaction and execution flow. Further debugging requires examining Vercel deployment logs and verifying environment variable configurations (`DATABASE_URL`, `DIRECT_URL`). Indexing on `username` and `full_name` in the `profiles` table is also recommended for performance.
+### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Resolved)
+  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
+  - **Resolution:**
+    1.  The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
+    2.  The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
+  - **Current Status:** The search feature and profile routing are now functioning as expected.
+
 
 
 

@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search as SearchIcon, UserCircle, Loader } from 'lucide-react';
+import { Search as SearchIcon, UserCircle, Loader, ArrowLeft } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -71,16 +71,21 @@ const SearchPage = () => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="relative mb-8"
+          className="flex items-center mb-8"
         >
-          <input
-            type="text"
-            placeholder="Search for users by name or username..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-background-medium border border-border-medium rounded-full py-3 pl-12 pr-4 text-text-light placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
-          />
-          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Link href="/home" className="mr-4 p-2 rounded-full hover:bg-background-light transition-colors duration-200">
+            <ArrowLeft className="w-6 h-6 text-text-muted" />
+          </Link>
+          <div className="relative flex-grow">
+            <input
+              type="text"
+              placeholder="Search for users by username..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-background-medium border border-border-medium rounded-full py-3 pl-12 pr-4 text-text-light placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
+            />
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+          </div>
         </motion.div>
 
         <div className="space-y-4">

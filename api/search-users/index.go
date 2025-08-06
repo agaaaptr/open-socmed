@@ -103,8 +103,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	var users []Profile
 	searchQuery := "%" + query + "%"
 
-	log.Printf("[INFO] Executing database query: username ILIKE %s OR full_name ILIKE %s", searchQuery, searchQuery)
-	result := db.Where("username ILIKE ? OR full_name ILIKE ?", searchQuery, searchQuery).Find(&users)
+	log.Printf("[INFO] Executing database query: username ILIKE %s", searchQuery)
+	result := db.Where("username ILIKE ?", searchQuery).Find(&users)
 	if result.Error != nil {
 		http.Error(w, "Database query error", http.StatusInternalServerError)
 		log.Printf("[ERROR] Database query error: %v", result.Error)
