@@ -39,9 +39,12 @@ func Connect() (*gorm.DB, error) {
 				log.Println("Warning: .env file not found, relying on environment variables")
 			}
 		}
-		dsn := os.Getenv("DIRECT_URL")
+		dsn := os.Getenv("DIRECT_URL") // Try DIRECT_URL first
 		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable not set")
+			dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL
+		}
+		if dsn == "" {
+			log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
 		}
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 			PrepareStmt: false, // Disable prepared statement caching for serverless environment
