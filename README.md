@@ -40,7 +40,8 @@ To set up the project locally, follow these steps:
     Create a `.env` file in the project root for backend environment variables:
 
     ```
-    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
+    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:6543/postgres?pgbouncer=true"
+    DIRECT_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:5432/postgres" # Use this for direct database connections, e.g., for debugging prepared statement issues in serverless environments.
     SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
     ```
 
@@ -188,9 +189,14 @@ To create a new Go serverless API function that is compatible with Vercel and ad
                     log.Println("Warning: .env file not found, relying on environment variables")
                 }
             }
-            dsn := os.Getenv("DATABASE_URL")
+            // For local development or debugging prepared statement issues, you might use DIRECT_URL.
+            // In production, DATABASE_URL (with pgbouncer) is generally preferred for connection pooling.
+            dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
             if dsn == "" {
-                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+                dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
+            }
+            if dsn == "" {
+                log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
             }
             db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
                 PrepareStmt: false, // Disable prepared statement caching for serverless environment

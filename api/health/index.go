@@ -31,7 +31,7 @@ func Connect() (*gorm.DB, error) {
 			}
 		}
 
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL")
 		if dsn == "" {
 			log.Fatal("FATAL: DATABASE_URL environment variable not set")
 		}

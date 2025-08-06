@@ -39,7 +39,7 @@ func Connect() (*gorm.DB, error) {
 				log.Println("Warning: .env file not found, relying on environment variables")
 			}
 		}
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL")
 		if dsn == "" {
 			log.Fatal("FATAL: DATABASE_URL environment variable not set")
 		}

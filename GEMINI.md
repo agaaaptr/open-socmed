@@ -185,11 +185,10 @@ This project is developed in structured stages to ensure organized progress.
   - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
   - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
-- [ ] **Database Error: Prepared Statement Already Exists (Re-opened)**
+- [ ] **Database Error: Prepared Statement Already Exists (Debugging - Testing Direct URL)**
   - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors continue to occur in serverless environments, leading to API access issues.
-  - **Previous Attempted Resolution:** Explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)` was implemented. While these settings aimed to manage database connections more aggressively, the issue persists.
-  - **Hypothesis:** This issue likely stems from the nature of serverless functions, where instances might be shared or experience 'warm starts'. In such scenarios, a database connection (and its prepared statements) from a previous invocation might still be active or in a state that conflicts with a new invocation attempting to create a prepared statement with the same name. This suggests that the serverless function's lifecycle and database connection management are not yet optimally configured for all edge cases, and further improvements are needed to ensure robust database interaction in a shared, ephemeral environment.
-  - **Next Steps:** Further investigation and potential re-architecture of database connection handling within the serverless functions are required to fully resolve this persistent issue.
+  - **Attempted Resolution:** The Go backend API functions (`api/profile/index.go`, `api/check-username/index.go`, `api/health/index.go`) have been modified to use `DIRECT_URL` for database connections instead of `DATABASE_URL` (which uses `pgbouncer`). This is an attempt to bypass the connection pooler and see if it resolves the prepared statement conflict in serverless environments.
+  - **Next Steps:** The changes need to be deployed and thoroughly tested to verify if using `DIRECT_URL` resolves the issue. The `DIRECT_URL` environment variable must be configured in Vercel for the backend API to function correctly. If this does not resolve the issue, further investigation into GORM's behavior or serverless connection management will be required.
 
 - [x] **`/api/check-username` Database Query Error (Solved)**
   - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
@@ -506,9 +505,14 @@ To create a new Go serverless API function that is compatible with Vercel and ad
                     log.Println("Warning: .env file not found, relying on environment variables")
                 }
             }
-            dsn := os.Getenv("DATABASE_URL")
+            // For local development or debugging prepared statement issues, you might use DIRECT_URL.
+            // In production, DATABASE_URL (with pgbouncer) is generally preferred for connection pooling.
+            dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
             if dsn == "" {
-                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+                dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
+            }
+            if dsn == "" {
+                log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
             }
             db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
                 PrepareStmt: false, // Disable prepared statement caching for serverless environment
