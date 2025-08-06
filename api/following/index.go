@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -28,7 +27,7 @@ type Profile struct {
 }
 
 func (Profile) TableName() string {
-    return "public.profiles"
+	return "public.profiles"
 }
 
 // Follow struct matches the public.follows table
@@ -37,7 +36,7 @@ type Follow struct {
 }
 
 func (Follow) TableName() string {
-    return "public.follows"
+	return "public.follows"
 }
 
 // Connect initializes the database connection
@@ -57,7 +56,7 @@ func Connect() (*gorm.DB, error) {
 		if dsn == "" {
 			log.Fatal("FATAL: Database URL not set")
 		}
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{ PrepareStmt: false })
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{PrepareStmt: false})
 		if err != nil {
 			log.Fatalf("FATAL: Failed to connect to database: %v", err)
 		}
