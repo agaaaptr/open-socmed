@@ -155,7 +155,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
     }
 
     fetchProfile();
-  }, [supabase, router, fetchFollowData]);
+  }, [supabase, router, fetchFollowData, params.username]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
