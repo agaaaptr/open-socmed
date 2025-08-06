@@ -1,6 +1,6 @@
 # open-socmed
 
-`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and shared UI/Go component libraries.
+`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and a shared UI component library.
 
 ## 1. Getting Started
 
@@ -40,7 +40,8 @@ To set up the project locally, follow these steps:
     Create a `.env` file in the project root for backend environment variables:
 
     ```
-    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres"
+    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:6543/postgres?pgbouncer=true"
+    DIRECT_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:5432/postgres" # Use this for direct database connections, e.g., for debugging prepared statement issues in serverless environments.
     SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
     ```
 
@@ -76,7 +77,14 @@ npm run dev
 
 This will typically run the Next.js frontend on `http://localhost:3000` (or `3001` if `3000` is in use) and the Go API functions will be served by Vercel CLI.
 
-## 2. Project Structure & Conventions
+## 2. Features
+
+- **Authentication:** Secure user sign-up and sign-in using Supabase Auth.
+- **User Profiles:** View and edit user profiles with custom information.
+- **Social Graph:** Users can search for, follow, and unfollow other users.
+- **Dynamic Content:** Profile pages display dynamic lists of followers and following.
+
+## 3. Project Structure & Conventions
 
 This project follows a monorepo structure managed by Turborepo. Understanding its layout and conventions is crucial for effective contribution.
 
@@ -188,9 +196,14 @@ To create a new Go serverless API function that is compatible with Vercel and ad
                     log.Println("Warning: .env file not found, relying on environment variables")
                 }
             }
-            dsn := os.Getenv("DATABASE_URL")
+            // For local development or debugging prepared statement issues, you might use DIRECT_URL.
+            // In production, DATABASE_URL (with pgbouncer) is generally preferred for connection pooling.
+            dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
             if dsn == "" {
-                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+                dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
+            }
+            if dsn == "" {
+                log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
             }
             db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
                 PrepareStmt: false, // Disable prepared statement caching for serverless environment

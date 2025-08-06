@@ -35,9 +35,12 @@ func Connect() (*gorm.DB, error) {
 			}
 		}
 
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL") // Try DIRECT_URL first
 		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable not set")
+			dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL
+		}
+		if dsn == "" {
+			log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
 		}
 
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -131,10 +134,23 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.DB) {
+	username := r.URL.Query().Get("username")
 	var profile Profile
-	if err := db.Where("id = ?", userID).First(&profile).Error; err != nil {
+	var err error
+
+	if username != "" {
+		// If username is provided, fetch by username
+		err = db.Where("username = ?", username).First(&profile).Error
+		log.Printf("[DEBUG] Attempting to fetch profile by username: %s", username)
+	} else {
+		// Otherwise, fetch by userID from token
+		err = db.Where("id = ?", userID).First(&profile).Error
+		log.Printf("[DEBUG] Attempting to fetch profile by userID: %s", userID)
+	}
+
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Printf("[DEBUG] Profile not found for user ID: %s", userID)
+			log.Printf("[DEBUG] Profile not found for username/userID: %s/%s", username, userID)
 			http.Error(w, "Profile not found", http.StatusNotFound)
 			return
 		}

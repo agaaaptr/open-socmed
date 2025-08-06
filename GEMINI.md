@@ -11,7 +11,7 @@
 - **`apps/web`**: The main frontend application built with Next.js (TypeScript).
 - **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
-- **`packages/go-common`**: A shared Go module for common functionalities like database connection and models.
+
 
 ## 2. Technologies Used
 
@@ -38,7 +38,7 @@
 - **Language**: Go (Vercel Serverless Functions)
 - **ORM**: GORM (for PostgreSQL)
 - **Database**: Supabase PostgreSQL (via `DATABASE_URL`)
-- **Supabase Client**: `supabase-go`
+
 - **Environment Variables**: `godotenv` for local development.
 
 ### 2.4. Database & CI/CD
@@ -82,11 +82,9 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Checkpoint 1.1: Initial Monorepo & App Setup (Completed)**
 - [x] **Checkpoint 1.2: Project Restructuring & Initial Fixes (Completed)**
   - [x] Initial monorepo setup with `apps/frontend`, `apps/backend`, `packages/ui`.
-  - [x] Refactored to standard monorepo structure: `apps/web`, `apps/api`, `packages/go-common`, `packages/ui`.
+  - [x] Refactored to standard monorepo structure: `apps/web`, `apps/api`, `packages/ui`.
   - [x] Moved frontend code to `apps/web`.
   - [x] Moved Go serverless functions to `apps/api`.
-  - [x] Moved shared Go code (database, models) to `packages/go-common`.
-  - [x] Updated `go.mod` and import paths for new Go module structure.
 - [x] **Checkpoint 1.3: Supabase Project Integration (Completed)**
   - [x] Created and linked remote Supabase project.
   - [x] Configured `.env` files for both `web` and `api` with actual credentials.
@@ -136,7 +134,11 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Prevent Back to Landing Page:** Implemented logic to prevent authenticated users from navigating back to the landing page (`/`) using browser history. This includes using `router.replace()` on sign-in/sign-up and a `popstate` listener on the home page.
   - [x] **Enhanced Form Validation:** Switched form validation behavior from `onChange` to `onBlur` for a better user experience. Added new validation rules for profile editing (full name length) and implemented a real-time unique username check against the backend.
   - [x] **Desktop Refresh:** Implemented page refresh functionality by clicking the "Cirqle" text in the desktop sidebar.
-  - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
+  - [x] **Follow Button State Update:** Fixed the issue where the "Follow" button's state was not updating correctly after an unfollow action. The `FollowButton` component now uses `useEffect` to synchronize its internal `isFollowing` state with the `initialIsFollowing` prop, ensuring the UI accurately reflects the current follow status.
+- [x] **Profile Followers/Following Display:** Fixed the bug where the followers/following list displayed "API returned unexpected data" when the list was empty. The `fetchFollowData` function in `apps/web/app/profile/[username]/page.tsx` now correctly handles `null` responses from the backend by converting them to an empty array, and the `UserList` component displays a more informative message (e.g., "No followers yet." or "Not following anyone yet.") in such cases.
+- [x] **Search Result Follow Status:** Fixed the issue where the "Follow" button was incorrectly displayed for already followed users in search results. The `searchUsers` function in `apps/web/app/search/page.tsx` now fetches the current user's following list and correctly sets the `is_following` status for each search result. Also addressed a linting warning by adding `currentUserId` and `supabase` to the dependency array of the `searchUsers` useCallback hook.
+- [x] **Search Bar UI Enhancement:** Updated the search bar placeholder to "Search for users by username..." and added a back button with an `ArrowLeft` icon to the left of the search bar, linking back to the `/home` page.
+- [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
   - [x] Refactored root `layout.tsx` to be a Server Component and moved client-side logic to a new `ClientLayoutContent.tsx` component to allow metadata export.
@@ -165,43 +167,54 @@ This project is developed in structured stages to ensure organized progress.
   - [x] Moved Go serverless functions from `apps/api` to `api/` at the project root.
   - [x] Updated `vercel.json` to reflect the new API directory structure.
   - [x] Updated Go package names to `main` for Vercel compatibility.
-  - [x] Updated `go.mod` to use relative path for `packages/go-common`.
+  
   - [x] Restructured Go API functions into individual subdirectories with their own `go.mod` files.
-
-## 4. Current Known Issues
 
 ### 4.1. Frontend (`apps/web`)
 
 - [x] **Loading Screen & Back Button Behavior:** Resolved issues where the home page would only display a loading screen after login and the back button would incorrectly navigate to the landing page. The loading screen is now correctly centered, and navigation flow is as expected.
+- [x] **Profile Page Data Fetching:** Fixed the profile page (`/profile/[username]`) to correctly fetch and display profile data based on the username in the URL. The backend API (`/api/profile`) was updated to support fetching profiles by username, and the frontend (`apps/web/app/profile/page.tsx`) was modified to pass the username to the API and handle conditional email display for the authenticated user.
+- [x] **Profile Routing Refactor:** Implemented dynamic routing for user profiles. The `/profile` route now redirects to the authenticated user's profile (e.g., `/profile/your_username`), and `/profile/[username]` handles displaying any user's profile. This involved creating `apps/web/app/profile/[username]/page.tsx` and a new `apps/web/app/profile/page.tsx` for redirection.
 - **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
-### 4.2. Backend (`api/`)
+### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Resolved)
+  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
+  - **Resolution:**
+    1.  The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
+    2.  The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
+  - **Current Status:** The search feature and profile routing are now functioning as expected.
 
-- [x] **`/api/profile` endpoint returns 404 in `vercel dev` (Solved)**
-  - **Description:** The `/api/profile` endpoint was returning a 404 when running `vercel dev`.
-  - **Resolution:** The issue was resolved by ensuring correct `vercel.json` configuration and Go module setup, allowing the endpoint to be properly deployed and accessed. The problem was likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
 
-- [x] **Vercel Deployment Failure (Go Build Error) (Solved)**
-  - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
 
-- [ ] **Database Error: Prepared Statement Already Exists (Re-opened)**
-  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors continue to occur in serverless environments, leading to API access issues.
-  - **Previous Attempted Resolution:** Explicitly disabling prepared statement caching in GORM (`PrepareStmt: false`) and configuring the underlying `sql.DB` connection pool with `SetMaxIdleConns(1)`, `SetMaxOpenConns(1)`, and `SetConnMaxLifetime(time.Minute)` was implemented. While these settings aimed to manage database connections more aggressively, the issue persists.
-  - **Hypothesis:** This issue likely stems from the nature of serverless functions, where instances might be shared or experience 'warm starts'. In such scenarios, a database connection (and its prepared statements) from a previous invocation might still be active or in a state that conflicts with a new invocation attempting to create a prepared statement with the same name. This suggests that the serverless function's lifecycle and database connection management are not yet optimally configured for all edge cases, and further improvements are needed to ensure robust database interaction in a shared, ephemeral environment.
-  - **Next Steps:** Further investigation and potential re-architecture of database connection handling within the serverless functions are required to fully resolve this persistent issue.
-
-- [x] **`/api/check-username` Database Query Error (Solved)**
-  - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
-  - **Resolution:** The `Profile` struct in `api/check-username/index.go` was not accurately reflecting the `profiles` table schema in the database. Specifically, it was using `gorm.Model` which adds default fields that were not present or had different types in the actual database table. The `Profile` struct was updated to precisely match the database schema, including using `uuid.UUID` for the `ID` field and pointers for nullable fields, resolving the schema mismatch and allowing successful database queries.
 
 ## 5. Next Steps: Troubleshooting & Development
 
-### 5.1. Feature: User Profile (View & Edit) - Completed
+### 5.1. Feature: Social Graph (Follow/Unfollow) - COMPLETED
+
+**Goal:** Allow users to search for other users, follow them, and see lists of followers and following on profile pages. This is a prerequisite for a meaningful timeline feed.
+
+#### 5.1.1. Frontend (`apps/web`) - Next.js
+
+- [x] **Search Page:** Create a dedicated page at `/search` for finding users by username or full name.
+- [x] **Profile Page Redesign:** Update the profile page to display user stats (Posts, Followers, Following) and include tabs for viewing lists of followers and following.
+- [x] **Follow Button UI:** Implement a reusable "Follow/Following" button with interactive states.
+- [x] **API Integration:** Connect the search page, profile stats, and follow buttons to the backend API.
+- [x] **Display User Lists:** Fetch and display real data in the "Followers" and "Following" tabs.
+
+#### 5.1.2. Backend (`api/`) - Go
+
+- [x] **Database Schema:** Create a `follows` table to store follower/following relationships.
+- [x] **Search API:** Implement an API endpoint (`GET /api/search-users?q=...`) to search for users.
+- [x] **Follow/Unfollow API:** Implement endpoints to create and delete follow relationships (`POST /api/follow`, `DELETE /api/follow`). (Already implemented)
+- [x] **Follower/Following List API:** Implement endpoints to retrieve lists of a user's followers (`GET /api/followers`) and the users they are following (`GET /api/following`).
+- [x] **Authentication:** Secure all endpoints to ensure only authenticated users can perform actions.
+- [x] **API Refactoring:** Ensured all new API endpoints (`search-users`, `follow`, `followers`, `following`) follow the established one-directory-per-function structure for stability and consistency.
+
+### 5.2. Feature: User Profile (View & Edit) - Completed
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
-#### 5.1.1. Frontend (`apps/web`) - Next.js
+#### 5.2.1. Frontend (`apps/web`) - Next.js
 
 - [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
 - [x] Fetch user profile data from the backend API when the dashboard page loads.
@@ -214,7 +227,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
 
-#### 5.1.2. Backend (`api/`) - Go: - Completed
+#### 5.2.2. Backend (`api/`) - Go: - Completed
 
 - [x] Ensure the `models.Profile` model aligns with the `profiles` table schema in Supabase (ID, username, full_name, avatar_url, etc.).
 - [x] Create an API endpoint (`GET /api/profile`) to retrieve user profile data based on user ID or authentication token.
@@ -227,11 +240,11 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Implement middleware or logic in the backend to verify JWT tokens received from the frontend for all protected profile endpoints.
 - [x] Extract user ID from the JWT token to ensure users can only access or modify their own profile.
 
-## 5.2. Feature: Post Feed (View & Create)
+### 5.3. Feature: Post Feed (View & Create)
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
-#### 5.2.1. Frontend (`apps/web`) - Next.js
+#### 5.3.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
 - [ ] Fetch post data from the backend API.
@@ -241,7 +254,7 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Send new post data to the backend API.
 - [ ] Implement UI for like/comment buttons (functionality will be added later).
 
-#### 5.2.2. Backend (`api/`) - Go
+#### 5.3.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
 - [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
@@ -251,11 +264,11 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Validate post content.
 - [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
 
-### 5.3. Feature: Timeline (Main Feed)
+### 5.4. Feature: Timeline (Main Feed)
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
-#### 5.3.1. Frontend (`apps/web`) - Next.js
+#### 5.4.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Integrate post feed display into the main dashboard layout.
 - [ ] Implement a visually appealing and interactive timeline UI.
@@ -263,38 +276,38 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
-#### 5.3.2. Backend (`api/`) - Go
+#### 5.4.2. Backend (`api/`) - Go
 
 - [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
 - [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
 
-### 5.4. Feature: Stories
+### 5.5. Feature: Stories
 
 **Goal:** Users can view and create short, ephemeral stories.
 
-#### 5.4.1. Frontend (`apps/web`) - Next.js
+#### 5.5.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI component to display a carousel or list of active stories.
 - [ ] Implement a full-screen viewer for individual stories.
 - [ ] Create a form or interface for users to upload images/videos and create new stories.
 - [ ] Add a placeholder UI element on the dashboard for stories.
 
-#### 5.4.2. Backend (`api/`) - Go
+#### 5.5.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for stories (ID, user ID, media URL, expiration time, etc.).
 - [ ] Create API endpoints for creating, fetching, and viewing stories.
 
-### 5.5. Feature: Direct Messages
+### 5.6. Feature: Direct Messages
 
 **Goal:** Users can send and receive direct messages with other users.
 
-#### 5.5.1. Frontend (`apps/web`) - Next.js
+#### 5.6.1. Frontend (`apps/web`) - Next.js
 
 - [ ] Create a UI to display a list of conversations/chats.
 - [ ] Implement a real-time chat interface for sending and receiving messages.
 - [ ] Add a placeholder UI element on the dashboard for direct messages.
 
-#### 5.5.2. Backend (`api/`) - Go
+#### 5.6.2. Backend (`api/`) - Go
 
 - [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.
@@ -506,9 +519,14 @@ To create a new Go serverless API function that is compatible with Vercel and ad
                     log.Println("Warning: .env file not found, relying on environment variables")
                 }
             }
-            dsn := os.Getenv("DATABASE_URL")
+            // For local development or debugging prepared statement issues, you might use DIRECT_URL.
+            // In production, DATABASE_URL (with pgbouncer) is generally preferred for connection pooling.
+            dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
             if dsn == "" {
-                log.Fatal("FATAL: DATABASE_URL environment variable not set")
+                dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
+            }
+            if dsn == "" {
+                log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
             }
             db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
                 PrepareStmt: false, // Disable prepared statement caching for serverless environment
@@ -632,14 +650,7 @@ To create a new Go serverless API function that is compatible with Vercel and ad
   - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
   - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
 
-#### 10.2.2. For Shared Go Modules (`packages/go-common`)
 
-- **Structure:**
-  - Organize code into logical subdirectories (e.g., `packages/go-common/services/`, `packages/go-common/utils/`).
-  - Each subdirectory can have its own package name (e.g., `package services`, `package utils`).
-- **Dependencies:**
-  - If this shared module requires new dependencies, add them to `packages/go-common/go.mod`.
-  - After adding/removing dependencies, navigate to `packages/go-common` and run `go mod tidy`.
 
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 
