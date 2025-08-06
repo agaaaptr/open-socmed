@@ -64,7 +64,7 @@ const UserList = ({ users, isLoading, error }: { users: User[], isLoading: boole
   );
 };
 
-export default function ProfileViewPage() {
+export default function ProfileViewPage({ params }: { params: { username: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [profile, setProfile] = useState<(User & { email: string }) | null>(null);
@@ -105,16 +105,26 @@ export default function ProfileViewPage() {
       setError('');
       const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) {
-        router.push('/auth/signin');
-        return;
+      let targetUsername = params.username;
+
+      if (!targetUsername) {
+        // If no username in URL, try to get authenticated user
+        if (!user) {
+          router.push('/auth/signin');
+          return;
+        }
       }
 
       try {
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        const response = await fetch('/api/profile', {
+        let apiUrl = '/api/profile';
+        if (params.username) {
+          apiUrl += `?username=${params.username}`;
+        }
+
+        const response = await fetch(apiUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         });
@@ -125,7 +135,13 @@ export default function ProfileViewPage() {
         }
 
         const data = await response.json();
-        setProfile({ ...data, email: user.email });
+        
+        // Only set email if the fetched profile is the authenticated user's profile
+        if (user && data.id === user.id) {
+          setProfile({ ...data, email: user.email });
+        } else {
+          setProfile(data);
+        }
         
         fetchFollowData('followers', data.id);
         fetchFollowData('following', data.id);

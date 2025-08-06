@@ -166,12 +166,11 @@ This project is developed in structured stages to ensure organized progress.
   
   - [x] Restructured Go API functions into individual subdirectories with their own `go.mod` files.
 
-### 4.3. Frontend (`apps/web`) - Profile Page Error (Solved)
-  - **Description:** Encountered `TypeError: can't access property "length", k[e].data is null` when accessing the profile page, specifically related to fetching followers/following data.
-  - **Resolution:** The issue was due to incorrect `useCallback` dependency array for `fetchFollowData` and potential unexpected non-array responses from the API. Fixed by: 
-    1.  Ensuring `fetchFollowData`'s `useCallback` dependency array is correctly managed to prevent infinite loops/race conditions.
-    2.  Adding explicit `Array.isArray(data)` check before setting state to ensure API responses are valid arrays.
-    3.  Updating `UserList` component to handle `null` or empty `users` array gracefully.
+### 4.1. Frontend (`apps/web`)
+
+- [x] **Loading Screen & Back Button Behavior:** Resolved issues where the home page would only display a loading screen after login and the back button would incorrectly navigate to the landing page. The loading screen is now correctly centered, and navigation flow is as expected.
+- [x] **Profile Page Data Fetching:** Fixed the profile page (`/profile/[username]`) to correctly fetch and display profile data based on the username in the URL. The backend API (`/api/profile`) was updated to support fetching profiles by username, and the frontend (`apps/web/app/profile/page.tsx`) was modified to pass the username to the API and handle conditional email display for the authenticated user.
+- **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
 ### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Diagnosed)
   - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `401 Unauthorized` or prolonged requests.
