@@ -91,12 +91,13 @@ export default function ProfileViewPage({ params }: { params: { username: string
         throw new Error(`Failed to fetch ${type}`);
       }
       const data = await response.json();
-      if (!Array.isArray(data)) {
-        // If data is not an array, it's an unexpected response, treat as error
-        throw new Error(`API returned unexpected data for ${type}`);
+      // If data is null, treat it as an empty array
+      const processedData = data === null ? [] : data;
+
+      if (!Array.isArray(processedData)) {
+        throw new Error(`API returned unexpected data for ${type}. Received: ${JSON.stringify(data)}`);
       }
-      // If data is an empty array, it means no followers/following, which is a valid state
-      setTabData(prev => ({ ...prev, [type]: { data, isLoading: false, error: null } }));
+      setTabData(prev => ({ ...prev, [type]: { data: processedData, isLoading: false, error: null } }));
     } catch (err: any) {
       setTabData(prev => ({ ...prev, [type]: { ...prev[type], isLoading: false, error: err.message } }));
     }
