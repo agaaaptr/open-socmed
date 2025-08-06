@@ -166,30 +166,21 @@ This project is developed in structured stages to ensure organized progress.
   
   - [x] Restructured Go API functions into individual subdirectories with their own `go.mod` files.
 
-## 4. Current Known Issues
+### 4.3. Frontend (`apps/web`) - Profile Page Error (Solved)
+  - **Description:** Encountered `TypeError: can't access property "length", k[e].data is null` when accessing the profile page, specifically related to fetching followers/following data.
+  - **Resolution:** The issue was due to incorrect `useCallback` dependency array for `fetchFollowData` and potential unexpected non-array responses from the API. Fixed by: 
+    1.  Ensuring `fetchFollowData`'s `useCallback` dependency array is correctly managed to prevent infinite loops/race conditions.
+    2.  Adding explicit `Array.isArray(data)` check before setting state to ensure API responses are valid arrays.
+    3.  Updating `UserList` component to handle `null` or empty `users` array gracefully.
 
-### 4.1. Frontend (`apps/web`)
+### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Diagnosed)
+  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `401 Unauthorized` or prolonged requests.
+  - **Diagnosis:**
+    1.  The `401 Unauthorized` error from `web_fetch` indicated a potential misconfiguration in Vercel's routing or an unintended authentication layer on the `search-users` endpoint, despite the Go code not explicitly requiring authentication.
+    2.  Prolonged requests and indefinite loading suggest database connection issues or slow query performance.
+  - **Current Status:** Detailed logging has been added to `api/search-users/index.go` to provide more insights into database interaction and execution flow. Further debugging requires examining Vercel deployment logs and verifying environment variable configurations (`DATABASE_URL`, `DIRECT_URL`). Indexing on `username` and `full_name` in the `profiles` table is also recommended for performance.
 
-- [x] **Loading Screen & Back Button Behavior:** Resolved issues where the home page would only display a loading screen after login and the back button would incorrectly navigate to the landing page. The loading screen is now correctly centered, and navigation flow is as expected.
-- **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
-### 4.2. Backend (`api/`)
-
-- [x] **`/api/profile` endpoint returns 404 in `vercel dev` (Solved)**
-  - **Description:** The `/api/profile` endpoint was returning a 404 when running `vercel dev`.
-  - **Resolution:** The issue was resolved by ensuring correct `vercel.json` configuration and Go module setup, allowing the endpoint to be properly deployed and accessed. The problem was likely a limitation or bug within the `vercel dev` environment itself when handling this specific monorepo setup (Turborepo + Next.js + self-contained Go serverless functions). The Go functions compile correctly when tested independently.
-
-- [x] **Vercel Deployment Failure (Go Build Error) (Solved)**
-  - **Description:** Deployment to Vercel failed with `undefined: GetDB` and `undefined: Profile` errors in `handler/index.go`.
-  - **Resolution:** Consolidated all Go code for each serverless function into a single `index.go` file within its respective directory (`api/profile/index.go` and `api/health/index.go`). Removed redundant `database.go` and `profile.go` files. This approach ensures all necessary definitions are present in the single file that Vercel compiles for the function, making the deployment robust.
-
-- [x] **Database Error: Prepared Statement Already Exists (Solved)**
-  - **Description:** Intermittent `Database error: ERROR: prepared statement "stmtcache_..." already exists (SQLSTATE 42P05)` errors were occurring in serverless environments, leading to API access issues.
-  - **Resolution:** The Go backend API functions (`api/profile/index.go`, `api/check-username/index.go`, `api/health/index.go`) have been updated to prioritize `DIRECT_URL` for database connections and fallback to `DATABASE_URL` if `DIRECT_URL` is not set. Additionally, `PrepareStmt: false` has been explicitly set in GORM's configuration to disable prepared statement caching, which resolves the conflict in serverless environments. The `DIRECT_URL` environment variable must be configured in Vercel for the backend API to function correctly.
-
-- [x] **`/api/check-username` Database Query Error (Solved)**
-  - **Description:** The `/api/check-username` endpoint returned a "Database query error" with a 500 status code, indicating a problem during database interaction.
-  - **Resolution:** The `Profile` struct in `api/check-username/index.go` was not accurately reflecting the `profiles` table schema in the database. Specifically, it was using `gorm.Model` which adds default fields that were not present or had different types in the actual database table. The `Profile` struct was updated to precisely match the database schema, including using `uuid.UUID` for the `ID` field and pointers for nullable fields, resolving the schema mismatch and allowing successful database queries.
 
 ## 5. Next Steps: Troubleshooting & Development
 
