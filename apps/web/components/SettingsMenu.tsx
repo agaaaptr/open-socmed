@@ -6,6 +6,8 @@ import { LogOut, HelpCircle, MessageSquareWarning } from 'lucide-react';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
 interface SettingsMenuProps {
   onClose: () => void;
@@ -14,6 +16,9 @@ interface SettingsMenuProps {
 export default function SettingsMenu({ onClose }: SettingsMenuProps) {
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(menuRef, onClose);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -33,6 +38,7 @@ export default function SettingsMenu({ onClose }: SettingsMenuProps) {
 
   return (
     <motion.div
+      ref={menuRef}
       initial="hidden"
       animate="visible"
       exit="hidden"

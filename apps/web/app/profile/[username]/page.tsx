@@ -192,9 +192,10 @@ export default function ProfileViewPage({ params }: { params: { username: string
           transition={{ duration: 0.5 }} 
           className="relative bg-background-light p-6 rounded-2xl shadow-lg"
         >
-          <Link href="/home" className="absolute top-4 right-4 flex items-center text-sm text-accent-main hover:underline">
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to Home
+          <Link href="/home" className="absolute top-4 right-4 flex items-center text-text-light hover:text-accent-main transition-colors duration-300 p-2 rounded-lg text-sm">
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
           </Link>
           <div className="flex flex-col sm:flex-row items-center sm:space-x-6">
             <UserCircle className="w-24 h-24 sm:w-28 sm:h-28 text-accent-main flex-shrink-0" />
