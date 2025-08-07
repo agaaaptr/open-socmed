@@ -105,14 +105,14 @@ export default function CreatePost({ onPostCreated, onClose, isMobile }: CreateP
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           disabled={charCount === 0 || charCount > MAX_CHARS || isSubmitting}
-          className="flex items-center px-5 py-2 bg-accent-main text-text-light font-semibold rounded-full shadow-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center px-5 py-2 bg-accent-main text-text-light font-semibold rounded-full shadow-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <LoadingState type="dots" />
           ) : (
             <Send className="w-5 h-5 mr-2" />
           )}
-          {isSubmitting ? 'Posting...' : 'Post'}
+          {isSubmitting ? 'Posting...' : <span>Post</span>}
         </motion.button>
       </div>
     </motion.div>
