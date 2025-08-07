@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Loader } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
 interface CreatePostProps {
   onPostCreated: (newPost: any) => void; // Callback to update the timeline
@@ -16,6 +17,9 @@ export default function CreatePost({ onPostCreated, onClose }: CreatePostProps) 
   const [error, setError] = useState('');
   const supabase = createClientComponentClient();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null); // Ref for click outside
+
+  useOnClickOutside(modalRef, onClose); // Apply click outside hook
 
   const MAX_CHARS = 280;
   const charCount = content.length;
@@ -72,11 +76,12 @@ export default function CreatePost({ onPostCreated, onClose }: CreatePostProps) 
 
   return (
     <motion.div
+      ref={modalRef} // Attach ref to the modal div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="relative bg-background-light p-6 rounded-2xl shadow-2xl border border-border-medium w-full max-w-lg mx-auto z-50"
+      className="relative bg-background-light p-6 rounded-2xl shadow-2xl border border-border-medium w-full max-w-xl md:max-w-2xl mx-auto z-50" // Adjusted width
     >
       <h2 className="text-2xl font-bold text-text-light mb-4">Create New Post</h2>
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}

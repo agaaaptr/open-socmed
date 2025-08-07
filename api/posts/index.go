@@ -102,10 +102,21 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 func getPosts(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var posts []Post
-	if err := db.Preload("User").Order("created_at desc").Find(&posts).Error; err != nil {
-		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
-		return
+	query := db.Preload("User").Order("created_at desc")
+
+	userIDStr := r.URL.Query().Get("user_id")
+	if userIDStr != "" {
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			http.Error(w, "Invalid user_id format", http.StatusBadRequest)
+			return
+		}
+		query = query.Where("user_id = ?", userID)
 	}
+
+	if err := query.Find(&posts).Error; err != nil {
+		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+		return	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)

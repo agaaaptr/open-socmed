@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserCircle, Loader, LogOut, Edit, ArrowLeft, Rss, Users } from 'lucide-react';
+import { UserCircle, Loader, LogOut, Edit, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -13,6 +13,19 @@ interface User {
   full_name: string;
   username: string;
   avatar_url: string;
+}
+
+interface Post {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  user: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url: string;
+  };
 }
 
 // Reusable component for a list of users
@@ -65,6 +78,71 @@ const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoad
   );
 };
 
+// Reusable component for a list of posts
+const PostList = ({ posts, isLoading, error }: { posts: Post[], isLoading: boolean, error: string | null }) => {
+  if (isLoading) {
+    return <div className="flex justify-center items-center py-10"><Loader className="w-8 h-8 text-accent-main animate-spin" /></div>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-400">{error}</p>;
+  }
+  
+  if (!posts || posts.length === 0) {
+    return (
+        <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
+            <Rss className="mx-auto w-10 h-10 mb-4" />
+            <h3 className="text-lg font-semibold">No posts yet</h3>
+            <p>This user has not posted anything yet.</p>
+        </div>
+    );
+  }
+
+  const postVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  return (
+    <div className="space-y-6">
+      {posts.map((post) => (
+        <motion.div
+          key={post.id}
+          variants={postVariants}
+          className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
+        >
+          <div className="flex items-center mb-3">
+            {post.user?.avatar_url ? (
+              <Image src={post.user.avatar_url} alt={post.user.full_name} width={40} height={40} className="rounded-full mr-3 md:mr-4" />
+            ) : (
+              <UserCircle className="w-9 h-9 md:w-10 md:h-10 text-accent-main mr-3 md:mr-4" />
+            )}
+            <div>
+              <p className="font-semibold text-text-light text-base md:text-lg">{post.user?.full_name || 'Unknown User'}</p>
+              <p className="text-xs md:text-sm text-text-muted">@{post.user?.username || 'unknown'} • {new Date(post.created_at).toLocaleString()}</p>
+            </div>
+          </div>
+          <p className="text-text-light text-sm md:text-base leading-relaxed mb-4">{post.content}</p>
+          <div className="flex space-x-4 md:space-x-6 text-text-muted text-sm">
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <Heart className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Like</span>
+            </button>
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Comment</span>
+            </button>
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <Share2 className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Share</span>
+            </button>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
 export default function ProfileViewPage({ params }: { params: { username: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -73,15 +151,20 @@ export default function ProfileViewPage({ params }: { params: { username: string
   const [error, setError] = useState('');
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
-  const [tabData, setTabData] = useState<{ [key: string]: { data: User[], isLoading: boolean, error: string | null } }> ({
+  const [tabData, setTabData] = useState<{ 
+    followers: { data: User[], isLoading: boolean, error: string | null };
+    following: { data: User[], isLoading: boolean, error: string | null };
+    posts: { data: Post[], isLoading: boolean, error: string | null };
+  }> ({
       followers: { data: [], isLoading: true, error: null },
       following: { data: [], isLoading: true, error: null },
+      posts: { data: [], isLoading: true, error: null },
   });
 
   const fetchFollowData = useCallback(async (type: 'followers' | 'following', userId: string) => {
     setTabData(prev => {
       if (prev[type].data.length > 0 && !prev[type].isLoading && !prev[type].error) {
-        return prev;
+        return prev; 
       }
       return { ...prev, [type]: { ...prev[type], isLoading: true, error: null } };
     });
@@ -103,8 +186,37 @@ export default function ProfileViewPage({ params }: { params: { username: string
     }
   }, []);
 
+  const fetchPostsData = useCallback(async (userId: string) => {
+    setTabData(prev => ({ ...prev, posts: { ...prev.posts, isLoading: true, error: null } }));
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error('User not authenticated. Please sign in.');
+      }
+      const token = session.access_token;
+
+      const response = await fetch(`/api/posts?user_id=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch posts.');
+      }
+
+      const data: Post[] = await response.json();
+      setTabData(prev => ({ ...prev, posts: { data, isLoading: false, error: null } }));
+    } catch (err: any) {
+      setTabData(prev => ({ ...prev, posts: { ...prev.posts, isLoading: false, error: err.message } }));
+    }
+  }, [supabase]);
+
   useEffect(() => {
-    async function fetchProfile() {
+    async function fetchProfileAndData() {
       setLoading(true);
       setError('');
       const { data: { user } } = await supabase.auth.getUser();
@@ -141,6 +253,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
         
         fetchFollowData('followers', data.id);
         fetchFollowData('following', data.id);
+        fetchPostsData(data.id); // Fetch posts for the profile
 
       } catch (err: any) {
         console.error('Error fetching profile:', err);
@@ -150,8 +263,8 @@ export default function ProfileViewPage({ params }: { params: { username: string
       }
     }
 
-    fetchProfile();
-  }, [supabase, router, fetchFollowData, params.username]);
+    fetchProfileAndData();
+  }, [supabase, router, fetchFollowData, fetchPostsData, params.username]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -162,6 +275,8 @@ export default function ProfileViewPage({ params }: { params: { username: string
       setActiveTab(tab);
       if((tab === 'followers' || tab === 'following') && profile) {
           fetchFollowData(tab, profile.id)
+      } else if (tab === 'posts' && profile) {
+          fetchPostsData(profile.id);
       }
   }
 
@@ -204,7 +319,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
               <p className="text-md md:text-lg text-text-muted">@{profile?.username}</p>
               <div className="flex justify-center sm:justify-start space-x-6 mt-4 text-text-light">
                 <div>
-                  <span className="font-bold">0</span>
+                  <span className="font-bold">{tabData.posts.isLoading ? '...' : tabData.posts.data.length}</span>
                   <span className="text-text-muted ml-1">Posts</span>
                 </div>
                 <div>
@@ -240,13 +355,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
           <div className="mt-6">
             <AnimatePresence mode="wait">
               <motion.div key={activeTab} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: 0.2 }}>
-                {activeTab === 'posts' && (
-                  <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
-                    <Rss className="mx-auto w-10 h-10 mb-4" />
-                    <h3 className="text-lg font-semibold">No posts yet</h3>
-                    <p>Posts from this user will appear here.</p>
-                  </div>
-                )}
+                {activeTab === 'posts' && <PostList posts={tabData.posts.data} isLoading={tabData.posts.isLoading} error={tabData.posts.error} />}
                 {activeTab === 'followers' && <UserList users={tabData.followers.data} isLoading={tabData.followers.isLoading} error={tabData.followers.error} listType="followers" />}
                 {activeTab === 'following' && <UserList users={tabData.following.data} isLoading={tabData.following.isLoading} error={tabData.following.error} listType="following" />}
               </motion.div>

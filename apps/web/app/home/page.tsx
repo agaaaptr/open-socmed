@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader, PlusCircle } from 'lucide-react';
+import { Loader, PlusCircle, PlusSquare } from 'lucide-react';
 
 import Timeline from '../../components/Timeline';
 import MobileSuggestedFeatures from '../../components/MobileSuggestedFeatures';
@@ -96,7 +96,7 @@ export default function HomePage() {
             onClick={() => setIsCreatePostOpen(true)}
             className="hidden md:flex fixed bottom-8 right-8 p-4 rounded-full bg-accent-main text-text-light shadow-lg z-40 focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark"
           >
-            <PlusCircle size={28} />
+            <PlusSquare size={28} />
           </motion.button>
 
           {/* Create Post Modal/Bottom Sheet */}

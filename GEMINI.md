@@ -12,7 +12,6 @@
 - **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
 
-
 ## 2. Technologies Used
 
 ### 2.1. Core Monorepo
@@ -127,6 +126,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Post Creation UI:** Create a form for users to create new posts.
   - [x] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
+  - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
   - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
@@ -180,14 +180,12 @@ This project is developed in structured stages to ensure organized progress.
 - **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
 ### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Resolved)
-  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
-  - **Resolution:**
-    1.  The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
-    2.  The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
-  - **Current Status:** The search feature and profile routing are now functioning as expected.
 
-
-
+- **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
+- **Resolution:**
+    1. The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
+    2. The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
+- **Current Status:** The search feature and profile routing are now functioning as expected.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -228,6 +226,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Provide feedback to the user after successful or failed updates.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
+- [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
 
 #### 5.2.2. Backend (`api/`) - Go: - COMPLETED
 
@@ -258,17 +257,15 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 5.5. Feature: Post Feed (View & Create) - COMPLETED
 
-**Goal:** Users can view a feed of posts from other users and create new posts.
+**Goal:** Enable users to create new posts and display them dynamically on the home timeline.
 
 #### 5.5.1. Frontend (`apps/web`) - Next.js
 
-- [x] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-- [x] Fetch post data from the backend API.
-- [x] Implement pagination or infinite scrolling for the feed.
-- [x] Create a form for users to compose and submit new posts.
-- [x] Handle form input and validation.
-- [x] Send new post data to the backend API.
-- [ ] Implement UI for like/comment buttons (functionality will be added later).
+- [x] **`CreatePost.tsx` Component:** Developed a reusable React component for post creation, including a self-resizing textarea, character counter, and API submission logic. Implemented click-outside-to-close functionality.
+- [x] **Desktop UI:** Implemented a sticky Floating Action Button (FAB) with a `PlusSquare` icon in the bottom-right corner of the desktop view. Clicking it opens a floating modal containing the `CreatePost` component, which is now wider and centered.
+- [x] **Mobile UI:** Integrated a prominent "Add Post" button with a `PlusSquare` icon in the center of the mobile navbar. Clicking it triggers a smooth bottom sheet animation to reveal the `CreatePost` component, which is now wider and fills the bottom of the screen.
+- [x] **Timeline Integration:** Modified `Timeline.tsx` to fetch and display posts from the `/api/posts` endpoint. New posts created via the `CreatePost` component are dynamically added to the timeline.
+- [x] **Mobile Navbar Refactor:** Restructured `MobileNavbar.tsx` to display only essential icons (Home, Search, Add Post, Messages, More). A new `MoreMenu.tsx` component was created to house less frequently used navigation items (Notifications, Profile, Settings), accessible via a "More" icon in the navbar.
 
 #### 5.5.2. Backend (`api/`) - Go
 
@@ -335,8 +332,8 @@ This project is developed in structured stages to ensure organized progress.
 
 - [ ] **Docker Desktop Configuration:** Document and guide the user through the one-time setup of Docker Desktop, including resource allocation (CPU, Memory) for optimal performance.
 - [ ] **Supabase CLI Integration:**
-    - [ ] Instruct the user to run `supabase start` to initialize the local environment.
-    - [ ] Explain how this command runs all necessary services (Postgres, Auth, Functions) locally within Docker containers.
+  - [ ] Instruct the user to run `supabase start` to initialize the local environment.
+  - [ ] Explain how this command runs all necessary services (Postgres, Auth, Functions) locally within Docker containers.
 - [ ] **VS Code Extension:** Guide the user on how to connect the official Supabase VS Code extension to the running local instance for database management and log streaming.
 - [ ] **Update `README.md`:** Add a new section to the main `README.md` detailing the end-to-end local setup process for future reference.
 
@@ -676,8 +673,6 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 - **Utilities/Hooks/Libs:**
   - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
   - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
-
-
 
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 
