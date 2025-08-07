@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { UserCircle, Heart, MessageCircle, Share2, Loader } from 'lucide-react';
+import { UserCircle, Heart, MessageCircle, Share2 } from 'lucide-react';
+import LoadingState from './LoadingState';
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Image from 'next/image';
@@ -75,8 +76,7 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-10">
-        <Loader className="w-8 h-8 text-accent-main animate-spin" />
-        <p className="ml-2 text-text-muted">Loading posts...</p>
+        <LoadingState text="Loading posts..." />
       </div>
     );
   }

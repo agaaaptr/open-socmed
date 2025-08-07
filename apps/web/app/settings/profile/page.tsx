@@ -4,7 +4,8 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { UserCircle, Loader, Save, ArrowLeft } from 'lucide-react';
+import { UserCircle, Save, ArrowLeft } from 'lucide-react';
+import LoadingState from '../../../components/LoadingState';
 import Link from 'next/link';
 
 export default function EditProfilePage() {
@@ -199,10 +200,7 @@ export default function EditProfilePage() {
         className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-background-dark text-text-light"
       >
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-background-gradient-start via-background-gradient-end to-background-gradient-end animate-background-pan -z-10" />
-        <div className="flex flex-col items-center justify-center">
-          <Loader className="w-12 h-12 text-accent-main animate-spin" />
-          <p className="mt-4 text-text-muted">Loading profile data...</p>
-        </div>
+        <LoadingState text="Loading profile data..." />
       </motion.div>
     );
   }
@@ -283,7 +281,7 @@ export default function EditProfilePage() {
                 disabled={checkingUsername || !profile.username || !!usernameError || profile.username === initialUsername}
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {checkingUsername ? <Loader className="w-4 h-4 animate-spin" /> : 'Check'}
+                {checkingUsername ? <LoadingState type="dots" /> : 'Check'}
               </button>
             </div>
             <p className="text-text-muted text-xs mt-1">Username must be unique.</p>
@@ -300,7 +298,7 @@ export default function EditProfilePage() {
             className="w-full flex items-center justify-center bg-accent-main hover:bg-accent-hover text-text-light font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
-              <Loader className="w-5 h-5 animate-spin mr-2" />
+              <LoadingState type="dots" />
             ) : (
               <Save className="w-5 h-5 mr-2" />
             )}

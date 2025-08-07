@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import LoadingState from './LoadingState';
 
 interface FollowButtonProps {
   userIdToFollow: string;
@@ -66,7 +67,7 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
           ? 'bg-transparent border border-accent-main text-accent-main'
           : 'bg-accent-main text-text-light'
         } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-      {isLoading ? '...' : (isFollowing ? 'Following' : 'Follow')}
+      {isLoading ? <LoadingState type="dots" /> : (isFollowing ? 'Following' : 'Follow')}
     </motion.button>
   );
 };

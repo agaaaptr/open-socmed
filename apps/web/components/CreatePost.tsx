@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Loader } from 'lucide-react';
+import { Send } from 'lucide-react';
+import LoadingState from './LoadingState';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
@@ -107,7 +108,7 @@ export default function CreatePost({ onPostCreated, onClose, isMobile }: CreateP
           className="flex items-center px-5 py-2 bg-accent-main text-text-light font-semibold rounded-full shadow-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
-            <Loader className="w-5 h-5 mr-2 animate-spin" />
+            <LoadingState type="dots" />
           ) : (
             <Send className="w-5 h-5 mr-2" />
           )}

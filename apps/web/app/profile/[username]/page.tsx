@@ -4,7 +4,8 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserCircle, Loader, LogOut, Edit, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { UserCircle, LogOut, Edit, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
+import LoadingState from '../../../components/LoadingState';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -31,7 +32,7 @@ interface Post {
 // Reusable component for a list of users
 const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoading: boolean, error: string | null, listType?: 'followers' | 'following' }) => {
   if (isLoading) {
-    return <div className="flex justify-center items-center py-10"><Loader className="w-8 h-8 text-accent-main animate-spin" /></div>;
+    return <div className="flex justify-center items-center py-10"><LoadingState /></div>;
   }
 
   if (error) {
@@ -81,7 +82,7 @@ const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoad
 // Reusable component for a list of posts
 const PostList = ({ posts, isLoading, error }: { posts: Post[], isLoading: boolean, error: string | null }) => {
   if (isLoading) {
-    return <div className="flex justify-center items-center py-10"><Loader className="w-8 h-8 text-accent-main animate-spin" /></div>;
+    return <div className="flex justify-center items-center py-10"><LoadingState /></div>;
   }
 
   if (error) {
@@ -283,8 +284,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
   if (loading) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center bg-background-dark text-text-light">
-        <Loader className="w-12 h-12 text-accent-main animate-spin" />
-        <p className="mt-4 text-text-muted">Loading profile...</p>
+        <LoadingState text="Loading profile..." />
       </motion.div>
     );
   }

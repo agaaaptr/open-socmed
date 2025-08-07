@@ -4,8 +4,8 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
+import LoadingState from '../../components/LoadingState';
 
 export default function ProfileRedirectPage() {
   const supabase = createClientComponentClient();
@@ -58,8 +58,7 @@ export default function ProfileRedirectPage() {
   if (loading) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center bg-background-dark text-text-light">
-        <Loader className="w-12 h-12 text-accent-main animate-spin" />
-        <p className="mt-4 text-text-muted">Loading your profile...</p>
+        <LoadingState text="Loading your profile..." />
       </motion.div>
     );
   }
