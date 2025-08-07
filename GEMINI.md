@@ -151,9 +151,9 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Username Uniqueness Check API:** Added a new endpoint (`/api/check-username`) to verify if a username is already taken.
   - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
-  - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
-  - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
-  - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
+  - [x] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
+  - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
+  - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.

@@ -33,6 +33,10 @@
     {
       "src": "api/following/index.go",
       "use": "@vercel/go"
+    },
+    {
+      "src": "api/posts/index.go",
+      "use": "@vercel/go"
     }
   ],
   "rewrites": [
