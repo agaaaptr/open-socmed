@@ -291,8 +291,8 @@ This project is developed in structured stages to ensure organized progress.
 
 #### 5.6.2. Backend (`api/`) - Go
 
-- [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-- [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
+- [x] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
+- [x] Implement logic to aggregate posts based on follow relationships and other criteria.
 
 ### 5.7. Feature: Stories
 
