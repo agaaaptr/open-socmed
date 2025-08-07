@@ -93,7 +93,7 @@ export default function CreatePost({ onPostCreated, onClose, isMobile }: CreateP
         placeholder="What's on your mind?"
         rows={isMobile ? 5 : 10} // Conditional rows
         maxLength={MAX_CHARS}
-        className="w-full p-3 bg-background-medium rounded-lg border border-border-subtle text-text-light placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-main resize-none overflow-hidden"
+        className="w-full p-3 bg-background-medium rounded-lg border border-border-subtle text-text-light placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-main resize-none overflow-hidden min-h-[100px] md:min-h-[200px]"
       />
       <div className="flex justify-between items-center mt-4">
         <span className={`text-sm ${charCount > MAX_CHARS ? 'text-red-400' : 'text-text-muted'}`}>
