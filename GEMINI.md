@@ -216,6 +216,13 @@ This project is developed in structured stages to ensure organized progress.
 
 **Goal:** Users can view their own profile (full name, username, etc.) on the dashboard and edit their profile information on a dedicated page.
 
+### 5.3. Feature: Settings Menu (Desktop & Mobile) - Completed
+
+**Goal:** Provide users with easy access to settings and sign-out functionality through a consistent but platform-optimized interface.
+
+- **Desktop:** A floating settings menu is implemented in the sidebar, appearing when the user clicks the "Settings" button. It contains options like "Report a Problem," "Help Center," and "Sign Out."
+- **Mobile:** A dedicated settings page is created at `/settings`. The settings icon in the mobile navbar now links to this page, which offers the same options in a full-screen, mobile-friendly layout.
+
 #### 5.2.1. Frontend (`apps/web`) - Next.js
 
 - [x] Create UI components to display user profile information (full name, username, avatar, etc.) on the `/dashboard` page.
