@@ -329,6 +329,17 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.
 - [ ] Consider WebSocket integration for real-time messaging.
 
+### 5.9. DevOps: Local Development Environment Setup
+
+**Goal:** Streamline the local development workflow by setting up a complete, local Supabase environment using Docker. This will enable rapid testing of backend functions without relying on Vercel preview deployments.
+
+- [ ] **Docker Desktop Configuration:** Document and guide the user through the one-time setup of Docker Desktop, including resource allocation (CPU, Memory) for optimal performance.
+- [ ] **Supabase CLI Integration:**
+    - [ ] Instruct the user to run `supabase start` to initialize the local environment.
+    - [ ] Explain how this command runs all necessary services (Postgres, Auth, Functions) locally within Docker containers.
+- [ ] **VS Code Extension:** Guide the user on how to connect the official Supabase VS Code extension to the running local instance for database management and log streaming.
+- [ ] **Update `README.md`:** Add a new section to the main `README.md` detailing the end-to-end local setup process for future reference.
+
 ## 6. Commit Rules (Semantic Commits)
 
 All commits in this project **must** adhere to the Semantic Commit Messages standards to maintain a clean and readable Git history. Each commit message must follow the format:
