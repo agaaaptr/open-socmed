@@ -12,7 +12,6 @@
 - **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go.
 - **`packages/ui`**: A shared library for React/Tailwind components.
 
-
 ## 2. Technologies Used
 
 ### 2.1. Core Monorepo
@@ -124,9 +123,10 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a timeline. The 'Stories' section has been removed as per user request.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
-  - [ ] **Post Creation UI:** Create a form for users to create new posts.
-  - [ ] **Post List Display:** Display a list of posts from other users.
+  - [x] **Post Creation UI:** Create a form for users to create new posts.
+  - [x] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
+  - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
   - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
@@ -138,7 +138,8 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Profile Followers/Following Display:** Fixed the bug where the followers/following list displayed "API returned unexpected data" when the list was empty. The `fetchFollowData` function in `apps/web/app/profile/[username]/page.tsx` now correctly handles `null` responses from the backend by converting them to an empty array, and the `UserList` component displays a more informative message (e.g., "No followers yet." or "Not following anyone yet.") in such cases.
 - [x] **Search Result Follow Status:** Fixed the issue where the "Follow" button was incorrectly displayed for already followed users in search results. The `searchUsers` function in `apps/web/app/search/page.tsx` now fetches the current user's following list and correctly sets the `is_following` status for each search result. Also addressed a linting warning by adding `currentUserId` and `supabase` to the dependency array of the `searchUsers` useCallback hook.
 - [x] **Search Bar UI Enhancement:** Updated the search bar placeholder to "Search for users by username..." and added a back button with an `ArrowLeft` icon to the left of the search bar, linking back to the `/home` page.
-- [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
+- [x] **Loading State Enhancement:** Implemented a centralized `LoadingState` component with animated spinner and text, replacing previous loading indicators across `home/page.tsx`, `profile/[username]/page.tsx`, `profile/page.tsx`, `search/page.tsx`, `settings/profile/page.tsx`, `components/CreatePost.tsx`, `components/FollowButton.tsx`, and `components/Timeline.tsx` for consistent and professional UI. The `LoadingState` component now supports different loader types (spinner and dots) to accommodate various UI needs. Fixed inconsistent button loading animations by adjusting `LoadingState` styling and button content wrapping to maintain consistent button dimensions during loading states.
+  - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
   - [x] Refactored root `layout.tsx` to be a Server Component and moved client-side logic to a new `ClientLayoutContent.tsx` component to allow metadata export.
@@ -151,9 +152,9 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Username Uniqueness Check API:** Added a new endpoint (`/api/check-username`) to verify if a username is already taken.
   - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
-  - [ ] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
-  - [ ] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
-  - [ ] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
+  - [x] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
+  - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
+  - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.
@@ -180,14 +181,12 @@ This project is developed in structured stages to ensure organized progress.
 - **Responsive Design:** Initial responsive design has been implemented for core pages (Home, Sign In, Sign Up, Profile, Edit Profile). Further refinement and testing across various devices are recommended.
 
 ### 4.4. Frontend (`apps/web`) & Backend (`api/`) - Search Feature Issues (Resolved)
-  - **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
-  - **Resolution:**
-    1.  The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
-    2.  The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
-  - **Current Status:** The search feature and profile routing are now functioning as expected.
 
-
-
+- **Description:** The search feature (`/search`) displayed a loading icon indefinitely, and direct API calls to `/api/search-users` resulted in `404 Not Found` or prolonged requests. The `/profile/arih` endpoint was also returning a 404.
+- **Resolution:**
+    1. The `api/search-users` endpoint was modified to search only by `username` to address the bug where it was searching both `username` and `full_name` with the same query parameter.
+    2. The 404 error for `/profile/arih` was resolved by refactoring the Next.js profile routing. The `apps/web/app/profile/page.tsx` was moved to `apps/web/app/profile/[username]/page.tsx` to enable dynamic routing for individual user profiles. A new `apps/web/app/profile/page.tsx` was created to redirect authenticated users to their specific profile page (e.g., `/profile/your_username`).
+- **Current Status:** The search feature and profile routing are now functioning as expected.
 
 ## 5. Next Steps: Troubleshooting & Development
 
@@ -228,6 +227,7 @@ This project is developed in structured stages to ensure organized progress.
 - [x] Provide feedback to the user after successful or failed updates.
 - [x] Ensure only authenticated users can view and edit their profiles.
 - [x] Use Supabase authentication tokens to secure requests to the backend API.
+- [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
 
 #### 5.2.2. Backend (`api/`) - Go: - COMPLETED
 
@@ -256,46 +256,44 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Click-Outside-to-Close:** Implemented a reusable `useOnClickOutside` hook to allow users to close floating menus (like the new Settings menu and the mobile Suggested Features) by simply clicking outside of them.
 - [x] **Button Consistency:** Standardized the styling of the "Back to Home" button on the profile page to perfectly match the "Back to Profile Detail" button, ensuring visual consistency across related views.
 
-### 5.5. Feature: Post Feed (View & Create)
+### 5.5. Feature: Post Feed (View & Create) - COMPLETED
 
-**Goal:** Users can view a feed of posts from other users and create new posts.
+**Goal:** Enable users to create new posts and display them dynamically on the home timeline.
 
 #### 5.5.1. Frontend (`apps/web`) - Next.js
 
-- [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-- [ ] Fetch post data from the backend API.
-- [ ] Implement pagination or infinite scrolling for the feed.
-- [ ] Create a form for users to compose and submit new posts.
-- [ ] Handle form input and validation.
-- [ ] Send new post data to the backend API.
-- [ ] Implement UI for like/comment buttons (functionality will be added later).
+- [x] **`CreatePost.tsx` Component:** Developed a reusable React component for post creation, including a self-resizing textarea, character counter, and API submission logic. Implemented click-outside-to-close functionality.
+- [x] **Desktop UI:** Implemented a sticky Floating Action Button (FAB) with a `PlusSquare` icon in the bottom-right corner of the desktop view. Clicking it opens a floating modal containing the `CreatePost` component, which is now wider and centered.
+- [x] **Mobile UI:** Integrated a prominent "Add Post" button with a `PlusSquare` icon in the center of the mobile navbar. Clicking it triggers a smooth bottom sheet animation to reveal the `CreatePost` component, which is now wider and fills the bottom of the screen.
+- [x] **Timeline Integration:** Modified `Timeline.tsx` to fetch and display posts from the `/api/posts` endpoint. New posts created via the `CreatePost` component are dynamically added to the timeline.
+- [x] **Mobile Navbar Refactor:** Restructured `MobileNavbar.tsx` to display only essential icons (Home, Search, Add Post, Messages, More). A new `MoreMenu.tsx` component was created to house less frequently used navigation items (Notifications, Profile, Settings), accessible via a "More" icon in the navbar.
 
 #### 5.5.2. Backend (`api/`) - Go
 
-- [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
-- [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
-- [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
-- [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
-- [ ] Implement logic to save new posts to the database.
-- [ ] Validate post content.
-- [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
+- [x] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+- [x] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+- [x] Implement logic to fetch posts from the database, potentially with filtering and pagination.
+- [x] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+- [x] Implement logic to save new posts to the database.
+- [x] Validate post content.
+- [x] Ensure API endpoints are protected and integrate with Supabase authentication.
 
-### 5.6. Feature: Timeline (Main Feed)
+### 5.6. Feature: Timeline (Main Feed) - COMPLETED
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
 #### 5.6.1. Frontend (`apps/web`) - Next.js
 
-- [ ] Integrate post feed display into the main dashboard layout.
-- [ ] Implement a visually appealing and interactive timeline UI.
-- [ ] Consider infinite scrolling or pagination for loading more posts.
-- [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
+- [x] Integrate post feed display into the main dashboard layout.
+- [x] Implement a visually appealing and interactive timeline UI.
+- [x] Consider infinite scrolling or pagination for loading more posts.
+- [x] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
 #### 5.6.2. Backend (`api/`) - Go
 
-- [ ] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-- [ ] Implement logic to aggregate posts based on follow relationships and other criteria.
+- [x] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
+- [x] Implement logic to aggregate posts based on follow relationships and other criteria.
 
 ### 5.7. Feature: Stories
 
@@ -328,6 +326,17 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] Define a GORM model for messages (ID, sender ID, receiver ID, content, timestamp, etc.).
 - [ ] Create API endpoints for sending, receiving, and retrieving messages.
 - [ ] Consider WebSocket integration for real-time messaging.
+
+### 5.9. DevOps: Local Development Environment Setup
+
+**Goal:** Streamline the local development workflow by setting up a complete, local Supabase environment using Docker. This will enable rapid testing of backend functions without relying on Vercel preview deployments.
+
+- [ ] **Docker Desktop Configuration:** Document and guide the user through the one-time setup of Docker Desktop, including resource allocation (CPU, Memory) for optimal performance.
+- [ ] **Supabase CLI Integration:**
+  - [ ] Instruct the user to run `supabase start` to initialize the local environment.
+  - [ ] Explain how this command runs all necessary services (Postgres, Auth, Functions) locally within Docker containers.
+- [ ] **VS Code Extension:** Guide the user on how to connect the official Supabase VS Code extension to the running local instance for database management and log streaming.
+- [ ] **Update `README.md`:** Add a new section to the main `README.md` detailing the end-to-end local setup process for future reference.
 
 ## 6. Commit Rules (Semantic Commits)
 
@@ -665,8 +674,6 @@ To create a new Go serverless API function that is compatible with Vercel and ad
 - **Utilities/Hooks/Libs:**
   - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
   - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
-
-
 
 #### 10.2.3. For Shared UI Components (`packages/ui`)
 

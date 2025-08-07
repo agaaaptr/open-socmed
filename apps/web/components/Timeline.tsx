@@ -2,36 +2,97 @@
 
 import { motion } from 'framer-motion';
 import { UserCircle, Heart, MessageCircle, Share2 } from 'lucide-react';
+import LoadingState from './LoadingState';
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import Image from 'next/image';
 
-const Timeline = () => {
+interface Post {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  user: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url: string;
+  };
+}
+
+interface TimelineProps {
+  posts: Post[];
+  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
+}
+
+const Timeline = ({ posts, setPosts }: TimelineProps) => {
+  const supabase = createClientComponentClient();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          throw new Error('User not authenticated. Please sign in.');
+        }
+
+        const token = session.access_token;
+
+        const response = await fetch('/api/posts', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to fetch posts.');
+        }
+
+        const data: Post[] = await response.json();
+        setPosts(data);
+      } catch (err: any) {
+        console.error('Error fetching posts:', err);
+        setError(err.message || 'Failed to load posts.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, [supabase, setPosts]);
+
   const postVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
-  const posts = [
-    {
-      id: 1,
-      user: 'User Name',
-      username: 'username',
-      time: '2h ago',
-      content: 'This is a placeholder for a social media post. Imagine engaging content, images, and more!',
-    },
-    {
-      id: 2,
-      user: 'Another User',
-      username: 'anotheruser',
-      time: '5h ago',
-      content: 'Excited to share new features soon! #Cirqle #SocialMedia',
-    },
-    {
-      id: 3,
-      user: 'Cirqle Team',
-      username: 'cirqle_official',
-      time: '1d ago',
-      content: 'Welcome to Cirqle! We are building the next generation social media platform.',
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <LoadingState text="Loading posts..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-center text-red-400">Error: {error}</p>;
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
+        <p className="text-lg font-semibold">No posts yet.</p>
+        <p>Be the first to post something!</p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -48,10 +109,14 @@ const Timeline = () => {
             className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
           >
             <div className="flex items-center mb-3">
-              <UserCircle className="w-9 h-9 md:w-10 md:h-10 text-accent-main mr-3 md:mr-4" />
+              {post.user?.avatar_url ? (
+                <Image src={post.user.avatar_url} alt={post.user.full_name} width={40} height={40} className="rounded-full mr-3 md:mr-4" />
+              ) : (
+                <UserCircle className="w-9 h-9 md:w-10 md:h-10 text-accent-main mr-3 md:mr-4" />
+              )}
               <div>
-                <p className="font-semibold text-text-light text-base md:text-lg">{post.user}</p>
-                <p className="text-xs md:text-sm text-text-muted">@{post.username} • {post.time}</p>
+                <p className="font-semibold text-text-light text-base md:text-lg">{post.user?.full_name || 'Unknown User'}</p>
+                <p className="text-xs md:text-sm text-text-muted">@{post.user?.username || 'unknown'} • {new Date(post.created_at).toLocaleString()}</p>
               </div>
             </div>
             <p className="text-text-light text-sm md:text-base leading-relaxed mb-4">{post.content}</p>

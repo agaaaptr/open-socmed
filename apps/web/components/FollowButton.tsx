@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import LoadingState from './LoadingState';
 
 interface FollowButtonProps {
   userIdToFollow: string;
@@ -62,11 +63,11 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
       disabled={isLoading}
       whileHover={{ scale: isLoading ? 1 : 1.05 }}
       whileTap={{ scale: isLoading ? 1 : 0.95 }}
-      className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 ${isFollowing
+      className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 flex items-center justify-center ${isFollowing
           ? 'bg-transparent border border-accent-main text-accent-main'
           : 'bg-accent-main text-text-light'
         } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-      {isLoading ? '...' : (isFollowing ? 'Following' : 'Follow')}
+      {isLoading ? <LoadingState type="dots" /> : <span>{isFollowing ? 'Following' : 'Follow'}</span>}
     </motion.button>
   );
 };

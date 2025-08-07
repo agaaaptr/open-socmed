@@ -2,7 +2,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search as SearchIcon, UserCircle, Loader, ArrowLeft } from 'lucide-react';
+import { Search as SearchIcon, UserCircle, ArrowLeft } from 'lucide-react';
+import LoadingState from '../../components/LoadingState';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -119,7 +120,7 @@ const SearchPage = () => {
         <div className="space-y-4">
           {isLoading && (
             <div className="flex justify-center items-center py-10">
-              <Loader className="w-8 h-8 text-accent-main animate-spin" />
+              <LoadingState text="Searching users..." />
             </div>
           )}
           {error && <p className="text-center text-red-400">{error}</p>}
