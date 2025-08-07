@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Home, Search, MessageSquare, Bell, UserCircle } from 'lucide-react';
+import { Home, Search, MessageSquare, Bell, UserCircle, Settings } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { name: 'Messages', href: '/messages', icon: MessageSquare },
   { name: 'Notifications', href: '/notifications', icon: Bell },
   { name: 'Profile', href: '/profile', icon: UserCircle },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 const MobileNavbar = () => {

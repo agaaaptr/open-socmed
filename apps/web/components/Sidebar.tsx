@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Home, Search, MessageSquare, Bell, UserCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, Search, MessageSquare, Bell, UserCircle, Settings } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
+import SettingsMenu from './SettingsMenu';
 
 const navItems = [
   { name: 'Home', href: '/home', icon: Home },
@@ -18,6 +19,7 @@ const Sidebar = () => {
   const router = useRouter();
   const supabase = createClientComponentClient();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
+  const [isSettingsMenuOpen, setSettingsMenuOpen] = useState(false);
 
   useEffect(() => {
     async function fetchUserProfile() {
@@ -90,18 +92,36 @@ const Sidebar = () => {
           </motion.li>
         ))}
       </ul>
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="mt-auto pt-6 border-t border-border-subtle flex items-center text-text-light"
-      >
-        <UserCircle className="w-10 h-10 mr-3 text-accent-main" />
-        <div>
-          <p className="font-semibold text-text-light">{userProfile?.full_name || 'Current User'}</p>
-          <p className="text-sm text-text-muted">@{userProfile?.username || 'username'}</p>
-        </div>
-      </motion.div>
+      <div className="mt-auto space-y-4">
+        <motion.div
+          whileHover={{ scale: 1.02, x: 5 }}
+          whileTap={{ scale: 0.98 }}
+          className="relative"
+        >
+          <button
+            onClick={() => setSettingsMenuOpen(!isSettingsMenuOpen)}
+            className="w-full flex items-center p-3 rounded-xl text-text-light hover:bg-background-medium/50 hover:text-accent-main transition-all duration-300 ease-in-out"
+          >
+            <Settings className="w-6 h-6 mr-4" />
+            <span className="text-lg font-semibold">Settings</span>
+          </button>
+        </motion.div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="pt-4 border-t border-border-subtle flex items-center text-text-light"
+        >
+          <UserCircle className="w-10 h-10 mr-3 text-accent-main" />
+          <div>
+            <p className="font-semibold text-text-light">{userProfile?.full_name || 'Current User'}</p>
+            <p className="text-sm text-text-muted">@{userProfile?.username || 'username'}</p>
+          </div>
+        </motion.div>
+      </div>
+      <AnimatePresence>
+        {isSettingsMenuOpen && <SettingsMenu onClose={() => setSettingsMenuOpen(false)} />}
+      </AnimatePresence>
     </motion.nav>
   );
 };

@@ -68,9 +68,10 @@ const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoad
 export default function ProfileViewPage({ params }: { params: { username: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
-  const [profile, setProfile] = useState<(User & { email: string }) | null>(null);
+  const [profile, setProfile] = useState<(User & { email?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
   const [tabData, setTabData] = useState<{ [key: string]: { data: User[], isLoading: boolean, error: string | null } }> ({
       followers: { data: [], isLoading: true, error: null },
@@ -80,7 +81,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
   const fetchFollowData = useCallback(async (type: 'followers' | 'following', userId: string) => {
     setTabData(prev => {
       if (prev[type].data.length > 0 && !prev[type].isLoading && !prev[type].error) {
-        return prev; 
+        return prev;
       }
       return { ...prev, [type]: { ...prev[type], isLoading: true, error: null } };
     });
@@ -91,7 +92,6 @@ export default function ProfileViewPage({ params }: { params: { username: string
         throw new Error(`Failed to fetch ${type}`);
       }
       const data = await response.json();
-      // If data is null, treat it as an empty array
       const processedData = data === null ? [] : data;
 
       if (!Array.isArray(processedData)) {
@@ -109,25 +109,16 @@ export default function ProfileViewPage({ params }: { params: { username: string
       setError('');
       const { data: { user } } = await supabase.auth.getUser();
 
-      let targetUsername = params.username;
-
-      if (!targetUsername) {
-        // If no username in URL, try to get authenticated user
-        if (!user) {
-          router.push('/auth/signin');
-          return;
-        }
+      if (!params.username && !user) {
+        router.push('/auth/signin');
+        return;
       }
 
       try {
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        let apiUrl = '/api/profile';
-        if (params.username) {
-          apiUrl += `?username=${params.username}`;
-        }
-
+        const apiUrl = `/api/profile?username=${params.username || ''}`;
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -140,11 +131,12 @@ export default function ProfileViewPage({ params }: { params: { username: string
 
         const data = await response.json();
         
-        // Only set email if the fetched profile is the authenticated user's profile
         if (user && data.id === user.id) {
           setProfile({ ...data, email: user.email });
+          setIsOwnProfile(true);
         } else {
           setProfile(data);
+          setIsOwnProfile(false);
         }
         
         fetchFollowData('followers', data.id);
@@ -194,7 +186,17 @@ export default function ProfileViewPage({ params }: { params: { username: string
   return (
     <div className="min-h-screen w-full bg-background-dark text-text-light">
       <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="bg-background-light p-6 rounded-2xl shadow-lg">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.5 }} 
+          className="relative bg-background-light p-6 rounded-2xl shadow-lg"
+        >
+          <Link href="/home" className="absolute top-4 right-4 flex items-center text-text-light hover:text-accent-main transition-colors duration-300 p-2 rounded-lg text-sm">
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
+          </Link>
           <div className="flex flex-col sm:flex-row items-center sm:space-x-6">
             <UserCircle className="w-24 h-24 sm:w-28 sm:h-28 text-accent-main flex-shrink-0" />
             <div className="text-center sm:text-left mt-4 sm:mt-0">
@@ -216,18 +218,16 @@ export default function ProfileViewPage({ params }: { params: { username: string
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
-            <Link href="/settings/profile" className="flex-1 text-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
-              <Edit className="mr-2 h-5 w-5" /> Edit Profile
-            </Link>
-            <button onClick={handleSignOut} className="flex-1 text-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
-              <LogOut className="mr-2 h-5 w-5" /> Sign Out
-            </button>
-          </div>
-           <Link href="/home" className="flex items-center justify-center mt-4 text-sm text-accent-main hover:underline">
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Back to Home
-            </Link>
+          {isOwnProfile && (
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
+              <Link href="/settings/profile" className="flex-1 text-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                <Edit className="mr-2 h-5 w-5" /> Edit Profile
+              </Link>
+              <button onClick={handleSignOut} className="flex-1 text-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                <LogOut className="mr-2 h-5 w-5" /> Sign Out
+              </button>
+            </div>
+          )}
         </motion.div>
 
         <div className="mt-8">

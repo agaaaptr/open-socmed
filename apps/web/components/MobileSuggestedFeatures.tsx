@@ -1,14 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, X } from 'lucide-react';
 import SuggestedFeatures from './SuggestedFeatures';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
 export default function MobileSuggestedFeatures() {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleOpen = () => setIsOpen(!isOpen);
+  const closeMenu = () => setIsOpen(false);
+
+  useOnClickOutside(menuRef, closeMenu);
 
   const menuVariants = {
     hidden: {
@@ -26,7 +31,7 @@ export default function MobileSuggestedFeatures() {
   };
 
   return (
-    <div className="fixed bottom-20 left-4 z-50 lg:hidden">
+    <div ref={menuRef} className="fixed bottom-20 left-4 z-50 lg:hidden">
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
