@@ -1,21 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Home, Search, MessageSquare, Bell, UserCircle, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, Search, MessageSquare, PlusCircle, MoreHorizontal } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import MoreMenu from './MoreMenu';
 
-const navItems = [
-  { name: 'Home', href: '/home', icon: Home },
-  { name: 'Search', href: '/search', icon: Search },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Notifications', href: '/notifications', icon: Bell },
-  { name: 'Profile', href: '/profile', icon: UserCircle },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
+interface MobileNavbarProps {
+  onOpenCreatePost: () => void;
+}
 
-const MobileNavbar = () => {
+const MobileNavbar = ({ onOpenCreatePost }: MobileNavbarProps) => {
   const pathname = usePathname();
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+
+  const mainNavItems = [
+    { name: 'Home', href: '/home', icon: Home },
+    { name: 'Search', href: '/search', icon: Search },
+    { name: 'Messages', href: '/messages', icon: MessageSquare },
+  ];
 
   return (
     <motion.nav
@@ -24,11 +28,36 @@ const MobileNavbar = () => {
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="fixed bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-lg border-t border-border-subtle p-3 flex justify-around items-center shadow-lg z-50 md:hidden"
     >
-      {navItems.map((item) => (
+      {mainNavItems.map((item) => (
         <Link key={item.name} href={item.href} className="flex flex-col items-center text-text-light hover:text-accent-main transition-colors duration-300">
           <item.icon className={`w-6 h-6 ${pathname === item.href ? 'text-accent-main' : 'text-text-muted'}`} />
         </Link>
       ))}
+
+      {/* Central Post Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={onOpenCreatePost}
+        className="p-3 rounded-full bg-accent-main text-text-light shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark -mt-6"
+      >
+        <PlusCircle size={28} />
+      </motion.button>
+
+      {/* More Menu Toggle */}
+      <div className="relative">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+          className="p-3 rounded-full text-text-light hover:text-accent-main transition-colors duration-300"
+        >
+          <MoreHorizontal size={24} />
+        </motion.button>
+        <AnimatePresence>
+          {isMoreMenuOpen && <MoreMenu onClose={() => setIsMoreMenuOpen(false)} />}
+        </AnimatePresence>
+      </div>
     </motion.nav>
   );
 };

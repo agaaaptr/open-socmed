@@ -124,8 +124,8 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Home as Main Page:** Redesigned the home page to be the main social media feed, incorporating a timeline. The 'Stories' section has been removed as per user request.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
-  - [ ] **Post Creation UI:** Create a form for users to create new posts.
-  - [ ] **Post List Display:** Display a list of posts from other users.
+  - [x] **Post Creation UI:** Create a form for users to create new posts.
+  - [x] **Post List Display:** Display a list of posts from other users.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
   - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
@@ -256,40 +256,40 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Click-Outside-to-Close:** Implemented a reusable `useOnClickOutside` hook to allow users to close floating menus (like the new Settings menu and the mobile Suggested Features) by simply clicking outside of them.
 - [x] **Button Consistency:** Standardized the styling of the "Back to Home" button on the profile page to perfectly match the "Back to Profile Detail" button, ensuring visual consistency across related views.
 
-### 5.5. Feature: Post Feed (View & Create)
+### 5.5. Feature: Post Feed (View & Create) - COMPLETED
 
 **Goal:** Users can view a feed of posts from other users and create new posts.
 
 #### 5.5.1. Frontend (`apps/web`) - Next.js
 
-- [ ] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
-- [ ] Fetch post data from the backend API.
-- [ ] Implement pagination or infinite scrolling for the feed.
-- [ ] Create a form for users to compose and submit new posts.
-- [ ] Handle form input and validation.
-- [ ] Send new post data to the backend API.
+- [x] Create UI components to display a list of posts (content, author, timestamp, likes, comments count).
+- [x] Fetch post data from the backend API.
+- [x] Implement pagination or infinite scrolling for the feed.
+- [x] Create a form for users to compose and submit new posts.
+- [x] Handle form input and validation.
+- [x] Send new post data to the backend API.
 - [ ] Implement UI for like/comment buttons (functionality will be added later).
 
 #### 5.5.2. Backend (`api/`) - Go
 
-- [ ] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
-- [ ] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
-- [ ] Implement logic to fetch posts from the database, potentially with filtering and pagination.
-- [ ] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
-- [ ] Implement logic to save new posts to the database.
-- [ ] Validate post content.
-- [ ] Ensure API endpoints are protected and integrate with Supabase authentication.
+- [x] Define a GORM model for posts (ID, content, author ID, timestamp, etc.).
+- [x] Create an API endpoint (`GET /api/posts`) to retrieve a list of posts.
+- [x] Implement logic to fetch posts from the database, potentially with filtering and pagination.
+- [x] Create an API endpoint (`POST /api/posts`) to allow authenticated users to create new posts.
+- [x] Implement logic to save new posts to the database.
+- [x] Validate post content.
+- [x] Ensure API endpoints are protected and integrate with Supabase authentication.
 
-### 5.6. Feature: Timeline (Main Feed)
+### 5.6. Feature: Timeline (Main Feed) - COMPLETED
 
 **Goal:** The home page will serve as the main timeline, displaying a consolidated feed of posts from followed users and relevant content.
 
 #### 5.6.1. Frontend (`apps/web`) - Next.js
 
-- [ ] Integrate post feed display into the main dashboard layout.
-- [ ] Implement a visually appealing and interactive timeline UI.
-- [ ] Consider infinite scrolling or pagination for loading more posts.
-- [ ] Fetch and display posts from various sources (e.g., followed users, trending topics).
+- [x] Integrate post feed display into the main dashboard layout.
+- [x] Implement a visually appealing and interactive timeline UI.
+- [x] Consider infinite scrolling or pagination for loading more posts.
+- [x] Fetch and display posts from various sources (e.g., followed users, trending topics).
 - [ ] Ensure like, comment, and share buttons are integrated (UI only for now).
 
 #### 5.6.2. Backend (`api/`) - Go
