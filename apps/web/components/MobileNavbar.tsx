@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Search, MessageSquare, PlusSquare, MoreHorizontal } from 'lucide-react';
+import { Home, Search, MessageSquare, PlusSquare, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import MoreMenu from './MoreMenu';
@@ -42,9 +42,9 @@ const MobileNavbar = ({ onOpenCreatePost }: MobileNavbarProps) => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={onOpenCreatePost}
-        className="p-3 rounded-full bg-accent-main text-text-light shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark -mt-6"
+        className="p-4 rounded-full bg-accent-main text-text-light shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark -mt-8"
       >
-        <PlusSquare size={28} />
+        <PlusSquare size={32} />
       </motion.button>
 
       {navItemsRight.map((item) => (
@@ -61,7 +61,7 @@ const MobileNavbar = ({ onOpenCreatePost }: MobileNavbarProps) => {
           onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
           className="p-3 rounded-full text-text-light hover:text-accent-main transition-colors duration-300"
         >
-          <MoreHorizontal size={24} />
+          <Menu size={24} />
         </motion.button>
         <AnimatePresence>
           {isMoreMenuOpen && <MoreMenu onClose={() => setIsMoreMenuOpen(false)} />}

@@ -9,9 +9,10 @@ import { useOnClickOutside } from '../hooks/useOnClickOutside';
 interface CreatePostProps {
   onPostCreated: (newPost: any) => void; // Callback to update the timeline
   onClose: () => void; // Callback to close the modal/bottom sheet
+  isMobile?: boolean; // New prop to determine if it's mobile view
 }
 
-export default function CreatePost({ onPostCreated, onClose }: CreatePostProps) {
+export default function CreatePost({ onPostCreated, onClose, isMobile }: CreatePostProps) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -90,7 +91,7 @@ export default function CreatePost({ onPostCreated, onClose }: CreatePostProps) 
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="What's on your mind?"
-        rows={3}
+        rows={isMobile ? 5 : 10} // Conditional rows
         maxLength={MAX_CHARS}
         className="w-full p-3 bg-background-medium rounded-lg border border-border-subtle text-text-light placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-main resize-none overflow-hidden"
       />

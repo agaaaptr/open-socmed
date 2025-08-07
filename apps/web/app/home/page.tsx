@@ -94,9 +94,9 @@ export default function HomePage() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsCreatePostOpen(true)}
-            className="hidden md:flex fixed bottom-8 right-8 p-4 rounded-full bg-accent-main text-text-light shadow-lg z-40 focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark"
+            className="hidden md:flex fixed bottom-8 right-8 p-5 rounded-xl bg-accent-main text-text-light shadow-lg z-40 focus:outline-none focus:ring-2 focus:ring-accent-main focus:ring-offset-2 focus:ring-offset-background-dark"
           >
-            <PlusSquare size={28} />
+            <PlusSquare size={32} />
           </motion.button>
 
           {/* Create Post Modal/Bottom Sheet */}
@@ -108,7 +108,7 @@ export default function HomePage() {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
               >
-                <CreatePost onPostCreated={handlePostCreated} onClose={() => setIsCreatePostOpen(false)} />
+                <CreatePost onPostCreated={handlePostCreated} onClose={() => setIsCreatePostOpen(false)} isMobile={false} />
               </motion.div>
             )}
           </AnimatePresence>

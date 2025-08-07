@@ -41,7 +41,7 @@ export default function ClientLayoutContent({
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed inset-x-0 bottom-0 bg-background-dark/90 backdrop-blur-lg p-4 rounded-t-2xl shadow-lg z-50 md:hidden"
           >
-            <CreatePost onPostCreated={handlePostCreated} onClose={() => setIsCreatePostOpen(false)} />
+            <CreatePost onPostCreated={handlePostCreated} onClose={() => setIsCreatePostOpen(false)} isMobile={true} />
           </motion.div>
         )}
       </AnimatePresence>
