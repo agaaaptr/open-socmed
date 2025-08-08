@@ -105,7 +105,7 @@ export default function EditPostModal({ isOpen, post, onPostUpdated, onClose }: 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="relative bg-bg-light p-6 rounded-2xl shadow-2xl border border-border-medium w-full max-w-xl md:max-w-2xl mx-auto"
+            className="relative bg-background-light p-6 rounded-2xl shadow-2xl border border-border-medium w-full max-w-xl md:max-w-2xl mx-auto"
           >
             <h2 className="text-2xl font-bold text-text-light mb-4">Edit Post</h2>
             {error && <p className="text-red-400 text-sm mb-4">{error}</p>}

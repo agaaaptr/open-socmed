@@ -147,7 +147,8 @@ func getTimeline(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 	var posts []Post
 	// Fetch posts from users that the current user is following AND the user's own posts
-	if err := db.Preload("User").
+	if err := db.Distinct("posts.*, posts.created_at").
+		Preload("User").
 		Joins("LEFT JOIN follows ON posts.user_id = follows.following_id"). // Use LEFT JOIN to include user's own posts even if they don't follow anyone
 		Where("follows.follower_id = ? OR posts.user_id = ?", userID, userID). // Include posts from followed users OR user's own posts
 		Order("posts.created_at DESC").

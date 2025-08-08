@@ -53,7 +53,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             exit="hidden"
             variants={modalVariants}
             transition={{ duration: 0.3, ease: 'easeInOut', delay: 0.1 }}
-            className="bg-bg-light rounded-2xl shadow-2xl w-full max-w-md p-8 relative"
+            className="bg-background-light rounded-2xl shadow-2xl w-full max-w-md p-8 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center">
