@@ -137,7 +137,9 @@ export default function HomePage() {
       <PullToRefresh />
       <div className="w-full p-4 md:p-8">
         {loading ? (
-          <LoadingState text="Loading your home feed..." />
+          <div className="min-h-screen flex items-center justify-center">
+            <LoadingState text="Loading your home feed..." />
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-screen-xl mx-auto">
             <div className="lg:col-span-2 flex flex-col space-y-6 md:space-y-8 relative">
