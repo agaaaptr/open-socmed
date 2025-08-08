@@ -18,9 +18,10 @@ export default function ClientLayoutContent({
   const isAuthPage = pathname.startsWith('/auth');
   const isLandingPage = pathname === '/';
   const isProfilePage = pathname.startsWith('/profile');
+  const isEditProfilePage = pathname.startsWith('/settings/profile');
 
   const showMobileNav = pathname === '/home' || pathname === '/search' || pathname === '/messages';
-  const showSidebar = !isAuthPage && !isLandingPage && !isProfilePage;
+  const showSidebar = !isAuthPage && !isLandingPage && !isProfilePage && !isEditProfilePage;
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handlePostCreated = (newPost: any) => {
