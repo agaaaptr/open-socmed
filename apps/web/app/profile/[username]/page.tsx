@@ -147,7 +147,7 @@ const PostList = ({ posts, isLoading, error }: { posts: Post[], isLoading: boole
 export default function ProfileViewPage({ params }: { params: { username: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
-  const [profile, setProfile] = useState<(User & { email?: string }) | null>(null);
+  const [profile, setProfile] = useState<(User & { email?: string; posts?: Post[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isOwnProfile, setIsOwnProfile] = useState(false);
@@ -277,9 +277,9 @@ export default function ProfileViewPage({ params }: { params: { username: string
       if((tab === 'followers' || tab === 'following') && profile) {
           fetchFollowData(tab, profile.id)
       } else if (tab === 'posts' && profile) {
-          fetchPostsData(profile.id);
+          setTabData(prev => ({ ...prev, posts: { data: profile.posts || [], isLoading: false, error: null } }));
       }
-  }
+  };
 
   if (loading) {
     return (
