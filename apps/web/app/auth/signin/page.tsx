@@ -16,6 +16,14 @@ const AccentSubmitButton = ({ children, className = '' }) => (
     </button>
   );
 
+const passwordCriteria = [
+  { id: 'length', text: 'Password must be at least 6 characters long.', regex: /.{6,}/ },
+  { id: 'uppercase', text: 'Password must contain at least one uppercase letter.', regex: /[A-Z]/ },
+  { id: 'lowercase', text: 'Password must contain at least one lowercase letter.', regex: /[a-z]/ },
+  { id: 'number', text: 'Password must contain at least one number.', regex: /[0-9]/ },
+  { id: 'specialChar', text: 'Password must contain at least one special character.', regex: /[^A-Za-z0-9]/ },
+];
+
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,24 +46,14 @@ export default function SignInPage() {
 
   const validatePassword = (password: string) => {
     let errors: string[] = [];
-    if (password.length < 6) {
-      errors.push('Password must be at least 6 characters long.');
-    }
-    if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain at least one uppercase letter.');
-    }
-    if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain at least one lowercase letter.');
-    }
-    if (!/[0-9]/.test(password)) {
-      errors.push('Password must contain at least one number.');
-    }
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      errors.push('Password must contain at least one special character.');
-    }
+    passwordCriteria.forEach(criterion => {
+      if (!criterion.regex.test(password)) {
+        errors.push(criterion.text);
+      }
+    });
 
     if (errors.length > 0) {
-      setPasswordError(errors.join(' '));
+      setPasswordError(errors.join(' ')); // Still join for a general error message
       return false;
     }
     setPasswordError(null);
@@ -148,10 +146,13 @@ export default function SignInPage() {
               required
               className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
             />
-            <p className="text-text-muted text-xs mt-1">
-              Password must be at least 6 characters, include uppercase, lowercase, number, and special character.
-            </p>
-            {passwordError && <p className="text-red-400 text-xs mt-1">{passwordError}</p>}
+            {passwordError && (
+              <ul className="text-red-400 text-xs mt-1 space-y-1">
+                {passwordError.split(' ').map((errorItem, index) => (
+                  <li key={index}>{errorItem}</li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <AccentSubmitButton>

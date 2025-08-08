@@ -65,11 +65,8 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
       className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
     >
       <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
         className="text-4xl font-extrabold text-text-light mb-10 tracking-tight cursor-pointer"
-        onClick={() => router.refresh()}
+        onClick={() => router.push('/home')}
       >
         Cirqle
       </motion.div>
@@ -110,10 +107,7 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
             <span className="text-lg font-semibold">Settings</span>
           </button>
         </motion.div>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+        <div
           className="pt-4 border-t border-border-subtle flex items-center text-text-light"
         >
           <UserCircle className="w-10 h-10 mr-3 text-accent-main" />
@@ -121,7 +115,7 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
             <p className="font-semibold text-text-light">{userProfile?.full_name || 'Current User'}</p>
             <p className="text-sm text-text-muted">@{userProfile?.username || 'username'}</p>
           </div>
-        </motion.div>
+        </div>
       </div>
       <AnimatePresence>
         {isSettingsMenuOpen && <SettingsMenu onClose={() => setSettingsMenuOpen(false)} />}
