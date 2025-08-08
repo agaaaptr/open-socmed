@@ -236,12 +236,12 @@ export default function MyProfilePage() {
           following: { data: followingData === null ? [] : followingData, isLoading: false, error: null },
           posts: { data: (profileData.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
         });
+        setLoading(false); // Set loading to false here
 
       } catch (err: any) {
         console.error('Error fetching my profile:', err);
         setError(err.message || 'Failed to load your profile.');
-      } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false here on error
       }
     }
 

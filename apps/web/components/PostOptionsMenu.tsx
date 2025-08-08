@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { MoreHorizontal, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
@@ -25,9 +25,9 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
   };
 
   return (
-    <div className="relative" ref={menuRef}>
-      <button onClick={() => setIsOpen(!isOpen)} className="p-0.5 rounded-full hover:bg-accent-subtle transition-colors">
-        <MoreHorizontal size={20} />
+    <div className="absolute top-0 right-0" ref={menuRef}>
+      <button onClick={() => setIsOpen(!isOpen)} className="p-0 rounded-full hover:bg-accent-subtle transition-colors">
+        <MoreVertical size={20} />
       </button>
 
       <AnimatePresence>

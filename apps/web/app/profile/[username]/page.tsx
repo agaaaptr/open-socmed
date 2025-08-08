@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserCircle, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { UserCircle, LogOut, Edit, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
 import LoadingState from '../../../components/LoadingState';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -91,6 +91,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // State for current user ID
+  const [isOwnProfile, setIsOwnProfile] = useState(false); // Added back isOwnProfile
 
   // State for modals
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -226,8 +227,14 @@ export default function ProfileViewPage({ params }: { params: { username: string
 
         const data = await response.json();
         
-        // No longer setting isOwnProfile here, as this page is for viewing other users' profiles
-        setProfile(data);
+        // Re-introducing isOwnProfile logic
+        if (currentUser && data.id === currentUser.id) {
+          setProfile({ ...data, email: currentUser.email });
+          setIsOwnProfile(true);
+        } else {
+          setProfile(data);
+          setIsOwnProfile(false);
+        }
         
         const [followersResponse, followingResponse] = await Promise.all([
           fetch(`/api/followers?user_id=${data.id}`),
@@ -276,6 +283,11 @@ export default function ProfileViewPage({ params }: { params: { username: string
     );
   }
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
     <>
       <div className="min-h-screen w-full bg-background-dark text-text-light">
@@ -312,6 +324,16 @@ export default function ProfileViewPage({ params }: { params: { username: string
                 </div>
               </div>
             </div>
+            {isOwnProfile && ( // Conditional rendering based on isOwnProfile
+              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
+                <Link href="/settings/profile" className="flex-1 text-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                  <Edit className="mr-2 h-5 w-5" /> Edit Profile
+                </Link>
+                <button onClick={handleSignOut} className="flex-1 text-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                  <LogOut className="mr-2 h-5 w-5" /> Sign Out
+                </button>
+              </div>
+            )}
           </motion.div>
 
           <div className="mt-8">
