@@ -124,7 +124,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [x] **Post Creation UI:** Create a form for users to create new posts.
-  - [x] **Post List Display:** Display a list of posts from other users, now fetching from `/api/timeline`.
+  - [x] **Post List Display:** Display a list of posts from other users, now fetching from `/api/timeline`. Updated empty state message to encourage following or posting.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
@@ -294,7 +294,7 @@ This project is developed in structured stages to ensure organized progress.
 #### 5.6.2. Backend (`api/`) - Go
 
 - [x] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-- [x] Implement logic to aggregate posts based on follow relationships and other criteria.
+- [x] Implement logic to aggregate posts based on follow relationships and user's own posts.
 
 ### 5.7. Feature: Stories
 

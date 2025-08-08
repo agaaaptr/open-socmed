@@ -146,10 +146,10 @@ func getTimeline(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 	var posts []Post
-	// Fetch posts from users that the current user is following
+	// Fetch posts from users that the current user is following AND the user's own posts
 	if err := db.Preload("User").
-		Joins("JOIN follows ON posts.user_id = follows.following_id").
-		Where("follows.follower_id = ?", userID).
+		Joins("LEFT JOIN follows ON posts.user_id = follows.following_id"). // Use LEFT JOIN to include user's own posts even if they don't follow anyone
+		Where("follows.follower_id = ? OR posts.user_id = ?", userID, userID). // Include posts from followed users OR user's own posts
 		Order("posts.created_at DESC").
 		Find(&posts).Error; err != nil {
 		log.Printf("Error fetching timeline: %v", err)

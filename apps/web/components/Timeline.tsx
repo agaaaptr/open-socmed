@@ -89,7 +89,7 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
     return (
       <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
         <p className="text-lg font-semibold">No posts yet.</p>
-        <p>Be the first to post something!</p>
+        <p>Follow other users to see their posts, or create your own!</p>
       </div>
     );
   }
