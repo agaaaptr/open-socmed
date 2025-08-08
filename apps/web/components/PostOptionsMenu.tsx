@@ -38,7 +38,7 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
             exit="hidden"
             variants={menuVariants}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="absolute top-full right-0 mt-2 w-48 bg-bg-light rounded-lg shadow-lg z-10 overflow-hidden"
+            className="absolute top-full right-0 mt-2 w-48 bg-bg-light border border-border-medium rounded-lg shadow-lg z-10 overflow-hidden"
           >
             <ul className="text-sm">
               {isOwner ? (

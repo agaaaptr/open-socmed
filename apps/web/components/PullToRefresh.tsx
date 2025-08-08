@@ -5,11 +5,9 @@ import { motion, useAnimation } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-interface PullToRefreshProps {
-  children: React.ReactNode;
-}
+interface PullToRefreshProps {}
 
-const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
+const PullToRefresh: React.FC<PullToRefreshProps> = () => {
   const router = useRouter();
   const controls = useAnimation();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -98,30 +96,27 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
   }, [onTouchStart, onTouchMove, onTouchEnd]); // Dependencies for useCallback functions
 
   return (
-    <motion.div className="relative h-full"> {/* Removed ref={containerRef} and overflow-y-auto from here */}
-      <motion.div
-        animate={controls}
-        className="relative"
-        style={{ willChange: 'transform' }}
-      >
-        {isRefreshing || pullDistance > 0 ? (
+    <motion.div
+      animate={controls}
+      className="absolute top-0 left-0 right-0 flex justify-center items-center z-10 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-3xl pointer-events-none"
+      style={{ height: pullDistance, willChange: 'transform' }}
+    >
+      {isRefreshing || pullDistance > 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="flex justify-center items-center"
+        >
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: pullDistance > 0 ? pullDistance : REFRESH_THRESHOLD / 2, opacity: pullDistance > 0 ? 1 : 0 }}
-            exit={{ height: 0, opacity: 0, transition: { duration: 0.3, ease: "easeOut" } }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute top-0 left-0 right-0 flex justify-center items-center z-10 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-3xl"
+            animate={{ rotate: isRefreshing ? 360 : pullDistance * 2 }}
+            transition={{ duration: isRefreshing ? 0.5 : 0.1, ease: "linear", repeat: isRefreshing ? Infinity : 0 }}
           >
-            <motion.div
-              animate={{ rotate: isRefreshing ? 360 : pullDistance * 2 }}
-              transition={{ duration: isRefreshing ? 0.5 : 0.1, ease: "linear", repeat: isRefreshing ? Infinity : 0 }}
-            >
-              <RefreshCw className="text-accent-main" size={24} />
-            </motion.div>
+            <RefreshCw className="text-accent-main" size={24} />
           </motion.div>
-        ) : null}
-        {children}
-      </motion.div>
+        </motion.div>
+      ) : null}
     </motion.div>
   );
 };

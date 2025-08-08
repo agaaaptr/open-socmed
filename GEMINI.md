@@ -146,6 +146,11 @@ This project is developed in structured stages to ensure organized progress.
     - [x] Implemented a full edit workflow with a new `EditPostModal.tsx`, allowing users to update their post content.
     - [x] Integrated `react-hot-toast` for sleek, modern, and animated toast notifications for all post actions (create, update, delete).
     - [x] Enhanced the backend Post API (`api/posts`) to support `PUT` requests for editing posts securely.
+  - [x] **UI & State Refactor:**
+    - [x] Fixed transparent backgrounds on floating menus and modals for better readability.
+    - [x] Corrected modal positioning by refactoring the `PullToRefresh` component to prevent it from breaking the CSS `position: fixed` context.
+    - [x] Resolved a critical bug causing post duplication on edit by centralizing all post-related state management into `home/page.tsx`.
+    - [x] Refactored `Timeline.tsx` into a pure presentational component.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).

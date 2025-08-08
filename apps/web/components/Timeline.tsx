@@ -27,109 +27,26 @@ interface Post {
 
 interface TimelineProps {
   posts: Post[];
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
+  currentUserId: string | null;
+  onUpdatePost: (updatedPost: Post) => void;
+  onDeletePost: (post: Post) => void;
+  onReportPost: () => void;
 }
 
-const Timeline = ({ posts, setPosts }: TimelineProps) => {
-  const supabase = createClientComponentClient();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+const Timeline = ({ posts, currentUserId, onUpdatePost, onDeletePost, onReportPost }: TimelineProps) => {
+  // All state and data fetching logic is moved to the parent (home/page.tsx)
+  // This component is now only responsible for rendering the UI.
 
-  // State for modals
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    async function fetchInitialData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          // No need to throw error, just won't fetch posts
-          setCurrentUserId(null);
-          setPosts([]);
-          return;
-        }
-        setCurrentUserId(session.user.id);
-
-        const token = session.access_token;
-        const response = await fetch('/api/timeline', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch posts.');
-        }
-
-        const data: Post[] = await response.json();
-        setPosts(data || []); // Handle null response
-      } catch (err: any) {
-        console.error('Error fetching posts:', err);
-        setError(err.message || 'Failed to load posts.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchInitialData();
-  }, [supabase, setPosts]);
-
-  const openDeleteModal = (post: Post) => {
-    setSelectedPost(post);
-    setDeleteModalOpen(true);
-  };
 
   const openEditModal = (post: Post) => {
     setSelectedPost(post);
     setEditModalOpen(true);
   };
 
-  const handleReport = () => {
-    // Navigate to a dedicated report page or show a report modal
-    router.push('/settings'); // Example: navigating to settings page
-    toast.success('You will be redirected to report a problem.');
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!selectedPost) return;
-
-    setIsSubmitting(true);
-    const loadingToast = toast.loading('Deleting post...');
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('User not authenticated.');
-
-      const response = await fetch(`/api/posts?id=${selectedPost.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete post.');
-      }
-
-      setPosts(prev => prev.filter(p => p.id !== selectedPost.id));
-      toast.success('Post deleted successfully!', { id: loadingToast });
-      setDeleteModalOpen(false);
-      setSelectedPost(null);
-    } catch (err: any) {
-      console.error('Error deleting post:', err);
-      toast.error(err.message || 'Failed to delete post.', { id: loadingToast });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handlePostUpdated = (updatedPost: Post) => {
-    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+    onUpdatePost(updatedPost);
     toast.success('Post updated successfully!');
   };
 
@@ -138,13 +55,7 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
-  if (loading) {
-    return <LoadingState text="Loading timeline..." />;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-400 py-10">Error: {error}</p>;
-  }
+  
 
   return (
     <>
@@ -182,8 +93,8 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
                   <PostOptionsMenu
                     isOwner={currentUserId === post.user_id}
                     onEdit={() => openEditModal(post)}
-                    onDelete={() => openDeleteModal(post)}
-                    onReport={handleReport}
+                    onDelete={() => onDeletePost(post)}
+                    onReport={onReportPost}
                   />
                 </div>
                 <p className="text-text-light text-sm md:text-base leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
@@ -216,16 +127,6 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
           onPostUpdated={handlePostUpdated}
         />
       )}
-
-      <ConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Post"
-        description="Are you sure you want to permanently delete this post? This action cannot be undone."
-        confirmText="Yes, Delete"
-        isLoading={isSubmitting}
-      />
     </>
   );
 };
