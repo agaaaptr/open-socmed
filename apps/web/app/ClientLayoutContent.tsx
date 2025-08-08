@@ -37,7 +37,7 @@ export default function ClientLayoutContent({
       // Delay the redirect slightly to allow modal closing animation and toast to be seen
       setTimeout(() => {
         router.push('/home');
-      }, 500); // Adjust delay as needed (e.g., toast duration + modal close animation)
+      }, 2000); // Adjust delay as needed (e.g., toast duration + modal close animation)
     }
   };
 
