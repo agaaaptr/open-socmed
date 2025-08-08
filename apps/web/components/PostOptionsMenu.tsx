@@ -26,7 +26,7 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
 
   return (
     <div className="absolute top-0 right-0" ref={menuRef}>
-      <button onClick={() => setIsOpen(!isOpen)} className="p-0 rounded-full hover:bg-accent-subtle transition-colors">
+      <button onClick={() => setIsOpen(!isOpen)} className="p-0 rounded-full hover:bg-accent-subtle transition-colors mt-1 mr-1">
         <MoreVertical size={20} />
       </button>
 
