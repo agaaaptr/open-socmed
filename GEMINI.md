@@ -139,6 +139,13 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Search Result Follow Status:** Fixed the issue where the "Follow" button was incorrectly displayed for already followed users in search results. The `searchUsers` function in `apps/web/app/search/page.tsx` now fetches the current user's following list and correctly sets the `is_following` status for each search result. Also addressed a linting warning by adding `currentUserId` and `supabase` to the dependency array of the `searchUsers` useCallback hook.
 - [x] **Search Bar UI Enhancement:** Updated the search bar placeholder to "Search for users by username..." and added a back button with an `ArrowLeft` icon to the left of the search bar, linking back to the `/home` page.
 - [x] **Loading State Enhancement:** Implemented a centralized `LoadingState` component with animated spinner and text, replacing previous loading indicators across `home/page.tsx`, `profile/[username]/page.tsx`, `profile/page.tsx`, `search/page.tsx`, `settings/profile/page.tsx`, `components/CreatePost.tsx`, `components/FollowButton.tsx`, and `components/Timeline.tsx` for consistent and professional UI. The `LoadingState` component now supports different loader types (spinner and dots) to accommodate various UI needs. Fixed inconsistent button loading animations by adjusting `LoadingState` styling and button content wrapping to maintain consistent button dimensions during loading states.
+  - [x] **Post Interaction Overhaul (Edit/Delete/Report):**
+    - [x] Replaced the simple delete icon with a modern three-dot options menu (`PostOptionsMenu.tsx`).
+    - [x] Implemented conditional logic: shows "Edit" and "Delete" for the post owner, and "Report" for other users.
+    - [x] Created a reusable, animated confirmation modal (`ConfirmationModal.tsx`) for the delete action to prevent accidental deletions.
+    - [x] Implemented a full edit workflow with a new `EditPostModal.tsx`, allowing users to update their post content.
+    - [x] Integrated `react-hot-toast` for sleek, modern, and animated toast notifications for all post actions (create, update, delete).
+    - [x] Enhanced the backend Post API (`api/posts`) to support `PUT` requests for editing posts securely.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).

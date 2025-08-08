@@ -6,6 +6,7 @@ import MobileNavbar from '../components/MobileNavbar';
 import { useState } from 'react';
 import CreatePost from '../components/CreatePost';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 
 export default function ClientLayoutContent({
   children,
@@ -45,6 +46,33 @@ export default function ClientLayoutContent({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: '#1A1A2E', // bg-medium
+            color: '#E0E0EB', // text-light
+            border: '1px solid #28283A', // border-medium
+            borderRadius: '12px',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#8B5CF6', // accent-main
+              secondary: '#E0E0EB', // text-light
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#F87171', // A suitable red color
+              secondary: '#E0E0EB', // text-light
+            },
+          },
+        }}
+      />
     </div>
   );
 }

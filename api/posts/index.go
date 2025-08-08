@@ -92,7 +92,22 @@ func GetDB() (*gorm.DB, error) {
 	return db, nil
 }
 
+type UpdatePostRequest struct {
+	Content string `json:"content"`
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow any origin
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	// Handle preflight requests
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
 	db, err := GetDB()
 	if err != nil {
 		http.Error(w, "Failed to connect to database", http.StatusInternalServerError)
@@ -104,9 +119,100 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		createPost(w, r, db)
 	case http.MethodDelete:
 		deletePost(w, r, db)
+	case http.MethodPut:
+		updatePost(w, r, db)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func updatePost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	postIDStr := r.URL.Query().Get("id")
+	if postIDStr == "" {
+		http.Error(w, "Post ID is required", http.StatusBadRequest)
+		return
+	}
+
+	postID, err := uuid.Parse(postIDStr)
+	if err != nil {
+		http.Error(w, "Invalid Post ID format", http.StatusBadRequest)
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		return
+	}
+	tokenString := authHeader[len("Bearer "):]
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+
+	if err != nil || !token.Valid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		return
+	}
+
+	userIDStr, ok := claims["sub"].(string)
+	if !ok {
+		http.Error(w, "Invalid user ID in token", http.StatusUnauthorized)
+		return
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user ID format", http.StatusBadRequest)
+		return
+	}
+
+	var updateReq UpdatePostRequest
+	if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if updateReq.Content == "" {
+		http.Error(w, "Post content cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	var post Post
+	if err := db.First(&post, "id = ?", postID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "Post not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	if post.UserID != userID {
+		http.Error(w, "You are not authorized to edit this post", http.StatusForbidden)
+		return
+	}
+
+	post.Content = updateReq.Content
+	if err := db.Save(&post).Error; err != nil {
+		http.Error(w, "Failed to update post", http.StatusInternalServerError)
+		return
+	}
+	
+	if err := db.Preload("User").First(&post, "id = ?", post.ID).Error; err != nil {
+		http.Error(w, "Failed to retrieve updated post", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
 }
 
 func deletePost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
