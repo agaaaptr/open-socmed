@@ -62,7 +62,7 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
       initial={false} // Control visibility via animate prop
       animate={isVisible ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
+      className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
     >
       <motion.div
         initial={{ y: -20, opacity: 0 }}

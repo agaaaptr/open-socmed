@@ -30,7 +30,7 @@ const MobileNavbar = ({ onOpenCreatePost, isVisible }: MobileNavbarProps) => {
       initial={false} // Control visibility via animate prop
       animate={isVisible ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="fixed bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-lg border-t border-border-subtle p-3 flex justify-between items-center shadow-lg z-50"
+      className="fixed bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-lg border-t border-border-subtle p-3 flex justify-between items-center shadow-lg z-50 md:hidden"
     >
       <div className="flex-1 flex justify-around items-center">
         {navItemsLeft.map((item) => (
