@@ -28,6 +28,8 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
   const onTouchStart = (e: TouchEvent) => {
     if (containerRef.current && containerRef.current.scrollTop === 0) {
       startY.current = e.touches[0].clientY;
+    } else {
+      startY.current = 0; // Reset startY if not at top
     }
   };
 
@@ -37,12 +39,16 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
       let distance = currentY - startY.current;
 
       if (distance > 0) { // Only pull down
-        e.preventDefault(); // Prevent scrolling
+        e.preventDefault(); // Prevent native scrolling
         distance = Math.min(distance, MAX_PULL_DISTANCE);
         setPullDistance(distance);
         pullDistanceRef.current = distance;
         controls.start({ y: distance });
+      } else {
+        startY.current = 0; // Reset if scrolling up from top
       }
+    } else {
+      startY.current = 0; // Reset if not at top or not pulling down
     }
   }, [controls]);
 
