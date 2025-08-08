@@ -12,7 +12,15 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
   const controls = useAnimation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
-  const pullDistanceRef = useRef(pullDistance); // Keep ref for onTouchEnd
+  const pullDistanceRef = useRef(pullDistance);
+  const [windowHeight, setWindowHeight] = useState(0); // New state for window height
+
+  // Set window height on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowHeight(window.innerHeight);
+    }
+  }, []);
 
   const startY = useRef(0); // Initial touch Y position
   const isPulling = useRef(false); // Flag to track if a pull gesture is active
@@ -98,8 +106,8 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
   return (
     <motion.div
       animate={controls}
-      className="fixed top-0 left-0 right-0 flex justify-center items-center z-50 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-full pointer-events-none"
-      style={{ height: pullDistance, willChange: 'transform' }}
+      className="fixed inset-x-0 top-0 h-screen flex justify-center items-start z-50 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-full pointer-events-none"
+      style={{ willChange: 'transform', translateY: pullDistance - windowHeight }}
     >
       {isRefreshing || pullDistance > 0 ? (
         <motion.div
