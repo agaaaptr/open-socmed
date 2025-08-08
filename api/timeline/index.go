@@ -151,7 +151,6 @@ func getTimeline(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		Joins("JOIN follows ON posts.user_id = follows.following_id").
 		Where("follows.follower_id = ?", userID).
 		Order("posts.created_at DESC").
-		Distinct("posts.id").
 		Find(&posts).Error; err != nil {
 		log.Printf("Error fetching timeline: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
