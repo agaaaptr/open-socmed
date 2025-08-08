@@ -191,7 +191,6 @@ func deletePost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Post deleted successfully"})
 }
-}
 
 
 
