@@ -29,7 +29,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string[] | null>(null);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -53,7 +53,7 @@ export default function SignInPage() {
     });
 
     if (errors.length > 0) {
-      setPasswordError(errors.join(' ')); // Still join for a general error message
+      setPasswordError(errors); // Set passwordError directly to the array of messages
       return false;
     }
     setPasswordError(null);
@@ -147,8 +147,8 @@ export default function SignInPage() {
               className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
             />
             {passwordError && (
-              <ul className="text-red-400 text-xs mt-1 space-y-1">
-                {passwordError.split(' ').map((errorItem, index) => (
+              <ul className="text-red-400 text-xs mt-1 space-y-1 list-disc list-inside"> {/* Added list-disc and list-inside for bullets */}
+                {passwordError.map((errorItem, index) => ( // Map the array directly
                   <li key={index}>{errorItem}</li>
                 ))}
               </ul>
