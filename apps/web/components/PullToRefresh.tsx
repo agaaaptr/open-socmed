@@ -21,6 +21,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
     pullDistanceRef.current = pullDistance;
   }, [pullDistance]);
   const startY = useRef(0);
+  const isPulling = useRef(false); // Flag to track if a pull gesture is active
 
   const REFRESH_THRESHOLD = 80; // Distance in pixels to trigger refresh
   const MAX_PULL_DISTANCE = 150; // Max distance to allow pulling
@@ -28,32 +29,45 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
   const onTouchStart = (e: TouchEvent) => {
     if (containerRef.current && containerRef.current.scrollTop === 0) {
       startY.current = e.touches[0].clientY;
+      isPulling.current = true; // Potentially starting a pull gesture
     } else {
-      startY.current = 0; // Reset startY if not at top
+      startY.current = 0; // Reset if not at the top
+      isPulling.current = false;
     }
   };
 
   const onTouchMove = useCallback((e: TouchEvent) => {
-    if (containerRef.current && containerRef.current.scrollTop === 0 && startY.current !== 0) {
+    // Only proceed if a pull gesture is active and we are at the top of the scrollable area
+    if (isPulling.current && containerRef.current && containerRef.current.scrollTop === 0) {
       const currentY = e.touches[0].clientY;
       let distance = currentY - startY.current;
 
-      if (distance > 0) { // Only pull down
-        e.preventDefault(); // Prevent native scrolling
+      if (distance > 0) { // User is pulling down
+        e.preventDefault(); // Prevent native scrolling only when pulling down from the top
         distance = Math.min(distance, MAX_PULL_DISTANCE);
         setPullDistance(distance);
-        pullDistanceRef.current = distance;
+        // No need to update pullDistanceRef.current here, it's updated by useEffect
         controls.start({ y: distance });
       } else {
-        startY.current = 0; // Reset if scrolling up from top
+        // If distance is not > 0 (i.e., scrolling up or no movement), stop the pull gesture
+        isPulling.current = false;
+        startY.current = 0;
+        setPullDistance(0); // Reset visual pull
+        controls.start({ y: 0 });
       }
     } else {
-      startY.current = 0; // Reset if not at top or not pulling down
+      // If not at the top or not pulling, ensure flags are reset
+      isPulling.current = false;
+      startY.current = 0;
+      setPullDistance(0); // Reset visual pull
+      controls.start({ y: 0 });
     }
   }, [controls]);
 
   const onTouchEnd = useCallback(async () => {
-    startY.current = 0;
+    isPulling.current = false; // End of touch, so end the pull gesture
+    startY.current = 0; // Reset startY for next gesture
+
     if (pullDistanceRef.current >= REFRESH_THRESHOLD) {
       setIsRefreshing(true);
       await controls.start({ y: REFRESH_THRESHOLD / 2, transition: { duration: 0.2 } });
