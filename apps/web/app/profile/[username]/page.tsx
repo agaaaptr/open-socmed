@@ -200,11 +200,11 @@ export default function ProfileViewPage({ params }: { params: { username: string
     async function fetchProfileAndData() {
       setLoading(true);
       setError('');
-      const { data: { user: currentUser } } = await supabase.auth.getUser(); // Get current logged-in user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
       setCurrentUserId(currentUser?.id || null);
 
-      if (!params.username && !currentUser) {
-        router.push('/auth/signin');
+      if (!params.username) {
+        router.push('/home'); // Redirect if no username is provided in the URL
         return;
       }
 
@@ -212,7 +212,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        const apiUrl = `/api/profile?username=${params.username || ''}`;
+        const apiUrl = `/api/profile?username=${params.username}`;
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -233,7 +233,6 @@ export default function ProfileViewPage({ params }: { params: { username: string
           setIsOwnProfile(false);
         }
         
-        // Fetch followers and following data concurrently
         const [followersResponse, followingResponse] = await Promise.all([
           fetch(`/api/followers?user_id=${data.id}`),
           fetch(`/api/following?user_id=${data.id}`),
@@ -245,7 +244,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
         setTabData({
           followers: { data: followersData === null ? [] : followersData, isLoading: false, error: null },
           following: { data: followingData === null ? [] : followingData, isLoading: false, error: null },
-          posts: { data: data.posts || [], isLoading: false, error: null },
+          posts: { data: (data.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
         });
 
       } catch (err: any) {
