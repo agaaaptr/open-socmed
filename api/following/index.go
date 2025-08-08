@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -67,8 +68,8 @@ func Connect() (*gorm.DB, error) {
 		if err != nil {
 			log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
 		}
-		sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
-		sqlDB.SetMaxOpenConns(1) // Limit total open connections
+		sqlDB.SetMaxIdleConns(1)              // Keep very few idle connections
+		sqlDB.SetMaxOpenConns(1)              // Limit total open connections
 		sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
 
 		log.Println("Database connection successful and pool established.")
