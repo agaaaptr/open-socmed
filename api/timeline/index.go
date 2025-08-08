@@ -45,29 +45,40 @@ func Connect() (*gorm.DB, error) {
 	var err error
 	once.Do(func() {
 		if os.Getenv("VERCEL_ENV") == "" {
-			err = godotenv.Load("../../.env")
+			err = godotenv.Load("../../.env") // Assuming .env is at project root
 			if err != nil {
 				log.Println("Warning: .env file not found, relying on environment variables")
 			}
 		}
-
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
 		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable is not set")
+			dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
 		}
-
+		if dsn == "" {
+			log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
+		}
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			PrepareStmt: false,
+			PrepareStmt: false, // Disable prepared statement caching for serverless environment
 			Logger:      logger.Default.LogMode(logger.Silent),
 		})
 		if err != nil {
 			log.Fatalf("FATAL: Failed to connect to database: %v", err)
 		}
 
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+		}
+		sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
+		sqlDB.SetMaxOpenConns(1) // Limit total open connections
+		sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+
 		jwtSecret = []byte(os.Getenv("SUPABASE_JWT_SECRET"))
 		if len(jwtSecret) == 0 {
-			log.Fatal("FATAL: SUPABASE_JWT_SECRET environment variable is not set")
+			log.Fatal("FATAL: SUPABASE_JWT_SECRET environment variable not set")
 		}
+
+		log.Println("Database connection successful and pool established.")
 	})
 	if err != nil {
 		return nil, err

@@ -152,7 +152,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Username Uniqueness Check API:** Added a new endpoint (`/api/check-username`) to verify if a username is already taken.
   - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
-  - [x] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
+  - [x] **Post Creation API:** Implement API endpoint for creating new posts.
   - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
   - [x] **Improved API Error Handling:** Ensured `/api/timeline` returns JSON formatted errors for better frontend consumption.

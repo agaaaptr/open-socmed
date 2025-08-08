@@ -45,30 +45,39 @@ func Connect() (*gorm.DB, error) {
 	var err error
 	once.Do(func() {
 		if os.Getenv("VERCEL_ENV") == "" {
-			err = godotenv.Load("../../.env")
+			err = godotenv.Load("../../.env") // Assuming .env is at project root
 			if err != nil {
 				log.Println("Warning: .env file not found, relying on environment variables")
 			}
 		}
-
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
 		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable is not set")
+			dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
 		}
-
+		if dsn == "" {
+			log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
+		}
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			PrepareStmt: false,
+			PrepareStmt: false, // Disable prepared statement caching for serverless environment
 		})
 		if err != nil {
 			log.Fatalf("FATAL: Failed to connect to database: %v", err)
 		}
+
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+		}
+		sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
+		sqlDB.SetMaxOpenConns(1) // Limit total open connections
+		sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
 
 		jwtSecret = []byte(os.Getenv("SUPABASE_JWT_SECRET"))
 		if len(jwtSecret) == 0 {
 			log.Fatal("FATAL: SUPABASE_JWT_SECRET environment variable not set")
 		}
 
-		log.Println("Database connection successful.")
+		log.Println("Database connection successful and pool established.")
 	})
 	if err != nil {
 		return nil, err
@@ -91,8 +100,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-	case http.MethodGet:
-		getPosts(w, r, db)
 	case http.MethodPost:
 		createPost(w, r, db)
 	default:
@@ -100,32 +107,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getPosts(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	var posts []Post
-	query := db.Preload("User").Order("created_at desc")
 
-	userIDStr := r.URL.Query().Get("user_id")
-	if userIDStr != "" {
-		userID, err := uuid.Parse(userIDStr)
-		if err != nil {
-			http.Error(w, "Invalid user_id format", http.StatusBadRequest)
-			return
-		}
-		query = query.Where("user_id = ?", userID)
-	}
-
-	if err := query.Find(&posts).Error; err != nil {
-		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
-		return	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
-}
 
 func createPost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		http.Error(w, "Authorization header required", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Authorization header required"})
 		return
 	}
 	tokenString := authHeader[len("Bearer "):]
@@ -135,36 +123,42 @@ func createPost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	})
 
 	if err != nil || !token.Valid {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token"})
 		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token claims"})
 		return
 	}
 
 	userIDStr, ok := claims["sub"].(string)
 	if !ok {
-		http.Error(w, "Invalid user ID in token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid user ID in token"})
 		return
 	}
 
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		http.Error(w, "Invalid user ID format", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid user ID format"})
 		return
 	}
 
 	var post Post
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid request body"})
 		return
 	}
 
 	if post.Content == "" {
-		http.Error(w, "Post content cannot be empty", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Post content cannot be empty"})
 		return
 	}
 
@@ -172,13 +166,15 @@ func createPost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	post.ID = uuid.New()
 
 	if err := db.Create(&post).Error; err != nil {
-		http.Error(w, "Failed to create post", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to create post", "error": err.Error()})
 		return
 	}
 
 	// To return the created post with user info
 	if err := db.Preload("User").First(&post, "id = ?", post.ID).Error; err != nil {
-		http.Error(w, "Failed to retrieve created post", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to retrieve created post", "error": err.Error()})
 		return
 	}
 
