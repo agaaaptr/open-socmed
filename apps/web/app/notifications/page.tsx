@@ -1,7 +1,7 @@
 'use client';
 
-import UnderConstruction from '../../components/UnderConstruction';
+import UnderDevelopment from '../../components/UnderDevelopment';
 
 export default function NotificationsPage() {
-  return <UnderConstruction featureName="Notifications" />;
+  return <UnderDevelopment featureName="Notifications" />;
 }

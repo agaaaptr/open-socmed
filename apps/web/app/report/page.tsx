@@ -1,7 +1,7 @@
 'use client';
 
-import UnderConstruction from '../../components/UnderConstruction';
+import UnderDevelopment from '../../components/UnderDevelopment';
 
 export default function ReportPage() {
-  return <UnderConstruction featureName="Report a Problem" />;
+  return <UnderDevelopment featureName="Report a Problem" />;
 }

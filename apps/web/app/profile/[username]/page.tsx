@@ -363,7 +363,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
                           <motion.div
                             key={post.id}
                             variants={postVariants}
-                            className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
+                            className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle relative"
                           >
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center">
