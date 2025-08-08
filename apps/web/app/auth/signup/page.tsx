@@ -220,12 +220,15 @@ export default function SignUpPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onBlur={(e) => validatePassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePassword(e.target.value); // Call validation on change
+                }}
+                onBlur={(e) => validatePassword(e.target.value)} // Keep onBlur for final check
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
-              <ul className="text-xs mt-1 space-y-1">
+              <ul className="text-xs mt-1 space-y-1 list-disc list-inside">
                 {passwordCriteriaStatus.map(criterion => (
                   <li key={criterion.id} className={criterion.met ? 'text-green-500' : 'text-text-muted'}>
                     {criterion.text}

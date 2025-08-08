@@ -24,13 +24,19 @@ export default function ClientLayoutContent({
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handlePostCreated = (newPost: any) => {
-    // This function will be passed down to CreatePost and can be used
-    // to update the global state or re-fetch posts in the Timeline.
-    // For now, we'll just close the modal.
     console.log('New post created:', newPost);
-    // If not on the home page, redirect to home after successful post creation
+    // This function is called by CreatePost.
+    // The actual redirection will be handled by the onClose callback passed to CreatePost.
+  };
+
+  const handleCloseCreatePost = () => {
+    setIsCreatePostOpen(false);
+    // Only redirect if not on the home page and it's a mobile post creation
     if (pathname !== '/home') {
-      router.push('/home');
+      // Delay the redirect slightly to allow modal closing animation and toast to be seen
+      setTimeout(() => {
+        router.push('/home');
+      }, 500); // Adjust delay as needed (e.g., toast duration + modal close animation)
     }
   };
 
@@ -52,7 +58,11 @@ export default function ClientLayoutContent({
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed inset-x-0 bottom-0 bg-background-dark/90 backdrop-blur-lg p-4 rounded-t-2xl shadow-lg z-50 md:hidden"
           >
-            <CreatePost onPostCreated={handlePostCreated} onClose={() => setIsCreatePostOpen(false)} isMobile={true} />
+            <CreatePost
+              onPostCreated={handlePostCreated}
+              onClose={handleCloseCreatePost} // Pass the modified handler directly
+              isMobile={true}
+            />
           </motion.div>
         )}
       </AnimatePresence>

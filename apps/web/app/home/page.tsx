@@ -84,7 +84,6 @@ export default function HomePage() {
 
   const handlePostCreated = (newPost: Post) => {
     setPosts((prevPosts) => [newPost, ...prevPosts]);
-    toast.success('Post created successfully!');
   };
 
   const handlePostUpdated = (updatedPost: Post) => {
