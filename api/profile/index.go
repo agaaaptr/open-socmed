@@ -153,11 +153,11 @@ func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.
 
 	if username != "" {
 		// If username is provided, fetch by username
-		err = db.Preload("Posts").Where("username = ?", username).First(&profile).Error
+		err = db.Preload("Posts.User").Order("posts.created_at DESC").Where("username = ?", username).First(&profile).Error
 		log.Printf("[DEBUG] Attempting to fetch profile by username: %s", username)
 	} else {
 		// Otherwise, fetch by userID from token
-		err = db.Preload("Posts").Where("id = ?", userID).First(&profile).Error
+		err = db.Preload("Posts.User").Order("posts.created_at DESC").Where("id = ?", userID).First(&profile).Error
 		log.Printf("[DEBUG] Attempting to fetch profile by userID: %s", userID)
 	}
 
