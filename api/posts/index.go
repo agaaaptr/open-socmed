@@ -102,9 +102,95 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		createPost(w, r, db)
+	case http.MethodDelete:
+		deletePost(w, r, db)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func deletePost(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	postIDStr := r.URL.Query().Get("id") // Assuming post ID is passed as 'id' query param
+	if postIDStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Post ID is required"})
+		return
+	}
+
+	postID, err := uuid.Parse(postIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Post ID format"})
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Authorization header required"})
+		return
+	}
+	tokenString := authHeader[len("Bearer "):]
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+
+	if err != nil || !token.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token"})
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token claims"})
+		return
+	}
+
+	userIDStr, ok := claims["sub"].(string)
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid user ID in token"})
+		return
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid user ID format"})
+		return
+	}
+
+	var post Post
+	result := db.First(&post, "id = ?", postID)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Post not found"})
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Database query error", "error": result.Error.Error()})
+		return
+	}
+
+	if post.UserID != userID {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]string{"message": "You are not authorized to delete this post"})
+		return
+	}
+
+	if err := db.Delete(&post).Error; err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to delete post", "error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Post deleted successfully"})
+}
 }
 
 

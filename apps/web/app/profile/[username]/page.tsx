@@ -252,7 +252,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
       } else if (tab === 'posts' && profile) {
           setTabData(prev => ({ ...prev, posts: { data: profile.posts || [], isLoading: false, error: null } }));
       }
-  };
+  };;
 
   if (loading) {
     return (

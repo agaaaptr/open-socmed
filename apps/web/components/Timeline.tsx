@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { UserCircle, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { UserCircle, Heart, MessageCircle, Share2, Trash2 } from 'lucide-react';
 import LoadingState from './LoadingState';
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -30,6 +30,8 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchPosts() {
       setLoading(true);
@@ -39,6 +41,7 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
         if (sessionError || !session) {
           throw new Error('User not authenticated. Please sign in.');
         }
+        setCurrentUserId(session.user.id); // Set current user ID
 
         const token = session.access_token;
 
@@ -67,6 +70,38 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
 
     fetchPosts();
   }, [supabase, setPosts]);
+
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm('Are you sure you want to delete this post?')) {
+      return;
+    }
+
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error('User not authenticated. Please sign in.');
+      }
+      const token = session.access_token;
+
+      const response = await fetch(`/api/posts?id=${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete post.');
+      }
+
+      setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    } catch (err: any) {
+      console.error('Error deleting post:', err);
+      setError(err.message || 'Failed to delete post.');
+    }
+  };
 
   const postVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -108,7 +143,8 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
             variants={postVariants}
             className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
           >
-            <div className="flex items-center mb-3">
+                      <div className="flex items-center justify-between mb-3"> {/* Added justify-between */}
+            <div className="flex items-center">
               {post.user?.avatar_url ? (
                 <Image src={post.user.avatar_url} alt={post.user.full_name} width={40} height={40} className="rounded-full mr-3 md:mr-4" />
               ) : (
@@ -119,21 +155,31 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
                 <p className="text-xs md:text-sm text-text-muted">@{post.user?.username || 'unknown'} • {new Date(post.created_at).toLocaleString()}</p>
               </div>
             </div>
-            <p className="text-text-light text-sm md:text-base leading-relaxed mb-4">{post.content}</p>
-            <div className="flex space-x-4 md:space-x-6 text-text-muted text-sm">
-              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
-                <Heart className="w-4 h-4 md:w-5 md:h-5 mr-1" />
-                <span>Like</span>
+            {currentUserId === post.user_id && ( // Conditionally render delete button
+              <button
+                onClick={() => handleDeletePost(post.id)}
+                className="text-text-muted hover:text-red-500 transition-colors duration-200"
+                title="Delete Post"
+              >
+                <Trash2 className="w-5 h-5 md:w-6 md:h-6" />
               </button>
-              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
-                <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-1" />
-                <span>Comment</span>
-              </button>
-              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
-                <Share2 className="w-4 h-4 md:w-5 md:h-5 mr-1" />
-                <span>Share</span>
-              </button>
-            </div>
+            )}
+          </div>
+          <p className="text-text-light text-sm md:text-base leading-relaxed mb-4">{post.content}</p>
+          <div className="flex space-x-4 md:space-x-6 text-text-muted text-sm">
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <Heart className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Like</span>
+            </button>
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Comment</span>
+            </button>
+            <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+              <Share2 className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+              <span>Share</span>
+            </button>
+          </div>
           </motion.div>
         ))}
       </div>
