@@ -12,33 +12,35 @@ interface PullToRefreshProps {
 const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
   const router = useRouter();
   const controls = useAnimation();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
-  const pullDistanceRef = useRef(pullDistance);
+  const pullDistanceRef = useRef(pullDistance); // Keep ref for onTouchEnd
 
-  useEffect(() => {
-    pullDistanceRef.current = pullDistance;
-  }, [pullDistance]);
-  const startY = useRef(0);
+  const startY = useRef(0); // Initial touch Y position
   const isPulling = useRef(false); // Flag to track if a pull gesture is active
 
   const REFRESH_THRESHOLD = 80; // Distance in pixels to trigger refresh
   const MAX_PULL_DISTANCE = 150; // Max distance to allow pulling
 
-  const onTouchStart = (e: TouchEvent) => {
-    if (containerRef.current && containerRef.current.scrollTop === 0) {
+  // Update ref when pullDistance changes
+  useEffect(() => {
+    pullDistanceRef.current = pullDistance;
+  }, [pullDistance]);
+
+  const onTouchStart = useCallback((e: TouchEvent) => {
+    // Only consider starting a pull gesture if at the very top of the page
+    if (window.scrollY === 0) {
       startY.current = e.touches[0].clientY;
       isPulling.current = true; // Potentially starting a pull gesture
     } else {
       startY.current = 0; // Reset if not at the top
       isPulling.current = false;
     }
-  };
+  }, []);
 
   const onTouchMove = useCallback((e: TouchEvent) => {
-    // Only proceed if a pull gesture is active and we are at the top of the scrollable area
-    if (isPulling.current && containerRef.current && containerRef.current.scrollTop === 0) {
+    // Only proceed if a pull gesture was initiated and we are at the top of the page
+    if (isPulling.current && window.scrollY === 0) {
       const currentY = e.touches[0].clientY;
       let distance = currentY - startY.current;
 
@@ -46,10 +48,9 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
         e.preventDefault(); // Prevent native scrolling only when pulling down from the top
         distance = Math.min(distance, MAX_PULL_DISTANCE);
         setPullDistance(distance);
-        // No need to update pullDistanceRef.current here, it's updated by useEffect
         controls.start({ y: distance });
       } else {
-        // If distance is not > 0 (i.e., scrolling up or no movement), stop the pull gesture
+        // If scrolling up or no movement, stop the pull gesture
         isPulling.current = false;
         startY.current = 0;
         setPullDistance(0); // Reset visual pull
@@ -72,13 +73,11 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
       setIsRefreshing(true);
       await controls.start({ y: REFRESH_THRESHOLD / 2, transition: { duration: 0.2 } });
       router.refresh();
-      // In a real app, you'd fetch new data here.
-      // For now, we'll just simulate a delay and then reset.
       setTimeout(() => {
         setIsRefreshing(false);
         setPullDistance(0);
         controls.start({ y: 0, transition: { duration: 0.3 } });
-      }, 1000); // Simulate data fetch time
+      }, 1000);
     } else {
       setPullDistance(0);
       controls.start({ y: 0, transition: { duration: 0.3 } });
@@ -86,24 +85,20 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ children }) => {
   }, [controls, router]);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('touchstart', onTouchStart);
-      container.addEventListener('touchmove', onTouchMove, { passive: false });
-      container.addEventListener('touchend', onTouchEnd);
-    }
+    // Attach listeners to window for main page scroll
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
 
     return () => {
-      if (container) {
-        container.removeEventListener('touchstart', onTouchStart);
-        container.removeEventListener('touchmove', onTouchMove);
-        container.removeEventListener('touchend', onTouchEnd);
-      }
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [pullDistance, controls, router, onTouchEnd, onTouchMove]);
+  }, [onTouchStart, onTouchMove, onTouchEnd]); // Dependencies for useCallback functions
 
   return (
-    <motion.div ref={containerRef} className="relative h-full overflow-y-auto">
+    <motion.div className="relative h-full"> {/* Removed ref={containerRef} and overflow-y-auto from here */}
       <motion.div
         animate={controls}
         className="relative"
