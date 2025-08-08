@@ -187,34 +187,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
     }
   }, []);
 
-  const fetchPostsData = useCallback(async (userId: string) => {
-    setTabData(prev => ({ ...prev, posts: { ...prev.posts, isLoading: true, error: null } }));
-    try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        throw new Error('User not authenticated. Please sign in.');
-      }
-      const token = session.access_token;
-
-      const response = await fetch(`/api/posts?user_id=${userId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch posts.');
-      }
-
-      const data: Post[] = await response.json();
-      setTabData(prev => ({ ...prev, posts: { data, isLoading: false, error: null } }));
-    } catch (err: any) {
-      setTabData(prev => ({ ...prev, posts: { ...prev.posts, isLoading: false, error: err.message } }));
-    }
-  }, [supabase]);
+  
 
   useEffect(() => {
     async function fetchProfileAndData() {
@@ -254,7 +227,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
         
         fetchFollowData('followers', data.id);
         fetchFollowData('following', data.id);
-        fetchPostsData(data.id); // Fetch posts for the profile
+        setTabData(prev => ({ ...prev, posts: { data: data.posts || [], isLoading: false, error: null } })); // Use posts from profile data
 
       } catch (err: any) {
         console.error('Error fetching profile:', err);
@@ -265,7 +238,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
     }
 
     fetchProfileAndData();
-  }, [supabase, router, fetchFollowData, fetchPostsData, params.username]);
+  }, [supabase, router, fetchFollowData, params.username]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
