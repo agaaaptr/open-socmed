@@ -83,7 +83,7 @@ const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoad
   );
 };
 
-export default function ProfileViewPage({ params }: { params: { username: string } }) {
+export default function MyProfilePage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [profile, setProfile] = useState<(User & { email?: string; posts?: Post[] }) | null>(null);
@@ -91,7 +91,6 @@ export default function ProfileViewPage({ params }: { params: { username: string
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // State for current user ID
-  const [isOwnProfile, setIsOwnProfile] = useState(false); // Added back isOwnProfile
 
   // State for modals
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -194,51 +193,39 @@ export default function ProfileViewPage({ params }: { params: { username: string
     toast('You are being redirected to the report page.');
   };
 
-  const handleTabChange = (tab: string) => {
-      setActiveTab(tab);
-  };
-
   useEffect(() => {
-    async function fetchProfileAndData() {
+    async function fetchMyProfileAndData() {
       setLoading(true);
       setError('');
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setCurrentUserId(currentUser?.id || null);
-
-      if (!params.username) {
-        router.push('/home'); // Redirect if no username is provided in the URL
+      if (!currentUser) {
+        router.push('/auth/signin');
         return;
       }
+      setCurrentUserId(currentUser.id);
 
       try {
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        const apiUrl = `/api/profile?username=${params.username}`;
-        const response = await fetch(apiUrl, {
+        // Fetch current user's profile
+        const profileResponse = await fetch('/api/profile', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!profileResponse.ok) {
+          const errorData = await profileResponse.json();
           throw new Error(errorData.message || 'Failed to fetch profile.');
         }
 
-        const data = await response.json();
+        const profileData = await profileResponse.json();
+        setProfile({ ...profileData, email: currentUser.email });
         
-        // Re-introducing isOwnProfile logic
-        if (currentUser && data.id === currentUser.id) {
-          setProfile({ ...data, email: currentUser.email });
-          setIsOwnProfile(true);
-        } else {
-          setProfile(data);
-          setIsOwnProfile(false);
-        }
-        
+        // Fetch followers, following, and posts concurrently for the current user
         const [followersResponse, followingResponse] = await Promise.all([
-          fetch(`/api/followers?user_id=${data.id}`),
-          fetch(`/api/following?user_id=${data.id}`),
+          fetch(`/api/followers?user_id=${profileData.id}`),
+          fetch(`/api/following?user_id=${profileData.id}`),
         ]);
 
         const followersData = followersResponse.ok ? await followersResponse.json() : [];
@@ -247,19 +234,28 @@ export default function ProfileViewPage({ params }: { params: { username: string
         setTabData({
           followers: { data: followersData === null ? [] : followersData, isLoading: false, error: null },
           following: { data: followingData === null ? [] : followingData, isLoading: false, error: null },
-          posts: { data: (data.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
+          posts: { data: (profileData.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
         });
+        setLoading(false); // Set loading to false here
 
       } catch (err: any) {
-        console.error('Error fetching profile:', err);
-        setError(err.message || 'Failed to load profile.');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching my profile:', err);
+        setError(err.message || 'Failed to load your profile.');
+        setLoading(false); // Set loading to false here on error
       }
     }
 
-    fetchProfileAndData();
-  }, [supabase, router, params.username]);
+    fetchMyProfileAndData();
+  }, [supabase, router]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+  
+  const handleTabChange = (tab: string) => {
+      setActiveTab(tab);
+  };
 
   const postVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -269,7 +265,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
   if (loading) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center bg-background-dark text-text-light">
-        <LoadingState text="Loading profile..." />
+        <LoadingState text="Loading your profile..." />
       </motion.div>
     );
   }
@@ -282,11 +278,6 @@ export default function ProfileViewPage({ params }: { params: { username: string
       </motion.div>
     );
   }
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
 
   return (
     <>
@@ -324,8 +315,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
                 </div>
               </div>
             </div>
-            {isOwnProfile && ( // Conditional rendering based on isOwnProfile
-              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
                 <Link href="/settings/profile" className="flex-1 text-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
                   <Edit className="mr-2 h-5 w-5" /> Edit Profile
                 </Link>
@@ -333,7 +323,6 @@ export default function ProfileViewPage({ params }: { params: { username: string
                   <LogOut className="mr-2 h-5 w-5" /> Sign Out
                 </button>
               </div>
-            )}
           </motion.div>
 
           <div className="mt-8">
@@ -355,7 +344,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
                       <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
                           <Rss className="mx-auto w-10 h-10 mb-4" />
                           <h3 className="text-lg font-semibold">No posts yet</h3>
-                          <p>This user has not posted anything yet.</p>
+                          <p>You have not posted anything yet.</p>
                       </div>
                     ) : (
                       <div className="space-y-6">

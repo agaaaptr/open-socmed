@@ -45,29 +45,40 @@ func Connect() (*gorm.DB, error) {
 	var err error
 	once.Do(func() {
 		if os.Getenv("VERCEL_ENV") == "" {
-			err = godotenv.Load("../../.env")
+			err = godotenv.Load("../../.env") // Assuming .env is at project root
 			if err != nil {
 				log.Println("Warning: .env file not found, relying on environment variables")
 			}
 		}
-
-		dsn := os.Getenv("DATABASE_URL")
+		dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
 		if dsn == "" {
-			log.Fatal("FATAL: DATABASE_URL environment variable is not set")
+			dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
 		}
-
+		if dsn == "" {
+			log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
+		}
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			PrepareStmt: false,
+			PrepareStmt: false, // Disable prepared statement caching for serverless environment
 			Logger:      logger.Default.LogMode(logger.Silent),
 		})
 		if err != nil {
 			log.Fatalf("FATAL: Failed to connect to database: %v", err)
 		}
 
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
+		}
+		sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
+		sqlDB.SetMaxOpenConns(1) // Limit total open connections
+		sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
+
 		jwtSecret = []byte(os.Getenv("SUPABASE_JWT_SECRET"))
 		if len(jwtSecret) == 0 {
-			log.Fatal("FATAL: SUPABASE_JWT_SECRET environment variable is not set")
+			log.Fatal("FATAL: SUPABASE_JWT_SECRET environment variable not set")
 		}
+
+		log.Println("Database connection successful and pool established.")
 	})
 	if err != nil {
 		return nil, err
@@ -112,34 +123,39 @@ func getTimeline(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return jwtSecret, nil
 	})
 	if err != nil || !token.Valid {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Token"})
 		return
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Token Claims"})
 		return
 	}
 	userIDStr, ok := claims["sub"].(string)
 	if !ok {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid User ID in Token"})
 		return
 	}
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid User ID Format"})
 		return
 	}
-	var posts []Post // Menggunakan 'posts' untuk konsistensi
-	// Fetch posts from users that the current user is following
-	if err := db.Preload("User").
-		Joins("JOIN follows ON posts.user_id = follows.following_id"). // PERBAIKAN: JOIN dengan tabel follows dan kolom yang benar
-		Where("follows.follower_id = ?", userID).                      // PERBAIKAN: Filter berdasarkan follower_id dan hapus ')'
+	var posts []Post
+	// Fetch posts from users that the current user is following AND the user's own posts
+	if err := db.Distinct("posts.*, posts.created_at").
+		Preload("User").
+		Joins("LEFT JOIN follows ON posts.user_id = follows.following_id"). // Use LEFT JOIN to include user's own posts even if they don't follow anyone
+		Where("follows.follower_id = ? OR posts.user_id = ?", userID, userID). // Include posts from followed users OR user's own posts
 		Order("posts.created_at DESC").
-		Distinct("posts.id").
-		Find(&posts).Error; err != nil { // Menggunakan 'posts'
+		Find(&posts).Error; err != nil {
 		log.Printf("Error fetching timeline: %v", err)
-		http.Error(w, "Failed to fetch timeline", http.StatusInternalServerError) // Pesan error lengkap
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to fetch timeline", "error": err.Error()})
 		return
 	}
 

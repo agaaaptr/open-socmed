@@ -11,10 +11,18 @@ import { UserPlus } from 'lucide-react';
 const AccentSubmitButton = ({ children, className = '' }) => (
   <button
     type="submit"
-    className={`w-full inline-flex items-center justify-center text-text-light font-bold py-3 px-4 rounded-lg bg-accent-main hover:bg-accent-hover transition-all duration-300 ease-in-out shadow-lg hover:shadow-accent-main/40 transform hover:scale-105 ${className}`}>
+    className={`w-full inline-flex items-center justify-center text-text-light font-bold py-3 px-4 rounded-lg bg-accent-main hover:bg-accent-hover transition-all duration-300 ease-in-out shadow-lg hover:shadow-accent-main/40 ${className}`}>
     {children}
   </button>
 );
+
+const passwordCriteria = [
+  { id: 'length', text: 'Password must be at least 6 characters long.', regex: /.{6,}/ },
+  { id: 'uppercase', text: 'Password must contain at least one uppercase letter.', regex: /[A-Z]/ },
+  { id: 'lowercase', text: 'Password must contain at least one lowercase letter.', regex: /[a-z]/ },
+  { id: 'number', text: 'Password must contain at least one number.', regex: /[0-9]/ },
+  { id: 'specialChar', text: 'Password must contain at least one special character.', regex: /[^A-Za-z0-9]/ },
+];
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -27,6 +35,9 @@ export default function SignUpPage() {
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordCriteriaStatus, setPasswordCriteriaStatus] = useState(() =>
+    passwordCriteria.map(c => ({ ...c, met: false }))
+  );
   const supabase = createClientComponentClient();
 
   const validateFullName = (name: string) => {
@@ -39,11 +50,28 @@ export default function SignUpPage() {
   };
 
   const validateUsername = (username: string) => {
-    const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
-    if (!usernameRegex.test(username)) {
-      setUsernameError('Username must be 3-20 characters, alphanumeric, _, -, or .');
+    if (username.length === 0) {
+      setUsernameError('Username cannot be empty.');
       return false;
     }
+    if (username.length === 1) {
+      const alphaRegex = /^[a-zA-Z]$/;
+      if (!alphaRegex.test(username)) {
+        setUsernameError('Single character username must be an alphabet letter.');
+        return false;
+      }
+    } else {
+      const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+      if (!usernameRegex.test(username)) {
+        setUsernameError('Username can only contain alphanumeric, _, -, or .');
+        return false;
+      }
+    }
+    if (username.length > 20) {
+      setUsernameError('Username cannot exceed 20 characters.');
+      return false;
+    }
+
     setUsernameError(null);
     return true;
   };
@@ -59,25 +87,18 @@ export default function SignUpPage() {
   };
 
   const validatePassword = (password: string) => {
-    let errors: string[] = [];
-    if (password.length < 6) {
-      errors.push('Password must be at least 6 characters long.');
-    }
-    if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain at least one uppercase letter.');
-    }
-    if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain at least one lowercase letter.');
-    }
-    if (!/[0-9]/.test(password)) {
-      errors.push('Password must contain at least one number.');
-    }
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      errors.push('Password must contain at least one special character.');
-    }
+    let allCriteriaMet = true;
+    const updatedCriteriaStatus = passwordCriteria.map(criterion => {
+      const met = criterion.regex.test(password);
+      if (!met) {
+        allCriteriaMet = false;
+      }
+      return { ...criterion, met };
+    });
+    setPasswordCriteriaStatus(updatedCriteriaStatus);
 
-    if (errors.length > 0) {
-      setPasswordError(errors.join(' '));
+    if (!allCriteriaMet) {
+      setPasswordError('Password does not meet all requirements.'); // Generic error message
       return false;
     }
     setPasswordError(null);
@@ -157,7 +178,10 @@ export default function SignUpPage() {
                 type="text"
                 placeholder="John Doe"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  const cleanedName = e.target.value.replace(/\s+/g, ' ').trim();
+                  setFullName(cleanedName);
+                }}
                 onBlur={(e) => validateFullName(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
@@ -170,7 +194,7 @@ export default function SignUpPage() {
                 type="text"
                 placeholder="johndoe"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value.toLowerCase())}
                 onBlur={(e) => validateUsername(e.target.value)}
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
@@ -196,14 +220,21 @@ export default function SignUpPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onBlur={(e) => validatePassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePassword(e.target.value); // Call validation on change
+                }}
+                onBlur={(e) => validatePassword(e.target.value)} // Keep onBlur for final check
                 required
                 className="w-full p-3 rounded-lg bg-background-medium/50 border border-primary-700 text-text-light placeholder-neutral-muted focus:outline-none focus:ring-2 focus:ring-accent-main transition-all duration-300"
               />
-              <p className="text-text-muted text-xs mt-1">
-                Password must be at least 6 characters, include uppercase, lowercase, number, and special character.
-              </p>
+              <ul className="text-xs mt-1 space-y-1 list-disc list-inside">
+                {passwordCriteriaStatus.map(criterion => (
+                  <li key={criterion.id} className={criterion.met ? 'text-green-500' : 'text-text-muted'}>
+                    {criterion.text}
+                  </li>
+                ))}
+              </ul>
               {passwordError && <p className="text-red-400 text-xs mt-1">{passwordError}</p>}
             </div>
 

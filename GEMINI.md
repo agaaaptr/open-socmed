@@ -124,10 +124,13 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [x] **Post Creation UI:** Create a form for users to create new posts.
-  - [x] **Post List Display:** Display a list of posts from other users.
+  - [x] **Post List Display:** Display a list of posts from other users, now fetching from `/api/timeline`. Updated empty state message to encourage following or posting. Added delete functionality for owned posts.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
-  - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
-  - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
+  - [x] **Centralized Full-Page Loading State:** Modified `home/page.tsx` to ensure the `LoadingState` component is centered on the screen during full-page loads, aligning with the existing behavior in other full-page loading scenarios.
+  - [x] **Removed Stories Feature:** Deleted the `apps/web/app/stories` directory as the feature is not yet implemented and its placeholder page is no longer needed in the main navigation flow.
+  - [x] **MoreMenu Click Outside Fix:** Resolved an issue where clicking the MoreMenu toggle button would cause the menu to close and immediately reopen, by stopping event propagation on the button click.
+  - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts. Added delete functionality for owned posts.
+  - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background. Reworked pull-to-refresh logic to ensure it only triggers when scrolled to the very top and pulling down, addressing z-index and event blocking issues.
   - [x] **Refined Mobile Navigation:** Transformed the mobile sidebar into a clean, icon-only bottom navigation bar for a modern and intuitive user experience. The desktop sidebar is now always visible and dedicated to desktop views. The sidebar and mobile navbar are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
   - [x] **Profile Navigation Flow:** Implemented "Back to Home" option on the profile view page and changed "Back to Home" to "Back to Profile Detail" on the edit profile page.
   - [x] **Profile View Layout Refactor:** Redesigned the profile view page (`apps/web/app/profile/page.tsx`) for better readability and future expansion, organizing content into clear header, profile information, and actions sections. Improved placement of "Back to Home", "Sign Out", and "Edit Profile" buttons.
@@ -139,6 +142,25 @@ This project is developed in structured stages to ensure organized progress.
 - [x] **Search Result Follow Status:** Fixed the issue where the "Follow" button was incorrectly displayed for already followed users in search results. The `searchUsers` function in `apps/web/app/search/page.tsx` now fetches the current user's following list and correctly sets the `is_following` status for each search result. Also addressed a linting warning by adding `currentUserId` and `supabase` to the dependency array of the `searchUsers` useCallback hook.
 - [x] **Search Bar UI Enhancement:** Updated the search bar placeholder to "Search for users by username..." and added a back button with an `ArrowLeft` icon to the left of the search bar, linking back to the `/home` page.
 - [x] **Loading State Enhancement:** Implemented a centralized `LoadingState` component with animated spinner and text, replacing previous loading indicators across `home/page.tsx`, `profile/[username]/page.tsx`, `profile/page.tsx`, `search/page.tsx`, `settings/profile/page.tsx`, `components/CreatePost.tsx`, `components/FollowButton.tsx`, and `components/Timeline.tsx` for consistent and professional UI. The `LoadingState` component now supports different loader types (spinner and dots) to accommodate various UI needs. Fixed inconsistent button loading animations by adjusting `LoadingState` styling and button content wrapping to maintain consistent button dimensions during loading states.
+  - [x] **Post Interaction Overhaul (Edit/Delete/Report):**
+    - [x] Replaced the simple delete icon with a modern three-dot options menu (`PostOptionsMenu.tsx`).
+    - [x] Implemented conditional logic: shows "Edit" and "Delete" for the post owner, and "Report" for other users.
+    - [x] Created a reusable, animated confirmation modal (`ConfirmationModal.tsx`) for the delete action to prevent accidental deletions.
+    - [x] Implemented a full edit workflow with a new `EditPostModal.tsx`, allowing users to update their post content.
+    - [x] Integrated `react-hot-toast` for sleek, modern, and animated toast notifications for all post actions (create, update, delete).
+    - [x] Enhanced the backend Post API (`api/posts`) to support `PUT` requests for editing posts securely.
+  - [x] **UI & State Refactor:**
+    - [x] Fixed transparent backgrounds on floating menus and modals for better readability.
+    - [x] Corrected modal positioning by refactoring the `PullToRefresh` component to prevent it from breaking the CSS `position: fixed` context.
+    - [x] Resolved a critical bug causing post duplication on edit by centralizing all post-related state management into `home/page.tsx`.
+    - [x] Refactored `Timeline.tsx` into a pure presentational component.
+  - [x] **PullToRefresh Fixes:**
+    - [x] Removed duplicate `PullToRefresh` component from `home/page.tsx`.
+    - [x] Modified `PullToRefresh.tsx` to ensure the background is transparent and the refresh indicator stays at the top, addressing the gap issue by animating only the icon, not the entire background container. Reverted `rounded-b-full` class.
+  - [x] **Profile Page Optimizations:**
+    - [x] Ensured posts on the profile page (`profile/[username]/page.tsx`) are ordered by `created_at` in descending order (newest first).
+    - [x] Refactored profile API calls to eliminate duplication: `profile/page.tsx` now redirects to `profile/my-profile`, and a new `profile/my-profile/page.tsx` handles fetching the authenticated user's profile and displaying it directly, ensuring only one API call to `/api/profile` for the current user.
+  - [x] **Persistent Navbar & Sidebar:** Refined visibility logic in `ClientLayoutContent.tsx` for desktop sidebar (visible everywhere except auth, landing, and profile) and mobile navbar (visible only on home, search, and messages pages). Implemented `framer-motion` based visibility control in `Sidebar.tsx` and `MobileNavbar.tsx` to prevent visual refresh on navigation, ensuring smooth transitions. Reintroduced responsive CSS classes (`hidden md:flex` and `md:hidden`) to `Sidebar.tsx` and `MobileNavbar.tsx` respectively, to ensure correct display based on screen size.
   - [ ] **Error Handling & Feedback:** Improve user feedback for authentication and data operations.
 - [x] **Checkpoint 2.5: Frontend Title and Icon (Completed)**
   - [x] Implemented dynamic page titles using Next.js Metadata API for all relevant pages (`/`, `/auth/signin`, `/auth/signup`, `/home`, `/profile`, `/settings/profile`).
@@ -152,9 +174,10 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
   - [x] **Username Uniqueness Check API:** Added a new endpoint (`/api/check-username`) to verify if a username is already taken.
   - [x] **Login with Email/Password Backend:** Removed custom backend logic for login, now relying on Supabase client-side authentication.
-  - [x] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
+  - [x] **Post Creation & Deletion API:** Implement API endpoints for creating and deleting posts, with ownership verification for deletion.
   - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
+  - [x] **Improved API Error Handling:** Ensured `/api/timeline` returns JSON formatted errors for better frontend consumption.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.
@@ -293,7 +316,7 @@ This project is developed in structured stages to ensure organized progress.
 #### 5.6.2. Backend (`api/`) - Go
 
 - [x] Create an API endpoint (`GET /api/timeline`) to fetch a personalized feed for the authenticated user.
-- [x] Implement logic to aggregate posts based on follow relationships and other criteria.
+- [x] Implement logic to aggregate posts based on follow relationships and user's own posts.
 
 ### 5.7. Feature: Stories
 

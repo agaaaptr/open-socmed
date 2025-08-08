@@ -18,21 +18,21 @@ const LoadingState: React.FC<LoadingStateProps> = ({ text, type = 'spinner' }) =
       {type === 'spinner' ? (
         <Loader2 className="h-5 w-5 animate-spin text-accent-main" />
       ) : (
-        <div className="flex space-x-1">
+        <div className="flex space-x-1 min-w-[24px] min-h-[24px] items-center justify-center"> {/* Added min-w, min-h, items-center, justify-center */}
           <motion.span
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1.5 h-1.5 bg-accent-main rounded-full"
+            className="w-1.5 h-1.5 bg-text-light rounded-full" // Changed bg-accent-main to bg-text-light
           />
           <motion.span
             animate={{ y: [0, -3, 0] }}
             transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-            className="w-1.5 h-1.5 bg-accent-main rounded-full"
+            className="w-1.5 h-1.5 bg-text-light rounded-full" // Changed bg-accent-main to bg-text-light
           />
           <motion.span
             animate={{ y: [0, -3, 0] }}
             transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-            className="w-1.5 h-1.5 bg-accent-main rounded-full"
+            className="w-1.5 h-1.5 bg-text-light rounded-full" // Changed bg-accent-main to bg-text-light
           />
         </div>
       )}

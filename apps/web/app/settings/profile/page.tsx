@@ -24,6 +24,7 @@ export default function EditProfilePage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [initialUsername, setInitialUsername] = useState('');
+  const [initialFullName, setInitialFullName] = useState('');
 
   useEffect(() => {
     async function fetchProfile() {
@@ -62,6 +63,7 @@ export default function EditProfilePage() {
           username: data.username || '',
         });
         setInitialUsername(data.username || '');
+        setInitialFullName(data.full_name || '');
       } catch (err: any) {
         console.error('Error fetching profile:', err);
         setError(err.message || 'Failed to load profile.');
@@ -75,14 +77,21 @@ export default function EditProfilePage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+    let processedValue = value;
+
+    if (name === 'full_name') {
+      processedValue = value.replace(/\s+/g, ' ').trim();
+    } else if (name === 'username') {
+      processedValue = value.toLowerCase();
+    }
+    setProfile((prev) => ({ ...prev, [name]: processedValue }));
     if (name === 'username') {
       setUsernameAvailable(null); // Reset availability on change
       setUsernameError(null); // Clear username error on change
-      validateUsername(value);
+      validateUsername(processedValue); // Use processedValue
     }
     if (name === 'full_name') {
-      validateFullName(value);
+      validateFullName(processedValue); // Use processedValue
     }
   };
 
@@ -96,11 +105,28 @@ export default function EditProfilePage() {
   };
 
   const validateUsername = (username: string) => {
-    const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
-    if (!usernameRegex.test(username)) {
-      setUsernameError('Username must be 3-20 characters, alphanumeric, _, -, or .');
+    if (username.length === 0) {
+      setUsernameError('Username cannot be empty.');
       return false;
     }
+    if (username.length === 1) {
+      const alphaRegex = /^[a-zA-Z]$/;
+      if (!alphaRegex.test(username)) {
+        setUsernameError('Single character username must be an alphabet letter.');
+        return false;
+      }
+    } else {
+      const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+      if (!usernameRegex.test(username)) {
+        setUsernameError('Username can only contain alphanumeric, _, -, or .');
+        return false;
+      }
+    }
+    if (username.length > 20) {
+      setUsernameError('Username cannot exceed 20 characters.');
+      return false;
+    }
+
     setUsernameError(null);
     return true;
   };
@@ -190,6 +216,8 @@ export default function EditProfilePage() {
       setSubmitting(false);
     }
   };
+
+  const hasChanges = profile.full_name !== initialFullName || profile.username !== initialUsername;
 
   if (loading) {
     return (
@@ -294,7 +322,7 @@ export default function EditProfilePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !hasChanges}
             className="w-full flex items-center justify-center bg-accent-main hover:bg-accent-hover text-text-light font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (

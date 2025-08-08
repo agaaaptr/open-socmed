@@ -6,20 +6,24 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import SettingsMenu from './SettingsMenu';
 
-const navItems = [
-  { name: 'Home', href: '/home', icon: Home },
-  { name: 'Search', href: '/search', icon: Search },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Notifications', href: '/notifications', icon: Bell },
-  { name: 'Profile', href: '/profile', icon: UserCircle },
-];
+interface SidebarProps {
+  isVisible: boolean;
+}
 
-const Sidebar = () => {
+const Sidebar = ({ isVisible }: SidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClientComponentClient();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
   const [isSettingsMenuOpen, setSettingsMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: 'Home', href: '/home', icon: Home },
+    { name: 'Search', href: '/search', icon: Search },
+    { name: 'Messages', href: '/messages', icon: MessageSquare },
+    { name: 'Notifications', href: '/notifications', icon: Bell },
+    { name: 'Profile', href: userProfile ? `/profile/${userProfile.username}` : '/profile', icon: UserCircle },
+  ];
 
   useEffect(() => {
     async function fetchUserProfile() {
@@ -55,17 +59,14 @@ const Sidebar = () => {
 
   return (
     <motion.nav
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
+      initial={false} // Control visibility via animate prop
+      animate={isVisible ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
     >
       <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
         className="text-4xl font-extrabold text-text-light mb-10 tracking-tight cursor-pointer"
-        onClick={() => router.refresh()}
+        onClick={() => router.push('/home')}
       >
         Cirqle
       </motion.div>
@@ -106,10 +107,7 @@ const Sidebar = () => {
             <span className="text-lg font-semibold">Settings</span>
           </button>
         </motion.div>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+        <div
           className="pt-4 border-t border-border-subtle flex items-center text-text-light"
         >
           <UserCircle className="w-10 h-10 mr-3 text-accent-main" />
@@ -117,7 +115,7 @@ const Sidebar = () => {
             <p className="font-semibold text-text-light">{userProfile?.full_name || 'Current User'}</p>
             <p className="text-sm text-text-muted">@{userProfile?.username || 'username'}</p>
           </div>
-        </motion.div>
+        </div>
       </div>
       <AnimatePresence>
         {isSettingsMenuOpen && <SettingsMenu onClose={() => setSettingsMenuOpen(false)} />}
