@@ -14,7 +14,12 @@ export default function ClientLayoutContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const showNav = pathname === '/home';
+  const isAuthPage = pathname.startsWith('/auth');
+  const isLandingPage = pathname === '/';
+  const isProfilePage = pathname.startsWith('/profile');
+
+  const showMobileNav = pathname === '/home' || pathname === '/search' || pathname === '/messages';
+  const showSidebar = showMobileNav && !isProfilePage;
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handlePostCreated = (newPost: any) => {
@@ -26,11 +31,11 @@ export default function ClientLayoutContent({
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row text-text-light">
-      {showNav && <Sidebar />}
-      <main className={`flex-grow flex flex-col pb-16 md:pb-0 ${showNav ? 'md:ml-64' : ''}`}>
+      {showSidebar && <Sidebar />}
+      <main className={`flex-grow flex flex-col pb-16 md:pb-0 ${showSidebar ? 'md:ml-64' : ''}`}>
         {children}
       </main>
-      {showNav && <MobileNavbar onOpenCreatePost={() => setIsCreatePostOpen(true)} />}
+      {showMobileNav && <MobileNavbar onOpenCreatePost={() => setIsCreatePostOpen(true)} />}
 
       {/* Mobile Create Post Bottom Sheet */}
       <AnimatePresence>

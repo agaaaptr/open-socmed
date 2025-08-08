@@ -6,20 +6,20 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import SettingsMenu from './SettingsMenu';
 
-const navItems = [
-  { name: 'Home', href: '/home', icon: Home },
-  { name: 'Search', href: '/search', icon: Search },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Notifications', href: '/notifications', icon: Bell },
-  { name: 'Profile', href: '/profile', icon: UserCircle },
-];
-
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClientComponentClient();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
   const [isSettingsMenuOpen, setSettingsMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: 'Home', href: '/home', icon: Home },
+    { name: 'Search', href: '/search', icon: Search },
+    { name: 'Messages', href: '/messages', icon: MessageSquare },
+    { name: 'Notifications', href: '/notifications', icon: Bell },
+    { name: 'Profile', href: userProfile ? `/profile/${userProfile.username}` : '/profile', icon: UserCircle },
+  ];
 
   useEffect(() => {
     async function fetchUserProfile() {
