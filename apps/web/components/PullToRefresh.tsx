@@ -9,7 +9,7 @@ interface PullToRefreshProps {}
 
 const PullToRefresh: React.FC<PullToRefreshProps> = () => {
   const router = useRouter();
-  const controls = useAnimation();
+  const iconControls = useAnimation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const pullDistanceRef = useRef(pullDistance);
@@ -46,22 +46,22 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
         e.preventDefault(); // Prevent native scrolling only when pulling down from the top
         distance = Math.min(distance, MAX_PULL_DISTANCE);
         setPullDistance(distance);
-        controls.start({ y: distance });
+        iconControls.start({ y: distance });
       } else {
         // If scrolling up or no movement, stop the pull gesture
         isPulling.current = false;
         startY.current = 0;
         setPullDistance(0); // Reset visual pull
-        controls.start({ y: 0 });
+        iconControls.start({ y: 0 });
       }
     } else {
       // If not at the top or not pulling, ensure flags are reset
       isPulling.current = false;
       startY.current = 0;
       setPullDistance(0); // Reset visual pull
-      controls.start({ y: 0 });
+      iconControls.start({ y: 0 });
     }
-  }, [controls]);
+  }, [iconControls]);
 
   const onTouchEnd = useCallback(async () => {
     isPulling.current = false; // End of touch, so end the pull gesture
@@ -69,18 +69,18 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
 
     if (pullDistanceRef.current >= REFRESH_THRESHOLD) {
       setIsRefreshing(true);
-      await controls.start({ y: REFRESH_THRESHOLD / 2, transition: { duration: 0.2 } });
+      await iconControls.start({ y: REFRESH_THRESHOLD / 2, transition: { duration: 0.2 } });
       router.refresh();
       setTimeout(() => {
         setIsRefreshing(false);
         setPullDistance(0);
-        controls.start({ y: 0, transition: { duration: 0.3 } });
+        iconControls.start({ y: 0, transition: { duration: 0.3 } });
       }, 1000);
     } else {
       setPullDistance(0);
-      controls.start({ y: 0, transition: { duration: 0.3 } });
+      iconControls.start({ y: 0, transition: { duration: 0.3 } });
     }
-  }, [controls, router]);
+  }, [iconControls, router]);
 
   useEffect(() => {
     // Attach listeners to window for main page scroll
@@ -97,14 +97,16 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
 
   return (
     <motion.div
-      animate={controls}
       className="fixed top-0 left-0 right-0 flex justify-center items-start z-50 bg-background-medium/50 backdrop-blur-sm rounded-b-full pointer-events-none overflow-hidden"
       style={{ height: pullDistance > 0 ? pullDistance : 0, willChange: 'transform' }}
     >
       {isRefreshing || pullDistance > 0 ? (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: pullDistance > 0 ? 1 : 0 }}
+          initial={{ opacity: 0, y: 0 }}
+          animate={{
+            opacity: pullDistance > 0 ? 1 : 0,
+            y: pullDistance > 0 ? pullDistance / 2 : 0,
+          }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="flex justify-center items-center"

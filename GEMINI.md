@@ -153,7 +153,7 @@ This project is developed in structured stages to ensure organized progress.
     - [x] Refactored `Timeline.tsx` into a pure presentational component.
   - [x] **PullToRefresh Fixes:**
     - [x] Removed duplicate `PullToRefresh` component from `home/page.tsx`.
-    - [x] Modified `PullToRefresh.tsx` to ensure the background is transparent and the refresh indicator stays at the top, addressing the gap issue.
+    - [x] Modified `PullToRefresh.tsx` to ensure the background is transparent and the refresh indicator stays at the top, addressing the gap issue by animating only the icon, not the entire background container. Reverted `rounded-b-full` class.
   - [x] **Profile Page Optimizations:**
     - [x] Ensured posts on the profile page (`profile/[username]/page.tsx`) are ordered by `created_at` in descending order (newest first).
     - [x] Refactored profile API calls to eliminate duplication: `profile/page.tsx` now redirects to `profile/my-profile`, and a new `profile/my-profile/page.tsx` handles fetching the authenticated user's profile and displaying it directly, ensuring only one API call to `/api/profile` for the current user.
