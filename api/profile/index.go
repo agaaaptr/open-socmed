@@ -95,7 +95,7 @@ type Profile struct {
 	UpdatedAt *time.Time `json:"updated_at"`
 	AvatarURL *string    `json:"avatar_url"`
 	Website   *string    `json:"website"`
-	Posts     []Post     `gorm:"foreignKey:UserID;references:ID" json:"posts"` // Add this line
+	Posts     []Post     `gorm:"foreignKey:UserID;references:ID;order:created_at DESC" json:"posts"` // Add this line
 }
 
 // UpdateProfileRequest defines the structure for incoming profile update data.
