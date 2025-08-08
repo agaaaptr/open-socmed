@@ -81,6 +81,11 @@ type Post struct {
 	UserID    uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
 	Content   string    `gorm:"not null" json:"content"`
 	CreatedAt time.Time `json:"created_at"`
+	User      Profile   `gorm:"foreignKey:UserID" json:"user"` // Add this line
+}
+
+func (Profile) TableName() string {
+    return "profiles"
 }
 
 type Profile struct {
