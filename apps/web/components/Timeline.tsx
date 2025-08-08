@@ -78,7 +78,7 @@ const Timeline = ({ posts, currentUserId, onUpdatePost, onDeletePost, onReportPo
                 variants={postVariants}
                 className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
                     {post.user?.avatar_url ? (
                       <Image src={post.user.avatar_url} alt={post.user.full_name} width={40} height={40} className="rounded-full mr-3 md:mr-4" />

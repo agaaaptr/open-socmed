@@ -26,7 +26,7 @@ export default function ProfileRedirectPage() {
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        router.replace('/profile/me');
+        router.replace('/profile/my-profile');
       } catch (err) {
         console.error('Error fetching user profile for redirect:', err);
         router.replace('/home'); // Redirect to home on error

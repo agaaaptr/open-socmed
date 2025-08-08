@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserCircle, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { UserCircle, LogOut, Edit, ArrowLeft, Rss, Users, Heart, MessageCircle, Share2 } from 'lucide-react';
 import LoadingState from '../../../components/LoadingState';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -83,7 +83,7 @@ const UserList = ({ users, isLoading, error, listType }: { users: User[], isLoad
   );
 };
 
-export default function ProfileViewPage({ params }: { params: { username: string } }) {
+export default function MyProfilePage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [profile, setProfile] = useState<(User & { email?: string; posts?: Post[] }) | null>(null);
@@ -194,40 +194,38 @@ export default function ProfileViewPage({ params }: { params: { username: string
   };
 
   useEffect(() => {
-    async function fetchProfileAndData() {
+    async function fetchMyProfileAndData() {
       setLoading(true);
       setError('');
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setCurrentUserId(currentUser?.id || null);
-
-      if (!params.username) {
-        router.push('/home'); // Redirect if no username is provided in the URL
+      if (!currentUser) {
+        router.push('/auth/signin');
         return;
       }
+      setCurrentUserId(currentUser.id);
 
       try {
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         if (!token) throw new Error('No access token found.');
 
-        const apiUrl = `/api/profile?username=${params.username}`;
-        const response = await fetch(apiUrl, {
+        // Fetch current user's profile
+        const profileResponse = await fetch('/api/profile', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!profileResponse.ok) {
+          const errorData = await profileResponse.json();
           throw new Error(errorData.message || 'Failed to fetch profile.');
         }
 
-        const data = await response.json();
+        const profileData = await profileResponse.json();
+        setProfile({ ...profileData, email: currentUser.email });
         
-        // No longer setting isOwnProfile here, as this page is for viewing other users' profiles
-        setProfile(data);
-        
+        // Fetch followers, following, and posts concurrently for the current user
         const [followersResponse, followingResponse] = await Promise.all([
-          fetch(`/api/followers?user_id=${data.id}`),
-          fetch(`/api/following?user_id=${data.id}`),
+          fetch(`/api/followers?user_id=${profileData.id}`),
+          fetch(`/api/following?user_id=${profileData.id}`),
         ]);
 
         const followersData = followersResponse.ok ? await followersResponse.json() : [];
@@ -236,19 +234,28 @@ export default function ProfileViewPage({ params }: { params: { username: string
         setTabData({
           followers: { data: followersData === null ? [] : followersData, isLoading: false, error: null },
           following: { data: followingData === null ? [] : followingData, isLoading: false, error: null },
-          posts: { data: (data.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
+          posts: { data: (profileData.posts || []).sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), isLoading: false, error: null },
         });
 
       } catch (err: any) {
-        console.error('Error fetching profile:', err);
-        setError(err.message || 'Failed to load profile.');
+        console.error('Error fetching my profile:', err);
+        setError(err.message || 'Failed to load your profile.');
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProfileAndData();
-  }, [supabase, router, params.username]);
+    fetchMyProfileAndData();
+  }, [supabase, router]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+  
+  const handleTabChange = (tab: string) => {
+      setActiveTab(tab);
+  };
 
   const postVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -258,7 +265,7 @@ export default function ProfileViewPage({ params }: { params: { username: string
   if (loading) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center bg-background-dark text-text-light">
-        <LoadingState text="Loading profile..." />
+        <LoadingState text="Loading your profile..." />
       </motion.div>
     );
   }
@@ -308,9 +315,90 @@ export default function ProfileViewPage({ params }: { params: { username: string
                 </div>
               </div>
             </div>
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-6 pt-6 border-t border-border-subtle">
+                <Link href="/settings/profile" className="flex-1 text-center py-2 px-4 bg-accent-main hover:bg-accent-hover rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                  <Edit className="mr-2 h-5 w-5" /> Edit Profile
+                </Link>
+                <button onClick={handleSignOut} className="flex-1 text-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-text-light transition-colors duration-300 shadow-md flex items-center justify-center">
+                  <LogOut className="mr-2 h-5 w-5" /> Sign Out
+                </button>
+              </div>
           </motion.div>
 
-          
+          <div className="mt-8">
+            <div className="flex border-b border-border-medium">
+              <button onClick={() => handleTabChange('posts')} className={`py-2 px-6 font-semibold transition-colors ${activeTab === 'posts' ? 'text-accent-main border-b-2 border-accent-main' : 'text-text-muted'}`}>Posts</button>
+              <button onClick={() => handleTabChange('followers')} className={`py-2 px-6 font-semibold transition-colors ${activeTab === 'followers' ? 'text-accent-main border-b-2 border-accent-main' : 'text-text-muted'}`}>Followers</button>
+              <button onClick={() => handleTabChange('following')} className={`py-2 px-6 font-semibold transition-colors ${activeTab === 'following' ? 'text-accent-main border-b-2 border-accent-main' : 'text-text-muted'}`}>Following</button>
+            </div>
+
+            <div className="mt-6">
+              <AnimatePresence mode="wait">
+                <motion.div key={activeTab} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {activeTab === 'posts' && (
+                    tabData.posts.isLoading ? (
+                      <div className="flex justify-center items-center py-10"><LoadingState /></div>
+                    ) : tabData.posts.error ? (
+                      <p className="text-center text-red-400">{tabData.posts.error}</p>
+                    ) : !tabData.posts.data || tabData.posts.data.length === 0 ? (
+                      <div className="text-center text-text-muted py-10 bg-background-light rounded-lg">
+                          <Rss className="mx-auto w-10 h-10 mb-4" />
+                          <h3 className="text-lg font-semibold">No posts yet</h3>
+                          <p>You have not posted anything yet.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {tabData.posts.data.map((post) => (
+                          <motion.div
+                            key={post.id}
+                            variants={postVariants}
+                            className="bg-background-medium/30 p-4 md:p-5 rounded-xl border border-border-subtle"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center">
+                                {post.user?.avatar_url ? (
+                                  <Image src={post.user.avatar_url} alt={post.user.full_name} width={40} height={40} className="rounded-full mr-3 md:mr-4" />
+                                ) : (
+                                  <UserCircle className="w-9 h-9 md:w-10 md:h-10 text-accent-main mr-3 md:mr-4" />
+                                )}
+                                <div>
+                                  <p className="font-semibold text-text-light text-base md:text-lg">{post.user?.full_name || 'Unknown User'}</p>
+                                  <p className="text-xs md:text-sm text-text-muted">@{post.user?.username || 'unknown'} • {new Date(post.created_at).toLocaleString()}</p>
+                                </div>
+                              </div>
+                              <PostOptionsMenu
+                                isOwner={currentUserId === post.user_id}
+                                onEdit={() => openEditModal(post)}
+                                onDelete={() => openDeleteModal(post)}
+                                onReport={handleReportPost}
+                              />
+                            </div>
+                            <p className="text-text-light text-sm md:text-base leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
+                            <div className="flex space-x-4 md:space-x-6 text-text-muted text-sm">
+                              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+                                <Heart className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+                                <span>Like</span>
+                              </button>
+                              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+                                <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+                                <span>Comment</span>
+                              </button>
+                              <button className="flex items-center hover:text-accent-main transition-colors duration-200">
+                                <Share2 className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+                                <span>Share</span>
+                              </button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )
+                  )}
+                  {activeTab === 'followers' && <UserList users={tabData.followers.data} isLoading={tabData.followers.isLoading} error={tabData.followers.error} listType="followers" />}
+                  {activeTab === 'following' && <UserList users={tabData.following.data} isLoading={tabData.following.isLoading} error={tabData.following.error} listType="following" />}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
       {selectedPost && (

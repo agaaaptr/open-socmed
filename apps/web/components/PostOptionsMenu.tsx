@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { MoreVertical, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
@@ -26,8 +26,8 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
 
   return (
     <div className="relative" ref={menuRef}>
-      <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-full hover:bg-accent-subtle transition-colors">
-        <MoreVertical size={20} />
+      <button onClick={() => setIsOpen(!isOpen)} className="p-0.5 rounded-full hover:bg-accent-subtle transition-colors">
+        <MoreHorizontal size={20} />
       </button>
 
       <AnimatePresence>
@@ -38,7 +38,7 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
             exit="hidden"
             variants={menuVariants}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="absolute top-full right-0 mt-2 w-48 bg-background-light border border-border-medium rounded-lg shadow-lg z-10 overflow-hidden"
+            className="absolute top-0 right-0 mt-0 w-32 bg-background-light border border-border-medium rounded-lg shadow-lg z-10 overflow-hidden origin-top-right"
           >
             <ul className="text-sm">
               {isOwner ? (
@@ -46,19 +46,19 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
                   <li>
                     <button
                       onClick={() => { onEdit(); setIsOpen(false); }}
-                      className="w-full flex items-center px-4 py-3 text-left hover:bg-accent-subtle transition-colors"
+                      className="w-full flex items-center px-3 py-2 text-left hover:bg-accent-subtle transition-colors"
                     >
-                      <Edit size={16} className="mr-3" />
-                      Edit Post
+                      <Edit size={16} className="mr-2" />
+                      Edit
                     </button>
                   </li>
                   <li>
                     <button
                       onClick={() => { onDelete(); setIsOpen(false); }}
-                      className="w-full flex items-center px-4 py-3 text-left text-red-500 hover:bg-red-500/10 transition-colors"
+                      className="w-full flex items-center px-3 py-2 text-left text-red-500 hover:bg-red-500/10 transition-colors"
                     >
-                      <Trash2 size={16} className="mr-3" />
-                      Delete Post
+                      <Trash2 size={16} className="mr-2" />
+                      Delete
                     </button>
                   </li>
                 </>
@@ -66,10 +66,10 @@ const PostOptionsMenu: React.FC<PostOptionsMenuProps> = ({ isOwner, onEdit, onDe
                 <li>
                   <button
                     onClick={() => { onReport(); setIsOpen(false); }}
-                    className="w-full flex items-center px-4 py-3 text-left hover:bg-accent-subtle transition-colors"
+                    className="w-full flex items-center px-3 py-2 text-left hover:bg-accent-subtle transition-colors"
                   >
-                    <AlertTriangle size={16} className="mr-3" />
-                    Report Post
+                    <AlertTriangle size={16} className="mr-2" />
+                    Report
                   </button>
                 </li>
               )}
