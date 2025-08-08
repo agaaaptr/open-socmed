@@ -95,7 +95,7 @@ type Profile struct {
 	UpdatedAt *time.Time `json:"updated_at"`
 	AvatarURL *string    `json:"avatar_url"`
 	Website   *string    `json:"website"`
-	Posts     []Post     `gorm:"foreignKey:UserID;references:ID;order:created_at DESC" json:"posts"` // Add this line
+	Posts     []Post     `gorm:"foreignKey:UserID;references:ID" json:"posts"` // Add this line
 }
 
 // UpdateProfileRequest defines the structure for incoming profile update data.
@@ -153,11 +153,11 @@ func getProfile(w http.ResponseWriter, r *http.Request, userID string, db *gorm.
 
 	if username != "" {
 		// If username is provided, fetch by username
-		err = db.Preload("Posts.User").Order("posts.created_at DESC").Where("username = ?", username).First(&profile).Error
+		err = db.Preload("Posts.User").Where("username = ?", username).First(&profile).Error
 		log.Printf("[DEBUG] Attempting to fetch profile by username: %s", username)
 	} else {
 		// Otherwise, fetch by userID from token
-		err = db.Preload("Posts.User").Order("posts.created_at DESC").Where("id = ?", userID).First(&profile).Error
+		err = db.Preload("Posts.User").Where("id = ?", userID).First(&profile).Error
 		log.Printf("[DEBUG] Attempting to fetch profile by userID: %s", userID)
 	}
 
