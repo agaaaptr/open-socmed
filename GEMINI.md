@@ -124,7 +124,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Consistent Backgrounds:** Ensured all pages use the consistent `bg-background-dark` background defined in `globals.css` by removing conflicting explicit background classes from individual page components. Implemented subtle background gradients for a fresh look.
   - [x] **New Color Palette:** Implemented the "Subtle Harmony" color palette across the entire website, updating `tailwind.config.js`, `globals.css`, and all relevant components (`page.tsx`, `signin/page.tsx`, `signup/page.tsx`, `home/page.tsx`, `profile/page.tsx`, `Sidebar.tsx`, `Stories.tsx`, `Timeline.tsx`, `SuggestedFeatures.tsx`, `Button.tsx`). This includes updating all color classes to the new palette, ensuring clean and modern visuals with smooth transitions and interactive elements, and removing any remaining old color classes.
   - [x] **Post Creation UI:** Create a form for users to create new posts.
-  - [x] **Post List Display:** Display a list of posts from other users.
+  - [x] **Post List Display:** Display a list of posts from other users, now fetching from `/api/timeline`.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
   - [x] **Profile Post Display:** Updated the profile page (`profile/[username]/page.tsx`) to fetch and display posts specific to the viewed user, including an empty state handler. The post count in the profile header now reflects the actual number of posts.
   - [x] **Responsive Design:** Ensured all pages are responsive across devices, including the main layout, authentication pages, and profile pages. Refactored home page for mobile to move "Suggested Features" to a floating icon with improved spring-like animations, and implemented "pull-to-refresh" for the timeline with a modern, fluid background.
@@ -155,6 +155,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Post CRUD API:** Implement API endpoints for creating, reading, updating, and deleting posts.
   - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
+  - [x] **Improved API Error Handling:** Ensured `/api/timeline` returns JSON formatted errors for better frontend consumption.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.

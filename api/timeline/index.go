@@ -112,34 +112,39 @@ func getTimeline(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return jwtSecret, nil
 	})
 	if err != nil || !token.Valid {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Token"})
 		return
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid Token Claims"})
 		return
 	}
 	userIDStr, ok := claims["sub"].(string)
 	if !ok {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid User ID in Token"})
 		return
 	}
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid User ID Format"})
 		return
 	}
-	var posts []Post // Menggunakan 'posts' untuk konsistensi
+	var posts []Post
 	// Fetch posts from users that the current user is following
 	if err := db.Preload("User").
-		Joins("JOIN follows ON posts.user_id = follows.following_id"). // PERBAIKAN: JOIN dengan tabel follows dan kolom yang benar
-		Where("follows.follower_id = ?", userID).                      // PERBAIKAN: Filter berdasarkan follower_id dan hapus ')'
+		Joins("JOIN follows ON posts.user_id = follows.following_id").
+		Where("follows.follower_id = ?", userID).
 		Order("posts.created_at DESC").
 		Distinct("posts.id").
-		Find(&posts).Error; err != nil { // Menggunakan 'posts'
+		Find(&posts).Error; err != nil {
 		log.Printf("Error fetching timeline: %v", err)
-		http.Error(w, "Failed to fetch timeline", http.StatusInternalServerError) // Pesan error lengkap
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Failed to fetch timeline", "error": err.Error()})
 		return
 	}
 

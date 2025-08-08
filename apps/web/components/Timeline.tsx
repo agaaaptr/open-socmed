@@ -42,7 +42,7 @@ const Timeline = ({ posts, setPosts }: TimelineProps) => {
 
         const token = session.access_token;
 
-        const response = await fetch('/api/posts', {
+        const response = await fetch('/api/timeline', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
