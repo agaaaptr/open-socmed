@@ -6,6 +6,7 @@ import { Send } from 'lucide-react';
 import LoadingState from './LoadingState';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useOnClickOutside } from '../hooks/useOnClickOutside';
+import toast from 'react-hot-toast';
 
 interface CreatePostProps {
   onPostCreated: (newPost: any) => void; // Callback to update the timeline
@@ -67,10 +68,12 @@ export default function CreatePost({ onPostCreated, onClose, isMobile }: CreateP
       const newPost = await response.json();
       onPostCreated(newPost);
       setContent(''); // Clear content after successful post
+      toast.success('Post created successfully!'); // Add success toast
       onClose(); // Close the modal/bottom sheet
     } catch (err: any) {
       console.error('Error creating post:', err);
       setError(err.message || 'An unexpected error occurred.');
+      toast.error(err.message || 'Failed to create post.'); // Add error toast
     } finally {
       setIsSubmitting(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from '../components/Sidebar';
 import MobileNavbar from '../components/MobileNavbar';
 import { useState } from 'react';
@@ -14,12 +14,13 @@ export default function ClientLayoutContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isAuthPage = pathname.startsWith('/auth');
   const isLandingPage = pathname === '/';
   const isProfilePage = pathname.startsWith('/profile');
 
   const showMobileNav = pathname === '/home' || pathname === '/search' || pathname === '/messages';
-  const showSidebar = showMobileNav && !isProfilePage;
+  const showSidebar = !isAuthPage && !isLandingPage && !isProfilePage;
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handlePostCreated = (newPost: any) => {
@@ -27,15 +28,19 @@ export default function ClientLayoutContent({
     // to update the global state or re-fetch posts in the Timeline.
     // For now, we'll just close the modal.
     console.log('New post created:', newPost);
+    // If not on the home page, redirect to home after successful post creation
+    if (pathname !== '/home') {
+      router.push('/home');
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row text-text-light">
-      {showSidebar && <Sidebar />}
+      <Sidebar isVisible={showSidebar} />
       <main className={`flex-grow flex flex-col pb-16 md:pb-0 ${showSidebar ? 'md:ml-64' : ''}`}>
         {children}
       </main>
-      {showMobileNav && <MobileNavbar onOpenCreatePost={() => setIsCreatePostOpen(true)} />}
+      <MobileNavbar isVisible={showMobileNav} onOpenCreatePost={() => setIsCreatePostOpen(true)} />
 
       {/* Mobile Create Post Bottom Sheet */}
       <AnimatePresence>

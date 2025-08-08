@@ -6,7 +6,11 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import SettingsMenu from './SettingsMenu';
 
-const Sidebar = () => {
+interface SidebarProps {
+  isVisible: boolean;
+}
+
+const Sidebar = ({ isVisible }: SidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -55,10 +59,10 @@ const Sidebar = () => {
 
   return (
     <motion.nav
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
+      initial={false} // Control visibility via animate prop
+      animate={isVisible ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
+      className="md:flex flex-col fixed left-0 top-0 h-full w-64 bg-background-dark/80 backdrop-blur-lg border-r border-border-subtle p-6 shadow-xl z-50"
     >
       <motion.div
         initial={{ y: -20, opacity: 0 }}
