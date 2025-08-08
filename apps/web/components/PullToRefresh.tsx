@@ -98,7 +98,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = () => {
   return (
     <motion.div
       animate={controls}
-      className="absolute top-0 left-0 right-0 flex justify-center items-center z-10 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-3xl pointer-events-none"
+      className="fixed top-0 left-0 right-0 flex justify-center items-center z-50 bg-gradient-to-b from-transparent to-background-medium/70 backdrop-blur-sm rounded-b-full pointer-events-none"
       style={{ height: pullDistance, willChange: 'transform' }}
     >
       {isRefreshing || pullDistance > 0 ? (

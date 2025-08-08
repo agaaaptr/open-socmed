@@ -135,6 +135,7 @@ export default function HomePage() {
 
   return (
     <>
+      <PullToRefresh />
       <div className="w-full p-4 md:p-8">
         {loading ? (
           <LoadingState text="Loading your home feed..." />
