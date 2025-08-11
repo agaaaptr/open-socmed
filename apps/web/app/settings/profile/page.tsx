@@ -307,9 +307,16 @@ export default function EditProfilePage() {
                 type="button"
                 onClick={checkUsernameAvailability}
                 disabled={checkingUsername || !profile.username || !!usernameError || profile.username === initialUsername}
-                className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative w-20 absolute inset-y-0 right-0 flex items-center justify-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {checkingUsername ? <LoadingState type="dots" /> : <span>Check</span>}
+                {checkingUsername && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <LoadingState type="dots" size="sm" />
+                  </div>
+                )}
+                <span className={checkingUsername ? 'opacity-0' : 'opacity-100'}>
+                  Check
+                </span>
               </button>
             </div>
             <p className="text-text-muted text-xs mt-1">Username must be unique.</p>
@@ -319,18 +326,21 @@ export default function EditProfilePage() {
           </div>
           
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: submitting ? 1 : 1.02 }}
+            whileTap={{ scale: submitting ? 1 : 0.98 }}
             type="submit"
             disabled={submitting || !hasChanges}
-            className="w-full flex items-center justify-center bg-accent-main hover:bg-accent-hover text-text-light font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="relative w-full flex items-center justify-center bg-accent-main hover:bg-accent-hover text-text-light font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? (
-              <LoadingState type="dots" />
-            ) : (
-              <Save className="w-5 h-5 mr-2" />
+            {submitting && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <LoadingState type="dots" size="sm" text="Saving..." />
+              </div>
             )}
-            {submitting ? 'Saving...' : <span>Save Profile</span>}
+            <div className={`flex items-center justify-center ${submitting ? 'opacity-0' : 'opacity-100'}`}>
+              <Save className="w-5 h-5 mr-2" />
+              <span>Save Profile</span>
+            </div>
           </motion.button>
         </form>
       </motion.div>

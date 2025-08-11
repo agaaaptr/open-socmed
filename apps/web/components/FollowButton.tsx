@@ -63,11 +63,18 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
       disabled={isLoading}
       whileHover={{ scale: isLoading ? 1 : 1.05 }}
       whileTap={{ scale: isLoading ? 1 : 0.95 }}
-      className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 flex items-center justify-center ${isFollowing
+      className={`relative px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-28 flex items-center justify-center ${isFollowing
           ? 'bg-transparent border border-accent-main text-accent-main'
           : 'bg-accent-main text-text-light'
-        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-      {isLoading ? <LoadingState type="dots" /> : <span>{isFollowing ? 'Following' : 'Follow'}</span>}
+        } ${isLoading ? 'cursor-not-allowed' : ''}`}>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <LoadingState type="dots" size="sm" />
+        </div>
+      )}
+      <span className={isLoading ? 'opacity-0' : 'opacity-100'}>
+        {isFollowing ? 'Following' : 'Follow'}
+      </span>
     </motion.button>
   );
 };
