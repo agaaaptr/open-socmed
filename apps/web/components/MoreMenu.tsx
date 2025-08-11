@@ -8,6 +8,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useRef, useEffect, useState } from 'react';
 import { useOnClickOutside } from '../hooks/useOnClickOutside';
+import { useQuery } from '@tanstack/react-query'; // Added import
 
 interface MoreMenuProps {
   onClose: () => void;
@@ -19,13 +20,15 @@ export default function MoreMenu({ onClose }: MoreMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Added state for current user ID
 
   useOnClickOutside(menuRef, onClose);
 
   useEffect(() => {
-    async function fetchUserProfile() {
+    async function fetchUserProfileAndUserId() { // Combined function
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setCurrentUserId(user.id); // Set current user ID
         try {
           const token = (await supabase.auth.getSession()).data.session?.access_token;
           if (!token) {
@@ -51,8 +54,34 @@ export default function MoreMenu({ onClose }: MoreMenuProps) {
         }
       }
     }
-    fetchUserProfile();
+    fetchUserProfileAndUserId(); // Call combined function
   }, [supabase]);
+
+  // Fetch unread notifications count
+  const { data: unreadNotifications } = useQuery<any[]>({ // Use 'any[]' for simplicity, or define a more specific type if needed
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return []; // Return empty array if no session
+
+      const response = await fetch('/api/notifications', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to fetch notifications for unread count');
+        return [];
+      }
+      const data = await response.json();
+      return data.filter((n: any) => !n.is_read); // Filter for unread
+    },
+    enabled: !!currentUserId, // Only fetch if currentUserId is available
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const unreadCount = unreadNotifications?.length || 0;
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -61,7 +90,7 @@ export default function MoreMenu({ onClose }: MoreMenuProps) {
   };
 
   const menuItems = [
-    { label: 'Notifications', icon: <Bell className="w-5 h-5 text-text-muted" />, href: '/notifications' },
+    { label: 'Notifications', icon: <Bell className="w-5 h-5 text-text-muted" />, href: '/notifications', unreadCount: unreadCount }, // Added unreadCount
     { label: 'Profile', icon: <UserCircle className="w-5 h-5 text-text-muted" />, href: userProfile ? `/profile/${userProfile.username}` : '/profile' },
     { label: 'Settings', icon: <Settings2 className="w-5 h-5 text-text-muted" />, href: '/settings' },
   ];
@@ -94,6 +123,14 @@ export default function MoreMenu({ onClose }: MoreMenuProps) {
                 {item.icon}
                 <span className="ml-3">{item.label}</span>
               </div>
+              {item.label === 'Notifications' && item.unreadCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="ml-auto w-2.5 h-2.5 bg-red-500 rounded-full" // Adjust positioning as needed
+                />
+              )}
               <ChevronRight className="w-4 h-4 text-text-muted" />
             </Link>
           </motion.div>

@@ -143,7 +143,25 @@ const SearchPage = () => {
                 </div>
               </Link>
               {user.id !== currentUserId && (
-                <FollowButton userIdToFollow={user.id} initialIsFollowing={user.is_following} onToggleFollow={handleToggleFollow} />
+                <FollowButton
+                  targetUserId={user.id}
+                  currentUserId={currentUserId || ''} // currentUserId can be null, provide default or handle
+                  initialIsFollowing={user.is_following}
+                  onFollowSuccess={() => {
+                    setResults(prevResults =>
+                      prevResults.map(resultUser =>
+                        resultUser.id === user.id ? { ...resultUser, is_following: true } : resultUser
+                      )
+                    );
+                  }}
+                  onUnfollowSuccess={() => {
+                    setResults(prevResults =>
+                      prevResults.map(resultUser =>
+                        resultUser.id === user.id ? { ...resultUser, is_following: false } : resultUser
+                      )
+                    );
+                  }}
+                />
               )}
             </motion.div>
           ))}

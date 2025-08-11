@@ -40,6 +40,14 @@
         {
             "src": "api/timeline/index.go",
             "use": "@vercel/go"
+        },
+        {
+            "src": "api/notifications/index.go",
+            "use": "@vercel/go"
+        },
+        {
+            "src": "api/mark-notifications-as-read/index.go",
+            "use": "@vercel/go"
         }
     ],
     "rewrites": [{

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import SettingsMenu from './SettingsMenu';
+import { useQuery } from '@tanstack/react-query'; // Added import
 
 interface SidebarProps {
   isVisible: boolean;
@@ -16,12 +17,72 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
   const supabase = createClientComponentClient();
   const [userProfile, setUserProfile] = useState<{ full_name: string; username: string } | null>(null);
   const [isSettingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Added state for current user ID
+
+  useEffect(() => {
+    async function fetchUserProfileAndUserId() { // Combined function
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id); // Set current user ID
+        try {
+          const token = (await supabase.auth.getSession()).data.session?.access_token;
+          if (!token) {
+            throw new Error('No access token found.');
+          }
+
+          const response = await fetch('/api/profile', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile.');
+          }
+
+          const data = await response.json();
+          setUserProfile(data);
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
+    }
+    fetchUserProfileAndUserId(); // Call combined function
+  }, [supabase]);
+
+  // Fetch unread notifications count
+  const { data: unreadNotifications } = useQuery<any[]>({ // Use 'any[]' for simplicity, or define a more specific type if needed
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return []; // Return empty array if no session
+
+      const response = await fetch('/api/notifications', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to fetch notifications for unread count');
+        return [];
+      }
+      const data = await response.json();
+      return data.filter((n: any) => !n.is_read); // Filter for unread
+    },
+    enabled: !!currentUserId, // Only fetch if currentUserId is available
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const unreadCount = unreadNotifications?.length || 0;
 
   const navItems = [
     { name: 'Home', href: '/home', icon: Home },
     { name: 'Search', href: '/search', icon: Search },
     { name: 'Messages', href: '/messages', icon: MessageSquare },
-    { name: 'Notifications', href: '/notifications', icon: Bell },
+    { name: 'Notifications', href: '/notifications', icon: Bell, unreadCount: unreadCount }, // Added unreadCount
     { name: 'Profile', href: userProfile ? `/profile/${userProfile.username}` : '/profile', icon: UserCircle },
   ];
 
@@ -88,6 +149,14 @@ const Sidebar = ({ isVisible }: SidebarProps) => {
               >
                 <item.icon className="w-6 h-6 mr-4" />
                 <span className="text-lg font-semibold">{item.name}</span>
+                {item.name === 'Notifications' && item.unreadCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="ml-2 w-3 h-3 bg-red-500 rounded-full absolute top-3 right-3" // Adjust positioning as needed
+                  />
+                )}
               </div>
             </Link>
           </motion.li>

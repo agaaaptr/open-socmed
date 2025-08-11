@@ -7,6 +7,9 @@ import { useState } from 'react';
 import CreatePost from '../components/CreatePost';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // Added imports
+
+const queryClient = new QueryClient(); // Create a client
 
 export default function ClientLayoutContent({
   children,
@@ -42,68 +45,70 @@ export default function ClientLayoutContent({
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row text-text-light">
-      <Sidebar isVisible={showSidebar} />
-      <main className={`flex-grow flex flex-col pb-16 md:pb-0 ${showSidebar ? 'md:ml-64' : ''}`}>
-        {children}
-      </main>
-      <MobileNavbar isVisible={showMobileNav} onOpenCreatePost={() => setIsCreatePostOpen(true)} />
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen flex flex-col md:flex-row text-text-light">
+        <Sidebar isVisible={showSidebar} />
+        <main className={`flex-grow flex flex-col pb-16 md:pb-0 ${showSidebar ? 'md:ml-64' : ''}`}>
+          {children}
+        </main>
+        <MobileNavbar isVisible={showMobileNav} onOpenCreatePost={() => setIsCreatePostOpen(true)} />
 
-      {/* Mobile Create Post Bottom Sheet */}
-      <AnimatePresence>
-        {isCreatePostOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:hidden"
-            onClick={handleCloseCreatePost}
-          >
+        {/* Mobile Create Post Bottom Sheet */}
+        <AnimatePresence>
+          {isCreatePostOpen && (
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="w-full max-w-sm bg-background-dark rounded-2xl shadow-lg"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:hidden"
+              onClick={handleCloseCreatePost}
             >
-              <CreatePost
-                onPostCreated={handlePostCreated}
-                onClose={handleCloseCreatePost}
-                isMobile={true}
-              />
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="w-full max-w-sm bg-background-dark rounded-2xl shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <CreatePost
+                  onPostCreated={handlePostCreated}
+                  onClose={handleCloseCreatePost}
+                  isMobile={true}
+                />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
 
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        toastOptions={{
-          style: {
-            background: '#1A1A2E', // bg-medium
-            color: '#E0E0EB', // text-light
-            border: '1px solid #28283A', // border-medium
-            borderRadius: '12px',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#8B5CF6', // accent-main
-              secondary: '#E0E0EB', // text-light
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          toastOptions={{
+            style: {
+              background: '#1A1A2E', // bg-medium
+              color: '#E0E0EB', // text-light
+              border: '1px solid #28283A', // border-medium
+              borderRadius: '12px',
             },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: '#F87171', // A suitable red color
-              secondary: '#E0E0EB', // text-light
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#8B5CF6', // accent-main
+                secondary: '#E0E0EB', // text-light
+              },
             },
-          },
-        }}
-      />
-    </div>
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#F87171', // A suitable red color
+                secondary: '#E0E0EB', // text-light
+              },
+            },
+          }}
+        />
+      </div>
+    </QueryClientProvider>
   );
 }

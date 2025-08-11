@@ -6,12 +6,14 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import LoadingState from './LoadingState';
 
 interface FollowButtonProps {
-  userIdToFollow: string;
+  targetUserId: string; // Renamed from userIdToFollow
+  currentUserId: string; // Added
   initialIsFollowing: boolean;
-  onToggleFollow?: (userId: string, newStatus: boolean) => void;
+  onFollowSuccess?: () => void; // Added
+  onUnfollowSuccess?: () => void; // Added
 }
 
-const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: FollowButtonProps) => {
+const FollowButton = ({ targetUserId, currentUserId, initialIsFollowing, onFollowSuccess, onUnfollowSuccess }: FollowButtonProps) => {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClientComponentClient();
@@ -29,6 +31,13 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
       return;
     }
 
+    // Prevent self-follow
+    if (targetUserId === currentUserId) {
+      console.warn('Cannot follow/unfollow yourself.');
+      setIsLoading(false);
+      return;
+    }
+
     const endpoint = '/api/follow';
     const method = isFollowing ? 'DELETE' : 'POST';
 
@@ -39,7 +48,7 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ following_id: userIdToFollow }),
+        body: JSON.stringify({ following_id: targetUserId }), // Use targetUserId
       });
 
       if (!response.ok) {
@@ -47,9 +56,13 @@ const FollowButton = ({ userIdToFollow, initialIsFollowing, onToggleFollow }: Fo
       }
 
       setIsFollowing(!isFollowing);
-      if (onToggleFollow) {
-        onToggleFollow(userIdToFollow, !isFollowing);
+      // Call appropriate success callback
+      if (!isFollowing && onFollowSuccess) { // If was not following and now is
+        onFollowSuccess();
+      } else if (isFollowing && onUnfollowSuccess) { // If was following and now is not
+        onUnfollowSuccess();
       }
+      // Removed onToggleFollow as it's replaced by specific callbacks
     } catch (error) {
       console.error('Error toggling follow:', error);
     } finally {

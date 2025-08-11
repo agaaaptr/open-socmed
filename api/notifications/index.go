@@ -1,4 +1,4 @@
-package follow
+package notifications
 
 import (
 	"encoding/json"
@@ -22,18 +22,6 @@ var (
 	once sync.Once
 )
 
-// Follow struct matches the public.follows table
-type Follow struct {
-	ID          uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	FollowerID  uuid.UUID `gorm:"type:uuid;not null" json:"follower_id"`
-	FollowingID uuid.UUID `gorm:"type:uuid;not null" json:"following_id"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-func (Follow) TableName() string {
-    return "public.follows"
-}
-
 // Notification struct matches the public.notifications table
 type Notification struct {
 	ID            uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
@@ -46,12 +34,27 @@ type Notification struct {
 }
 
 func (Notification) TableName() string {
-    return "public.notifications"
+	return "public.notifications"
 }
 
-// FollowRequest defines the structure for incoming follow/unfollow requests
-type FollowRequest struct {
-	FollowingID string `json:"following_id"`
+// Profile struct for joining with sender's profile
+type Profile struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Username  string    `json:"username"`
+	FullName  string    `gorm:"column:full_name" json:"full_name"`
+	AvatarURL string    `gorm:"column:avatar_url" json:"avatar_url"`
+}
+
+func (Profile) TableName() string {
+	return "public.profiles"
+}
+
+// NotificationResponse combines Notification with Sender's Profile
+type NotificationResponse struct {
+	Notification
+	SenderUsername  string `json:"sender_username"`
+	SenderFullName  string `json:"sender_full_name"`
+	SenderAvatarURL string `json:"sender_avatar_url"`
 }
 
 // Connect initializes the database connection
@@ -106,32 +109,14 @@ func GetDB() (*gorm.DB, error) {
 func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	followerID, err := validateToken(r)
+	userID, err := validateToken(r)
 	if err != nil {
 		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	switch r.Method {
-	case http.MethodPost:
-		createFollow(w, r, followerID)
-	case http.MethodDelete:
-		deleteFollow(w, r, followerID)
-	default:
+	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func createFollow(w http.ResponseWriter, r *http.Request, followerID uuid.UUID) {
-	var req FollowRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	followingID, err := uuid.Parse(req.FollowingID)
-	if err != nil {
-		http.Error(w, "Invalid following_id", http.StatusBadRequest)
 		return
 	}
 
@@ -141,58 +126,41 @@ func createFollow(w http.ResponseWriter, r *http.Request, followerID uuid.UUID) 
 		return
 	}
 
-	follow := Follow{FollowerID: followerID, FollowingID: followingID}
-	if err := db.Create(&follow).Error; err != nil {
-		http.Error(w, "Failed to create follow relationship", http.StatusInternalServerError)
+	var notifications []Notification
+	// Fetch notifications for the recipient, ordered by creation time descending
+	result := db.Where("recipient_user_id = ?", userID).Order("created_at DESC").Find(&notifications)
+	if result.Error != nil {
+		http.Error(w, "Failed to fetch notifications", http.StatusInternalServerError)
 		return
 	}
 
-	// --- NEW: Create a notification for the recipient (followingID) ---
-	// Only create notification if followerID is not the same as followingID
-	if followerID != followingID {
-		notification := Notification{
-			RecipientUserID: followingID, // The user who is being followed receives the notification
-			SenderUserID:    followerID,  // The user who initiated the follow
-			Type:            "follow",    // Type of notification
-			IsRead:          false,       // Initially unread
+	// Fetch sender profiles for each notification
+	var notificationResponses []NotificationResponse
+	for _, n := range notifications {
+		var senderProfile Profile
+		profileResult := db.Where("id = ?", n.SenderUserID).First(&senderProfile)
+		if profileResult.Error != nil {
+			log.Printf("Warning: Could not fetch sender profile for notification %s: %v", n.ID.String(), profileResult.Error)
+			// Continue without sender info if profile not found
+			notificationResponses = append(notificationResponses, NotificationResponse{
+				Notification: n,
+				SenderUsername:  "Unknown",
+				SenderFullName:  "Unknown User",
+				SenderAvatarURL: "",
+			})
+			continue
 		}
-		if err := db.Create(&notification).Error; err != nil {
-			// Log the error but don't return an HTTP error, as the follow itself was successful.
-			log.Printf("Failed to create follow notification for user %s: %v", followingID.String(), err)
-		}
-	}
-	// --- END NEW ---
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(follow)
-}
-
-func deleteFollow(w http.ResponseWriter, r *http.Request, followerID uuid.UUID) {
-	var req FollowRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	followingID, err := uuid.Parse(req.FollowingID)
-	if err != nil {
-		http.Error(w, "Invalid following_id", http.StatusBadRequest)
-		return
-	}
-
-	db, err := GetDB()
-	if err != nil {
-		http.Error(w, "Database connection error", http.StatusInternalServerError)
-		return
-	}
-
-	if err := db.Where("follower_id = ? AND following_id = ?", followerID, followingID).Delete(&Follow{}).Error; err != nil {
-		http.Error(w, "Failed to delete follow relationship", http.StatusInternalServerError)
-		return
+		notificationResponses = append(notificationResponses, NotificationResponse{
+			Notification: n,
+			SenderUsername:  senderProfile.Username,
+			SenderFullName:  senderProfile.FullName,
+			SenderAvatarURL: senderProfile.AvatarURL,
+		})
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Successfully unfollowed"})
+	json.NewEncoder(w).Encode(notificationResponses)
 }
 
 func validateToken(r *http.Request) (uuid.UUID, error) {
