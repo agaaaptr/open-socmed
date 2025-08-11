@@ -126,6 +126,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Post Creation UI:** Create a form for users to create new posts.
   - [x] **Post List Display:** Display a list of posts from other users, now fetching from `/api/timeline`. Updated empty state message to encourage following or posting. Added delete functionality for owned posts.
   - [ ] **Basic Post Interaction:** Implement like/comment buttons (UI only for now).
+  - [x] **Notification Feature:** Implemented comprehensive notification display, mark as read functionality, and unread count badges on UI.
   - [x] **Centralized Full-Page Loading State:** Modified `home/page.tsx` to ensure the `LoadingState` component is centered on the screen during full-page loads, aligning with the existing behavior in other full-page loading scenarios.
   - [x] **Removed Stories Feature:** Deleted the `apps/web/app/stories` directory as the feature is not yet implemented and its placeholder page is no longer needed in the main navigation flow.
   - [x] **MoreMenu Click Outside Fix:** Resolved an issue where clicking the MoreMenu toggle button would cause the menu to close and immediately reopen, by stopping event propagation on the button click.
@@ -170,7 +171,7 @@ This project is developed in structured stages to ensure organized progress.
 
 ### 3.3. Backend Development Plan
 
-- [x] **Checkpoint 3.1: Backend Core Feature Implementation (In Progress)**
+- [x] **Checkpoint 3.1: Backend Core Feature Implementation (Completed)**
   - [x] Renamed `users` model/controller to `profiles` to match database schema.
   - [x] **Unique Username Constraint:** Added a unique constraint to the `username` column in the `profiles` table.
   - [x] **User Profile API:** Implemented API endpoint for fetching and updating user profiles.
@@ -180,6 +181,7 @@ This project is developed in structured stages to ensure organized progress.
   - [x] **Authentication Integration:** Ensure backend APIs are protected and integrate with Supabase authentication (e.g., verifying JWT tokens).
   - [x] **Database Interaction:** Implement GORM models and queries for `posts`, `comments`, `likes`, and `follows` tables.
   - [x] **Improved API Error Handling:** Ensured `/api/timeline` returns JSON formatted errors for better frontend consumption.
+  - [x] **Notification Feature:** Implemented database schema, API endpoints for fetching, creating (via follow), and marking notifications as read.
 - [x] **Checkpoint 3.2: Backend Deployment Optimization (Completed)**
   - [x] Refactored Go backend into Vercel serverless functions.
   - [x] Configured `vercel.json` for monorepo deployment with explicit `builds` and `routes`.

@@ -14,6 +14,7 @@
 - **Profile Stats:** View dynamic counts and lists of posts, followers, and users you are following.
 - **Fully Responsive:** A mobile-first design ensures a seamless experience on any device, from phones to desktops.
 - **Modern UI/UX:** Built with a custom "Subtle Harmony" color palette, smooth animations via Framer Motion, and a clean, intuitive layout.
+- **Notifications:** Real-time updates for new followers, with options to follow back and mark as read.
 - **And much more:** Including toast notifications, confirmation modals, pull-to-refresh on mobile, and more.
 
 ## 🛠️ Tech Stack
