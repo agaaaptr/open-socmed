@@ -307,7 +307,7 @@ export default function EditProfilePage() {
                 type="button"
                 onClick={checkUsernameAvailability}
                 disabled={checkingUsername || !profile.username || !!usernameError || profile.username === initialUsername}
-                className="relative w-20 absolute inset-y-0 right-0 flex items-center justify-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative absolute inset-y-0 right-0 flex items-center justify-center px-3 text-sm font-semibold text-accent-main hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {checkingUsername && (
                   <div className="absolute inset-0 flex items-center justify-center">
