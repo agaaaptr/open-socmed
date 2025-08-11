@@ -1,346 +1,170 @@
-# open-socmed
+# Cirqle (open-socmed)
 
-`open-socmed` is a full-stack social media platform built as a monorepo using Turborepo. It consists of a Next.js frontend, a Go backend API, and a shared UI component library.
+![Cirqle Logo](./apps/web/public/logo.png)
 
-## 1. Getting Started
+**Cirqle** is a modern, full-stack social media platform built with a Next.js frontend, a Go backend, and a robust monorepo architecture managed by Turborepo. It's designed to be a feature-rich, responsive, and visually appealing open-source social application.
 
-To set up the project locally, follow these steps:
+## ✨ Features
 
-### 1.1. Prerequisites
+- **Authentication:** Secure user sign-up and sign-in with email/password via Supabase Auth.
+- **Dynamic Timeline:** A personalized feed that aggregates posts from followed users.
+- **Post Management:** Create, edit, and delete your own posts with a modern UI.
+- **User Profiles:** View and edit user profiles, including display names and unique usernames.
+- **Social Graph:** Easily search for, follow, and unfollow other users.
+- **Profile Stats:** View dynamic counts and lists of posts, followers, and users you are following.
+- **Fully Responsive:** A mobile-first design ensures a seamless experience on any device, from phones to desktops.
+- **Modern UI/UX:** Built with a custom "Subtle Harmony" color palette, smooth animations via Framer Motion, and a clean, intuitive layout.
+- **And much more:** Including toast notifications, confirmation modals, pull-to-refresh on mobile, and more.
+
+## 🛠️ Tech Stack
+
+| Area      | Technologies                                                                                             |
+| :-------- | :------------------------------------------------------------------------------------------------------- |
+| **Monorepo**  | [Turborepo](https://turbo.build/repo), [npm Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces) |
+| **Frontend**  | [Next.js](https://nextjs.org/), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/) |
+| **Backend**   | [Go](https://go.dev/), [Vercel Serverless Functions](https://vercel.com/docs/functions/serverless-functions), [GORM](https://gorm.io/) |
+| **Database**  | [Supabase](https://supabase.com/) (PostgreSQL + Auth)                                                    |
+| **Deployment**| [Vercel](https://vercel.com/), [GitHub Actions](https://github.com/features/actions) for CI/CD          |
+
+## 🚀 Getting Started
+
+Follow these steps to set up and run the project locally.
+
+### Prerequisites
 
 - Node.js (v18 or higher)
 - Go (v1.21 or higher)
 - npm (v8 or higher)
-- Supabase CLI
-- Docker (for local Supabase setup, optional)
+- [Supabase CLI](https://supabase.com/docs/guides/cli)
 
-### 1.2. Installation
+### Installation & Setup
 
-1. **Clone the repository:**
-
+1.  **Clone the repository:**
     ```bash
     git clone https://github.com/your-repo/open-socmed.git
     cd open-socmed
     ```
 
-2. **Install dependencies:**
-
+2.  **Install dependencies:**
     ```bash
     npm install
     ```
 
-3. **Set up environment variables:**
-    Create a `.env.local` file in the project root for frontend environment variables:
-
-    ```
-    NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-    ```
-
-    Create a `.env` file in the project root for backend environment variables:
-
-    ```
-    DATABASE_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:6543/postgres?pgbouncer=true"
-    DIRECT_URL="postgresql://postgres:YOUR_DB_PASSWORD@db.abcdefghijk.supabase.com:5432/postgres" # Use this for direct database connections, e.g., for debugging prepared statement issues in serverless environments.
-    SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
-    ```
-
-    **DO NOT COMMIT `.env` or `.env.local` files to the repository.**
-
-4. **Set up Supabase (Local or Remote):**
-    - **Remote Supabase:** Link your local project to a remote Supabase project:
-
-        ```bash
-        supabase login
-        supabase link --project-ref your-project-ref
-        ```
-
-    - **Local Supabase (using Docker):**
-
-        ```bash
-        supabase start
-        ```
-
-5. **Push database migrations:**
-
+3.  **Set up Supabase:**
+    You can either connect to a remote Supabase project or run one locally using Docker.
     ```bash
-    supabase db push --yes
+    # Login to Supabase
+    supabase login
+
+    # Link to your remote project OR start a local instance
+    supabase link --project-ref your-project-ref
+    # --- OR ---
+    supabase start
     ```
 
-### 1.3. Running the Development Server
+4.  **Set up Environment Variables:**
+    Create two files in the project root: `.env` and `.env.local`.
+    - Get the required URLs and Keys from your Supabase project dashboard.
+    - If running Supabase locally, use the keys provided in the terminal after running `supabase start`.
 
-To start both the frontend and backend development servers:
+    **For the Backend (`.env`):**
+    ```env
+    DATABASE_URL="YOUR_SUPABASE_DATABASE_URL_WITH_PGBOUNCER"
+    SUPABASE_JWT_SECRET="YOUR_SUPABASE_JWT_SECRET"
+    ```
+
+    **For the Frontend (`.env.local`):**
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_PROJECT_URL"
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+    ```
+    > **Note:** These `.env` files are ignored by Git and should not be committed.
+
+5.  **Push Database Migrations:**
+    Apply the database schema to your Supabase instance.
+    ```bash
+    supabase db push
+    ```
+
+### Running the Development Server
+
+Start the frontend and backend development servers concurrently.
 
 ```bash
 npm run dev
 ```
 
-This will typically run the Next.js frontend on `http://localhost:3000` (or `3001` if `3000` is in use) and the Go API functions will be served by Vercel CLI.
+The Next.js app will be available at `http://localhost:3000`, and Vercel CLI will serve the Go API functions.
 
-## 2. Features
+## 🏗️ Project Structure
 
-- **Authentication:** Secure user sign-up and sign-in using Supabase Auth.
-- **User Profiles:** View and edit user profiles with custom information.
-- **Social Graph:** Users can search for, follow, and unfollow other users.
-- **Dynamic Content:** Profile pages display dynamic lists of followers and following.
+The monorepo is organized into three main areas:
 
-## 3. Project Structure & Conventions
+-   **`apps/web`**: The main Next.js frontend application.
+-   **`api/`**: The backend API, consisting of Vercel Serverless Functions written in Go. Each sub-directory is a separate, self-contained serverless function.
+-   **`packages/ui`**: A shared library for common React/Tailwind components used in the web app.
 
-This project follows a monorepo structure managed by Turborepo. Understanding its layout and conventions is crucial for effective contribution.
+## 🤝 Contributing
 
-### 2.1. Core Directories
+We welcome contributions! Please follow these guidelines to ensure a smooth development process.
 
-- **`apps/`**: Contains independent applications within the monorepo.
-  - **`apps/web`**: The Next.js frontend application. The 'Stories' section has been removed from the home page.
-- **`api/`**: Contains Go serverless functions deployed via Vercel.
-  - Each subdirectory within `api/` (e.g., `api/profile`, `api/health`) represents a distinct serverless function.
-  - Each function directory must contain a single `index.go` file with a `Handler` function and its own `go.mod`.
-- **`packages/`**: Contains shared code and components used across different applications.
-  - **`packages/ui`**: Shared React/Tailwind components.
-  
-### 2.2. Naming Conventions & File Creation
+### Commit Messages
 
-To maintain consistency and Vercel compatibility, please adhere to the following:
+All commits **must** adhere to the [Semantic Commit Messages](https://www.conventionalcommits.org/en/v1.0.0/) standard.
 
-- **Go Serverless Functions (`api/`):**
-  - **Directory Structure:** Each new API endpoint should reside in its own subdirectory under `api/` (e.g., `api/your_new_endpoint/`).
-  - **File Naming:** The main entry file for each function must be `index.go`. **All Go code for a given serverless function (including database connection, GORM models, helper functions, and structs) must be consolidated into this single `index.go` file.**
-  - **Package Naming:** The `index.go` file must declare a package name that **exactly matches its parent directory name** (e.g., `package profile` inside `api/profile/`). Using `package main` or a generic `package handler` will cause build failures.
-  - **Handler Function:** The entry point for Vercel must be a public function named `Handler(w http.ResponseWriter, r *http.Request)`.
-  - **`go.mod`:** Each function directory (`api/your_new_endpoint/`) must have its own `go.mod` file, managing its specific dependencies.
+-   **Format:** `<type>(<scope>): <subject>`
+-   **Example:** `feat(profile): add endpoint for updating user profiles`
+-   **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
+-   **Scopes:** `web`, `api`,- `ui`, `docs`, `monorepo`, `auth`, `post`, etc.
 
-- **Frontend Components (`apps/web` & `packages/ui`):**
-  - Follow standard Next.js and React conventions.
-  - Use PascalCase for React component files (e.g., `MyComponent.tsx`).
-  - Use kebab-case for utility files or non-component modules (e.g., `utils/helpers.ts`).
+### Development Workflow
 
-- **Next.js Metadata and Layouts:**
-  - Page titles and metadata are managed using Next.js 14's Metadata API.
-  - The root `apps/web/app/layout.tsx` is a Server Component and defines global metadata.
-  - Route-specific metadata is defined in `layout.tsx` files within each route's directory (e.g., `apps/web/app/auth/signin/layout.tsx`).
-  - Client-side logic (e.g., `usePathname`) from the root layout has been extracted into `apps/web/app/ClientLayoutContent.tsx` to allow the root layout to remain a Server Component.
-
-### 2.3. Responsive Design & UI/UX
-
-The frontend has been significantly refactored to ensure a professional, clean, and fully responsive user experience across all devices. Key improvements include:
-
-- **Mobile-First Approach:** Layouts are designed for mobile first and then scaled up for tablets and desktops.
-- **Responsive Components:** Core components like the `Sidebar` (which is now always visible on desktop and a mobile-only bottom navigation bar) and navigation elements adapt to different screen sizes.
-- **Optimized Pages:** All major pages, including the Home feed, Profile view/edit, and Sign In/Up forms, have been optimized for readability and ease of use on smaller screens.
-- **Home Page Enhancements:**
-  - **Desktop Suggested Features:** The "Suggested Features" section remains visible in its original position on desktop views.
-  - **Floating Suggested Features (Mobile):** On mobile devices, the "Suggested Features" section is now accessible via a floating icon in the bottom-left corner. Tapping the icon reveals a compact menu (max 3 items) with smooth, spring-like animations, ensuring it doesn't obstruct the main timeline.
-  - **Pull-to-Refresh (Mobile):** The mobile timeline now supports a "pull-to-refresh" gesture. Pulling down from the top of the timeline reveals a refresh icon with a fluid, semi-transparent background that expands as the screen is pulled, and releasing it triggers a page refresh.
-  - **Desktop Refresh:** On desktop, refreshing the home page can be done by clicking the "Cirqle" text in the sidebar.
-- **Structured Layouts:** Pages are organized into clear, logical sections to improve user comprehension and interaction flow.
-- **Conditional Rendering:** The sidebar and mobile navigation are now conditionally rendered only on the `/home` page, ensuring other pages maintain their full width and centered content.
-
-### 2.4. General Tips for Contributors
-
-- **`vercel dev`:** When running locally, ensure your `vercel.json` is correctly configured to route requests to both frontend and Go API functions.
-- **`go.mod` Management:** Always run `go mod tidy` within the specific Go module directory after adding or removing dependencies.
-- **Linting & Formatting:** Before committing, always run `npm run lint` and `npm run format` from the project root to ensure code consistency.
-- **Testing:** If applicable, write and run tests for your changes.
-
-### 2.4. API Development Guidelines
-
-To create a new Go serverless API function that is compatible with Vercel and adheres to the project's conventions, follow these steps:
-
-1. **Create Function Directory:**
-    - Inside the `api/` directory at the project root, create a new subdirectory for your API endpoint.
-    - **Example:** For a `/api/posts` endpoint, create `api/posts/` (this will be the module name).
-
+1.  **Create a branch:** Create a new feature branch from `develop`.
+2.  **Make changes:** Implement your feature or bug fix.
+3.  **Lint and Build:** Before committing, always run the linter and build the project to catch errors.
     ```bash
-    mkdir -p api/posts
+    npm run lint
+    npm run build
     ```
+4.  **Commit your changes:** Follow the semantic commit guidelines.
+5.  **Push and create a Pull Request:** Push your branch to the repository and open a PR against the `develop` branch.
 
-2. **Create `index.go` File (Consolidated Code):**
-    - Inside the new function directory (`api/posts/`), create a file named `index.go`.
-    - **`index.go` Content:**
-        - Use `package <function_directory_name>` (e.g., `package posts`).
-        - Define a `Handler(w http.ResponseWriter, r *http.Request)` function as the main entry point.
-        - **Crucially, all Go code (including database connection, GORM models, helper functions, and structs) directly related to this serverless function should be placed within this single `index.go` file.** This ensures Vercel's builder correctly compiles all necessary components.
-    - **Example `api/posts/index.go` (Illustrative - actual content will vary based on API logic):**
+### API Development Guide (Go)
 
-    ```go
-    package posts
+To create a new Go serverless API function that is compatible with Vercel, follow these steps:
 
-    import (
-        "encoding/json"
-        "net/http"
-        "log"
-        "os"
-        "sync"
-        "time"
+1.  **Create Function Directory**: Inside the `api/` directory, create a new subdirectory for your endpoint (e.g., `api/new-feature/`).
 
-        "github.com/joho/godotenv"
-        "gorm.io/driver/postgres"
-        "gorm.io/gorm"
-        "github.com/google/uuid"
-        // Add other necessary imports here
-    )
+2.  **Create `index.go` File**:
+    -   Inside the new directory, create an `index.go` file.
+    -   The package name **must** match the directory name (e.g., `package new_feature`).
+    -   The entry point must be a `Handler` function: `func Handler(w http.ResponseWriter, r *http.Request)`.
+    -   **Crucially, all Go code for the function (db connection, models, helpers) should be in this single `index.go` file to ensure Vercel builds it correctly.**
 
-    // Database connection variables (if needed for this function)
-    var (
-        db   *gorm.DB
-        once sync.Once
-    )
+3.  **Create `go.mod`**:
+    -   Inside the function directory, create a `go.mod` file.
+    -   The module name should match the directory name (e.g., `module new_feature`).
+    -   Add your dependencies here.
 
-    // Connect initializes the database connection (if needed for this function)
-    func Connect() (*gorm.DB, error) {
-        var err error
-        once.Do(func() {
-            if os.Getenv("VERCEL_ENV") == "" {
-                err = godotenv.Load()
-                if err != nil {
-                    log.Println("Warning: .env file not found, relying on environment variables")
-                }
-            }
-            // For local development or debugging prepared statement issues, you might use DIRECT_URL.
-            // In production, DATABASE_URL (with pgbouncer) is generally preferred for connection pooling.
-            dsn := os.Getenv("DIRECT_URL") // Use DIRECT_URL for direct connection
-            if dsn == "" {
-                dsn = os.Getenv("DATABASE_URL") // Fallback to DATABASE_URL if DIRECT_URL is not set
-            }
-            if dsn == "" {
-                log.Fatal("FATAL: Neither DIRECT_URL nor DATABASE_URL environment variable is set")
-            }
-            db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-                PrepareStmt: false, // Disable prepared statement caching for serverless environment
-            })
-            if err != nil {
-                log.Fatalf("FATAL: Failed to connect to database: %v", err)
-            }
-
-            sqlDB, err := db.DB()
-            if err != nil {
-                log.Fatalf("FATAL: Failed to get underlying sql.DB: %v", err)
-            }
-            sqlDB.SetMaxIdleConns(1) // Keep very few idle connections
-            sqlDB.SetMaxOpenConns(1) // Limit total open connections
-            sqlDB.SetConnMaxLifetime(time.Minute) // Short lifetime
-
-            log.Println("Database connection successful and pool established.")
-        })
-        if err != nil {
-            return nil, err
-        }
-        return db, nil
-    }
-
-    // GetDB returns the existing database connection pool (if needed for this function)
-    func GetDB() (*gorm.DB, error) {
-        if db == nil {
-            return Connect()
-        }
-        return db
-    }
-
-    // Example GORM Model (if needed for this function)
-    type Post struct {
-        ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"` // Ensure ID type matches database (e.g., uuid.UUID)
-        Content   string    `json:"content"`
-        AuthorID  uuid.UUID `json:"author_id"`
-        CreatedAt time.Time `json:"created_at"`
-        // For nullable fields, use pointers (e.g., *string, *time.Time)
-    }
-
-    // Handler is the main entry point for the serverless function
-    func Handler(w http.ResponseWriter, r *http.Request) {
-        if r.Method != http.MethodGet {
-            http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-            return
-        }
-        // Example: Fetch posts from DB
-        // db, err := GetDB()
-        // if err != nil { /* handle error */ }
-        // var posts []Post
-        // db.Find(&posts)
-
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(map[string]string{"message": "Posts API endpoint"})
-    }
-    ```
-
-3. **Create `go.mod` for the New Function:**
-    - Inside the new function directory (`api/posts/`), create a file named `go.mod`.
-    - **`go.mod` Content:**
-        - `module <function_directory_name>` (e.g., `module posts`).
-        - Specify the Go version (e.g., `go 1.21`).
-        - Add `require` directives for any dependencies used by this function.
-    - **Example `api/posts/go.mod`:**
-
-    ```go
-    module posts
-
-    go 1.21
-
-    require (
-        // Add your dependencies here, e.g.,
-        // github.com/joho/godotenv v1.5.1
-        // gorm.io/gorm v1.30.1
-        // gorm.io/driver/postgres v1.6.0
-        // github.com/google/uuid v1.6.0
-    )
-    ```
-
-4. **Update `vercel.json`:**
-    - Add a new entry in the `builds` section of `vercel.json` for your new API function.
-    - **Example Addition in `vercel.json`:**
-
-    ```json
-    {
-      "version": 2,
-      "builds": [
-        // ... existing builds
+4.  **Update `vercel.json`**:
+    -   Add a new entry to the `builds` array in the root `vercel.json` file:
+        ```json
         {
-          "src": "api/posts/index.go", // Path to your new function's index.go
+          "src": "api/new-feature/index.go",
           "use": "@vercel/go"
         }
-      ]
-      // No need for explicit "routes" or "rewrites" for API functions
-      // if they are placed directly under the top-level "api/" directory.
-    }
-    ```
+        ```
 
-5. **Run `go mod tidy`:**
-    - Navigate to your new function directory and run `go mod tidy` to manage dependencies and generate `go.sum`.
+5.  **Tidy Dependencies**:
+    -   Run `go mod tidy` inside your new function's directory.
 
     ```bash
-    cd api/posts
+    cd api/new-feature
     go mod tidy
     ```
 
-6. **Test Locally:**
-    - From the project root, run `vercel dev` and test your new API endpoint (e.g., `http://localhost:3000/api/posts`).
+### Frontend Development Guide (Next.js)
 
-### 2.5. General File/Folder Creation Rules
-
-#### For Frontend (`apps/web`)
-
-- **React Components:**
-  - Use **PascalCase** for component file names (e.g., `MyNewComponent.tsx`).
-  - Place components in relevant directories (e.g., `apps/web/components/`, or within `app/` directory if it's part of a specific page/layout).
-- **Next.js Pages:**
-  - Create new directories under `apps/web/app/` corresponding to your URL path (e.g., `apps/web/app/dashboard/`).
-  - Inside, create a `page.tsx` file as the entry point for that page.
-- **Utilities/Hooks/Libs:**
-  - Use **kebab-case** or **camelCase** for file names (e.g., `utils/helpers.ts`).
-  - Place them in `apps/web/lib/`, `apps/web/utils/`, or `apps/web/hooks/` based on their function.
-
-#### For Shared UI Components (`packages/ui`)
-
-- **React Components:**
-  - Use **PascalCase** for component file names (e.g., `Button.tsx`).
-  - Place directly in the root of `packages/ui/` or within subdirectories if there's a logical grouping (e.g., `packages/ui/forms/Input.tsx`).
-- **Dependencies:**
-  - Add new dependencies to `packages/ui/package.json`.
-  - Run `npm install` at the project root after modifying `package.json`.
-
-## 3. Contributing
-
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
-
-## 4. License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+-   **Components**: Use **PascalCase** for component files (`MyComponent.tsx`) and place them in `apps/web/components/` or `packages/ui/`.
+-   **Pages**: Create new page routes by creating a folder under `apps/web/app/` and adding a `page.tsx` file.
+-   **Utilities**: Use **kebab-case** or **camelCase** for utility files (e.g., `lib/utils.ts`).

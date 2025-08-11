@@ -26,19 +26,19 @@ export default function ClientLayoutContent({
 
   const handlePostCreated = (newPost: any) => {
     console.log('New post created:', newPost);
-    // This function is called by CreatePost.
-    // The actual redirection will be handled by the onClose callback passed to CreatePost.
-  };
+    setIsCreatePostOpen(false); // Close modal on success
 
-  const handleCloseCreatePost = () => {
-    setIsCreatePostOpen(false);
-    // Only redirect if not on the home page and it's a mobile post creation
+    // Only redirect if the user was not on the home page.
     if (pathname !== '/home') {
       // Delay the redirect slightly to allow modal closing animation and toast to be seen
       setTimeout(() => {
         router.push('/home');
-      }, 2000); // Adjust delay as needed (e.g., toast duration + modal close animation)
+      }, 2000); // Shorter delay, just for animations
     }
+  };
+
+  const handleCloseCreatePost = () => {
+    setIsCreatePostOpen(false); // This function now *only* closes the modal.
   };
 
   return (
@@ -53,17 +53,27 @@ export default function ClientLayoutContent({
       <AnimatePresence>
         {isCreatePostOpen && (
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-x-0 bottom-0 bg-background-dark/90 backdrop-blur-lg p-4 rounded-t-2xl shadow-lg z-50 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center md:hidden"
+            onClick={handleCloseCreatePost}
           >
-            <CreatePost
-              onPostCreated={handlePostCreated}
-              onClose={handleCloseCreatePost} // Pass the modified handler directly
-              isMobile={true}
-            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+              className="w-full bg-background-dark p-4 rounded-t-2xl shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CreatePost
+                onPostCreated={handlePostCreated}
+                onClose={handleCloseCreatePost}
+                isMobile={true}
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
