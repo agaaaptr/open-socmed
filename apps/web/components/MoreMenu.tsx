@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LogOut, HelpCircle, MessageSquareWarning, Bell, UserCircle, ChevronRight } from 'lucide-react';
+import { LogOut, HelpCircle, Settings2, Bell, UserCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -63,7 +63,7 @@ export default function MoreMenu({ onClose }: MoreMenuProps) {
   const menuItems = [
     { label: 'Notifications', icon: <Bell className="w-5 h-5 text-text-muted" />, href: '/notifications' },
     { label: 'Profile', icon: <UserCircle className="w-5 h-5 text-text-muted" />, href: userProfile ? `/profile/${userProfile.username}` : '/profile' },
-    { label: 'Settings', icon: <MessageSquareWarning className="w-5 h-5 text-text-muted" />, href: '/settings' },
+    { label: 'Settings', icon: <Settings2 className="w-5 h-5 text-text-muted" />, href: '/settings' },
   ];
 
   const menuVariants = {
