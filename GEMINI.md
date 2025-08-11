@@ -365,6 +365,27 @@ This project is developed in structured stages to ensure organized progress.
 - [ ] **VS Code Extension:** Guide the user on how to connect the official Supabase VS Code extension to the running local instance for database management and log streaming.
 - [ ] **Update `README.md`:** Add a new section to the main `README.md` detailing the end-to-end local setup process for future reference.
 
+### 5.10. Critical Decision: Vercel Serverless Function Limit
+
+**Problem:**
+The project has reached the Vercel Hobby plan's limit of 12 Serverless Functions. With the addition of the notification API endpoints (`api/notifications` and `api/mark-notifications-as-read`), the total number of Go serverless functions now exceeds this limit, preventing successful deployment on Vercel's free tier.
+
+**Options:**
+
+1.  **Upgrade Vercel Plan:**
+    *   **Description:** Upgrade the Vercel account to a Pro plan (or higher) to remove the serverless function limit.
+    *   **Pros:** Simplest solution, maintains current monorepo structure and Vercel-centric deployment for both frontend and backend.
+    *   **Cons:** Incurs monthly cost.
+
+2.  **Separate Go Backend Deployment:**
+    *   **Description:** Consolidate all Go backend API functions into a single, conventional Go HTTP application and deploy it to a separate hosting provider (e.g., Render, Railway, Fly.io) that offers free/generous tiers.
+    *   **Pros:** Avoids Vercel plan upgrade cost, potentially offers more control over the backend environment.
+    *   **Cons:** Requires significant refactoring of the Go backend code (from multiple serverless functions to a single HTTP server with routing), introduces a separate deployment pipeline for the backend, and requires updating frontend API calls to point to the new backend URL.
+
+**Decision Required:**
+This is a critical architectural decision that needs to be made before further development can proceed. The choice will impact the project's cost, complexity, and deployment strategy.
+
+
 ## 6. Commit Rules (Semantic Commits)
 
 All commits in this project **must** adhere to the Semantic Commit Messages standards to maintain a clean and readable Git history. Each commit message must follow the format:

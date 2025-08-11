@@ -26,6 +26,7 @@
 | **Backend**   | [Go](https://go.dev/), [Vercel Serverless Functions](https://vercel.com/docs/functions/serverless-functions), [GORM](https://gorm.io/) |
 | **Database**  | [Supabase](https://supabase.com/) (PostgreSQL + Auth)                                                    |
 | **Deployment**| [Vercel](https://vercel.com/), [GitHub Actions](https://github.com/features/actions) for CI/CD          |
+> **Note:** This project currently exceeds the Vercel Hobby plan's serverless function limit. Refer to `GEMINI.md` for details and solutions.
 
 ## 🚀 Getting Started
 
